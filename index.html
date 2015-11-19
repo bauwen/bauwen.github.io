@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>BS oefenen!</title>
+<body style="font-family: Calibri">
+
+<br><span id="info">De database is aan het laden...</span><br><br>
+<button id="button" onclick="flashcard()" style="margin-left: 10px;">Starten maar!</button><br><br><br>
+Vraag:<br><div id="question" style="border: 1px solid black; min-height: 20px; padding: 5px;"></div><br>
+Antwoord:<br><div id="answer" style="border: 1px solid black; min-height: 50px; padding: 5px;"></div><br><br>
+<a href="https://docs.google.com/spreadsheets/d/1U0taroJIMFQgwVYnYRif5GATPN2SsA4esnfBwnO39Dc/export?gid=0&format=csv" 
+   style="text-decoration: none; border: 2px solid purple; border-radius: 5px; padding: 5px; background: rgba(180, 0, 180, 0.2)">Download database</a>
+
+<script>
+var database = []
+
+function readCSV(CSV) {
+    // Noot: We nemen aan dat er geen fouten zitten in de CSV
+    
+    var escape = false;
+    var quote = false;
+    var entry = [];
+    var token = "";
+    
+    for (var i = 0, len = CSV.length; i < len; i += 1) {
+        var character = CSV.charAt(i);
+        
+        switch (character) {
+        case '"':
+            if (quote) {
+                token += '"';
+                quote = false;
+            } else {
+                quote = true;
+            }
+            
+            break;
+            
+        case ",":
+            if (escape) {
+                token += ",";
+            } else {
+                entry.push(token)
+                token = "";
+            }
+            
+            break
+            
+        case "\n":
+            if (escape) {
+                token += "\n";
+            } else {
+                entry.push(token);
+                token = "";
+                database.push(entry);
+                entry = [];
+            }
+            
+            break;
+            
+        default:
+            token += character;
+        }
+        
+        if (character != '"' && quote) {
+            escape = !escape;
+            quote = false;
+        }
+    }
+    
+    entry.push(token);
+    database.push(entry);
+    document.getElementById("info").innerHTML = "Er zijn " + database.length + " mogelijke vragen.";
+}
+
+
+// Het CSV-bestand ophalen van Google Docs
+
+var request = new XMLHttpRequest();
+
+request.onreadystatechange = function () {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
+            readCSV(request.responseText);
+        } else {
+            document.write("<br>Oeps...<br><br>De pagina is er niet in geslaagd het CSV-bestand van besturingssystemen te verkrijgen.<br><br>- Ben je er zeker van dat je verbonden bent met het internet?<br>- Is het oorspronkelijke <a href='https://docs.google.com/spreadsheets/d/1U0taroJIMFQgwVYnYRif5GATPN2SsA4esnfBwnO39Dc' target='_blank'>Google Document</a> misschien verplaatst of verwijderd?<br><br>...probeer eventueel opnieuw.");
+        }
+    }
+};
+
+request.open("GET", "https://docs.google.com/spreadsheets/d/1U0taroJIMFQgwVYnYRif5GATPN2SsA4esnfBwnO39Dc/export?gid=0&format=csv", true);
+request.send(null);
+
+
+// Het flashcard-programma
+
+var button = document.getElementById("button");
+var question = document.getElementById("question");
+var answer = document.getElementById("answer");
+var toggle = false;
+var current;
+
+function flashcard() {
+    if (toggle) {
+        var explanation = database[current][2];
+        
+        answer.innerHTML = explanation;
+        button.innerHTML = "Volgende...";
+    } else {
+        current = Math.floor(Math.random() * database.length);
+        
+        var chapter = database[current][0];
+        var concept = database[current][1];
+        
+        answer.innerHTML = "";
+        question.innerHTML = "Uit <b>" + chapter + "</b>, wat weet je over <b>" + concept + "</b>?";
+        button.innerHTML = "Bekijk antwoord";
+    }
+    
+    toggle = !toggle;
+}
+</script>
+
+</body>
+</html>
