@@ -117,7 +117,6 @@
 </div>
 
 <script>
-console.log(location);
 var settingscontainer = document.getElementById("settingscontainer");
 var store_browser = document.getElementById("store_browser");
 var store_server = document.getElementById("store_server");
@@ -157,6 +156,8 @@ var currentGenre;
 var currentRate;
 var season = 1;
 var serieURL = "";
+
+var serverURL = "http://" + window.location.href.slice(window.location.href.indexOf('?') + 1) + ":3000/";
 
 query_start.onkeydown = function (event) {
     var key = event.keyCode || event.which;
@@ -223,7 +224,7 @@ var search = function (input) {
     
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -337,7 +338,7 @@ var choose = function (n) {
     
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -394,7 +395,7 @@ var showFilm = function (json) {
 var getFilm = function () {
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -518,7 +519,7 @@ var getSeason = function (s) {
     
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -586,7 +587,7 @@ var getEpisode = function(n) {
     
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -618,7 +619,7 @@ var getAnother = function () {
     
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -881,7 +882,7 @@ var escapeHTML = function (str) {
 var loadWatchStatus = function () {
     var xhr = new XMLHttpRequest();
     
-    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.open("POST", serverURL, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -910,7 +911,7 @@ var saveWatchStatus = function () {
     if (localStorage.getItem("__extern_bewaren__") !== null) {
         var xhr = new XMLHttpRequest();
         
-        xhr.open("POST", "http://192.168.0.100:3000/", true);    
+        xhr.open("POST", serverURL, true);    
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.send("event=savewatchstatus&data=" + JSON.stringify(localStorage));
     }
