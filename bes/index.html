@@ -1,0 +1,947 @@
+﻿<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="http://g2f.nl/013tozd">
+    <title>Netchips</title>
+    <style>
+        body {
+            background: rgb(30, 30, 30);
+            background-image: url("http://g2f.nl/03u34bq");
+            font: 18px Verdana;
+            color: rgb(230, 230, 230);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        
+        #asettings {
+            text-decoration: none;
+            outline: none;
+            color: rgba(230, 80, 40, 0.2);
+        }
+        
+        #asettings:hover {
+            color: rgb(20, 180, 200);
+        }
+        
+        .atitle {
+            text-decoration: none;
+            outline: none;
+            color: rgb(220, 220, 220);
+        }
+        
+        .atitle:hover {
+            color: rgb(20, 180, 80);
+        }
+        
+        .awatched {
+            text-decoration: none;
+            outline: none;
+            color: rgb(230, 80, 40);
+        }
+        
+        .awatched:hover {
+            color: rgb(20, 180, 80);
+        }
+        
+        #list {
+            list-style-type: none;
+            font: 16px Verdana;
+            font-weight: bold;
+            color: rgb(230, 230, 230);
+            margin: 12vh 6vh 8vh 0vh;
+        }
+        
+        #list li {
+            border-radius: 0px;
+            border: 4px solid rgba(0, 0, 0, 0.7);
+            padding: 10px 10px;
+            margin: 15px 0px;
+        }
+        
+        #list li:nth-child(odd) {
+            background: rgba(0, 140, 220, 0.4);
+        }
+        
+        #list li:nth-child(even) {
+            background: rgba(0, 140, 220, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div style="margin: 6vh 10vh 16vh 10vh">
+    <div id="page_start" style="display: block">
+        <span id="settingscontainer" style="display: none; float: left">
+            <span style="color: rgb(20, 180, 200)">Informatie opslaan...</span>&nbsp;&nbsp;
+            in browser <input id="store_browser" type="radio" name="type_store" checked> 
+            <input id="store_server" type="radio" name="type_store"> op serverlocatie
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="clearWatchStatus()">Informatie wissen</button>
+        </span>
+        <div align="right">
+        <span><a id="asettings" href="javascript:void(0)" onclick="toggleSettingsDisplay()">Instellingen</a></span>
+        </div>
+        
+        <div style="margin-top: 16vh" align="center">
+            <span style="font: 128px monospace; font-weight: bold; color: rgb(220, 0, 0);">Netchips</span><br><br><br>
+            <input id="query_start" type="text" size="28" style="font: 24px Verdana; font-weight: bold; padding-left: 10px;" autofocus>
+            <button style="font: 24px Verdana;" onclick="search('start')">🔍</button><br><br>
+            Films <input id="type_start" type="radio" name="type_start" checked> <input type="radio" name="type_start"> Series
+        </div>
+    </div>
+
+    <div id="page_search" style="display: none">
+        <input id="query_search" type="text" size="24" style="font: 18px Verdana; font-weight: bold; padding-left: 10px;">
+        <button style="font: 18px Verdana;" onclick="search('search')">🔍</button>&nbsp;&nbsp;&nbsp;
+        Films <input id="type_search" type="radio" name="type_search"> <input id="type_search_series" type="radio" name="type_search"> Series
+        <span id="note" style="font: 16px Verdana; font-style: italic; color: rgb(230, 100, 100); float: right"></span>
+        
+        <div id="infodiv" style="margin-top: 8vh; margin-bottom: 4vh"></div>
+        <div id="videotitle" align="center" style="font: 32px Verdana; font-weight: bold; margin: 64px 0px 36px 0px; color: rgb(200, 200, 200);"></div>
+        
+        <div id="playertable" style="display: none">
+        <div id="playerdiv" align="center">
+            <center><video id="player" width="640" preload="auto" src="" style="display: none; background: black; border: 3px solid black" controls></video>
+        </div>
+        </div>
+        
+        <div style="margin-top: 16px">
+            <div id="previousdiv" style="float: left"></div>
+            <div id="nextdiv" style="float: right"></div>
+        </div>
+        
+        <div id="tools" align="center"></div>
+        <ul id="list"></ul>
+        <div id="footnote" align="center" style="font: 16px Verdana; color: rgb(230, 100, 100); margin-top: 96px"></div>
+    </div>
+</div>
+
+<script>
+console.log(location);
+var settingscontainer = document.getElementById("settingscontainer");
+var store_browser = document.getElementById("store_browser");
+var store_server = document.getElementById("store_server");
+
+var page_start = document.getElementById("page_start");
+var page_search = document.getElementById("page_search");
+var query_start = document.getElementById("query_start");
+var query_search = document.getElementById("query_search");
+var type_start = document.getElementById("type_start");
+var type_search = document.getElementById("type_search");
+
+var note = document.getElementById("note");
+var infodiv = document.getElementById("infodiv");
+var videotitle = document.getElementById("videotitle");
+var playertable = document.getElementById("playertable");
+var previousdiv = document.getElementById("previousdiv");
+var playerdiv = document.getElementById("playerdiv");
+var nextdiv = document.getElementById("nextdiv");
+var player = document.getElementById("player");
+var tools = document.getElementById("tools");
+var list = document.getElementById("list");
+var footnote = document.getElementById("footnote");
+
+var series = false;
+var query = "";
+var titles;
+var imgs;
+var urls;
+var release;
+var genres;
+var rates;
+var currentTitle;
+var currentImage;
+var currentURL;
+var currentRelease;
+var currentGenre;
+var currentRate;
+var season = 1;
+var serieURL = "";
+
+query_start.onkeydown = function (event) {
+    var key = event.keyCode || event.which;
+    
+    if (key == "13") {
+        event.preventDefault();
+        search("start");
+    }
+};
+
+query_search.onkeydown = function (event) {
+    var key = event.keyCode || event.which;
+    
+    if (key == "13") {
+        event.preventDefault();
+        search("search");
+    }
+};
+
+store_browser.onchange = function () {
+    if (store_browser.checked) {
+        if (localStorage.getItem("__extern_bewaren__") !== null) {
+            localStorage.removeItem("__extern_bewaren__");
+        }
+    }
+};
+
+store_server.onchange = function () {
+    if (store_server.checked) {
+        loadWatchStatus();
+    }
+};
+
+var search = function (input) {
+    var value, checked;
+    
+    switch (input) {
+    case "start":
+        query = query_start.value;
+        series = !type_start.checked;
+        page_start.style.display = "none";
+        page_search.style.display = "block";
+        query_search.value = query;
+        
+        if (series) {
+            document.getElementById("type_search_series").checked = true;
+        } else {
+            type_search.checked = true;
+        }
+        
+        break;
+        
+    case "search":
+        query = query_search.value;
+        series = !type_search.checked;
+        break;
+    }
+    
+    if (query === "") {
+        return;
+    }
+    
+    clearList();
+    
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                showSuggestions(xhr.responseText);
+            } else {
+                showSuggestions(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+    if (series) {
+        xhr.send("event=searchseries&query=" + encodeURIComponent(query));
+        note.innerHTML = "Zoeken naar series...";
+    } else {
+        xhr.send("event=searchfilms&query=" + encodeURIComponent(query));
+        note.innerHTML = "Zoeken naar films...";
+    }
+};
+
+var showSuggestions = function (json) {
+    clearList();
+    
+    if (json === null) {
+        note.innerHTML = "Kan geen verbinding maken met de server";
+        return;
+    }
+    
+    var post = JSON.parse(json);
+    
+    if (!post["Valid"]) {
+        note.innerHTML = post["Message"];
+        return;
+    }
+    
+    titles = post["Titles"];
+    urls = post["Urls"];
+    imgs = post["Imgs"];
+    
+    if (!series) {
+        releases = post["Releases"];
+        genres = post["Genres"];
+        rates = post["Rates"];
+    }
+    
+    if (titles === null) {
+        if (series) {
+            note.innerHTML = "Geen series gevonden voor '" + escapeHTML(query) + "'";
+            footnote.innerHTML = "Wees er zeker van dat de serietitel juist is ingevuld.";
+        } else {
+            note.innerHTML = "Geen films gevonden voor '" + escapeHTML(query) + "'";
+            footnote.innerHTML = "Wees er zeker van dat de filmtitel juist is ingevuld.";
+        }
+        
+        return;
+    } else {
+        if (series) {
+            footnote.innerHTML = "Staat de serie er niet bij? Wees er zeker van dat de serietitel juist is ingevuld.";
+        } else {
+            footnote.innerHTML = "Staat de film er niet bij? Wees er zeker van dat de filmtitel juist is ingevuld.";
+        }
+    }
+    
+    for (var i = 0; i < titles.length; i += 1) {
+        var label = document.createElement("li");
+        var watchedHTML;
+        
+        if (localStorage.getItem(titles[i]) !== null) {
+            watchedHTML = "<td name='watched' style='color: rgb(20, 180, 80);'>Reeds bekeken</td>";
+        } else {
+            watchedHTML = "<td name='watched'>Nog niet bekeken</td>";
+        }
+        
+        if (series) {
+            label.innerHTML = '<div style="height: 100px;"><a class="atitle" href="javascript:void(0)" onclick="choose(' + i + ')" style="float: left;"><table><tr><td style="width: 90px;"><img src="' + imgs[i] + '" height="94"></img></td><td style="width: 64px;"></td><td>' + titles[i] + '</td><td style="width: 0px;"></td><td></td></tr></table></a><a class="awatched" href="javascript:void(0)" onclick="toggleWatched(' + "`" + titles[i] + "`" + ', ' + i + '); return false;" style="float: right; text-align: right;"><table style="margin: 12px 12px 0px 0px;"><tr><td style="height: 24px;"></td></tr><tr>' + watchedHTML + '</tr></table></a></div>';
+        } else {
+            if (Math.floor(parseFloat(rates[i])) == 0) {
+                rates[i] = "n/a"
+            } else {
+                rates[i] = rates[i].replace(".", ",") + "/10";
+            }
+            
+            label.innerHTML = '<div style="height: 100px;"><a class="atitle" href="javascript:void(0)" onclick="choose(' + i + ')" style="float: left;"><table><tr><td style="width: 90px;"><img src="' + imgs[i] + '" height="94"></img></td><td style="width: 64px;"></td><td>' + titles[i] + '</td><td style="width: 0px;"></td><td></td></tr></table></a><a class="awatched" href="javascript:void(0)" onclick="toggleWatched(' + "`" + titles[i] + "`" + ', ' + i + '); return false;" style="float: right; text-align: right;"><table style="margin: 12px 12px 0px 0px;"><tr><td style="color: rgb(0, 200, 200);">' + genres[i] + '</td></tr><tr><td style="color: rgb(200, 200, 0);">★ ' + rates[i] + '</td></tr><tr>' + watchedHTML + '</tr></table></a></div>';
+        }
+        
+        list.appendChild(label);
+    }
+    
+    if (series) {
+        note.innerHTML = "Kies de serie die je wilt bekijken:";
+    } else {
+        note.innerHTML = "Kies de film die je wilt bekijken:";
+    }
+};
+
+var choose = function (n) {
+    currentTitle = titles[n];
+    currentImage = imgs[n];
+    currentURL = urls[n];
+    
+    if (!series) {
+        currentRelease = releases[n];
+        currentGenre = genres[n];
+        currentRate = rates[n];
+    } else {
+        serieURL = currentURL;
+    }
+    
+    clearList();
+    
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                if (series) {
+                    showSerie(xhr.responseText);
+                    getSeason(1);
+                } else {
+                    showFilm(xhr.responseText);
+                    getFilm();
+                }
+            } else {
+                showVideo(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+    if (series) {
+        xhr.send("event=findserie&url=" + encodeURIComponent(currentURL));
+        note.innerHTML = "Zoeken naar serie...";
+    } else {
+        xhr.send("event=findfilm&url=" + encodeURIComponent(currentURL));
+        note.innerHTML = "Zoeken naar film...";
+    }
+};
+
+var showFilm = function (json) {
+    if (json === null) {
+        note.innerHTML = "Kan geen verbinding maken met de server";
+        return;
+    }
+    
+    var post = JSON.parse(json);
+    
+    localStorage.setItem(currentTitle, "bekeken");
+    saveWatchStatus();
+    
+    description = post["Description"];
+    trailer = post["Trailer"];
+    
+    var trailerHTML;
+    
+    if (trailer === "") {
+        trailerHTML = '';
+    } else {
+        trailerHTML = '<br><a class="atitle" href="' + trailer + '" target="_blank" style="float: left">Bekijk trailer</a>'
+    }
+    
+    note.innerHTML = "";
+    infodiv.innerHTML = '<table style="width: 100%; border: 4px solid black; padding: 12px 24px 12px 12px; background: rgba(0, 20, 20, 0.3);"><tr><td><img src="' + currentImage + '" width="81"></img></td><td style="width: 12px"></td><td style="font-size: 14px;"><div style="float: left;">Genre: <span style="color: rgb(0, 160, 160); font-weight: bold;">' + currentGenre + '</span></div>&nbsp;&nbsp;&nbsp;&nbsp;<div style="float: right;"><span style="color: rgb(160, 160, 0); font-weight: bold;">★ ' + currentRate + '</span></div><br>Datum van publicatie: <span style="color: rgb(0, 160, 160); font-weight: bold;">' + currentRelease + '</span><br><br><i>' + description + '</i></td></tr></table>' + trailerHTML;
+};
+
+var getFilm = function () {
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                showVideo(xhr.responseText);
+            } else {
+                showVideo(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("event=findfilmvideo&url=" + encodeURIComponent(currentURL));
+    note.innerHTML = "Zoeken naar filmbestand...";
+};
+
+var showVideo = function (json) {
+    if (json === null) {
+        note.innerHTML = "Kan geen verbinding maken met de server";
+        return;
+    }
+    
+    note.innerHTML = "";
+    
+    var post = JSON.parse(json);
+    
+    if (!post["Valid"]) {
+        footnote.innerHTML = post["Message"] + ".";
+        return;
+    }
+    
+    iPause = post["I"];
+    jPause = post["J"];
+    source = post["Source"];
+    link = post["Url"];
+    
+    if (link.slice(0, 10) == "(function(") {
+        var text = eval(link);
+        var pos = text.indexOf(".mp4?");
+        
+        link = ".mp4?";
+        
+        for (var i = pos + link.length; i < text.length; i += 1) {
+            if (text[i] == "'") {
+                break;
+            }
+            
+            link += text[i];
+        }
+        
+        for (var i = pos - 1; i >= 0; i -= 1) {
+            if (text[i] == "'") {
+                break;
+            }
+            
+            link = text[i] + link;
+        }
+    }
+    
+    videotitle.innerHTML = currentTitle;
+    
+    switch (source) {
+    case "thevideo":
+    case "vodlocker":
+    case "gorillavid":
+    case "daclips":
+    case "filenuke":
+    case "ipithos":
+        note.innerHTML = "De video is aan het laden...";
+        tools.innerHTML = '<br><br>Voeg ondertiteling toe:<br><br><input type="file" accept=".vtt,.srt" onchange="addSubtitles(event)">';
+        footnote.innerHTML = '<a class="atitle" href="' + link + '" target="_blank" style="font-size: 48px; border-radius: 16px; border: 4px solid black; background: rgba(0, 80, 40, 0.5); padding: 12px 128px; font-weight: bold;" download>Download  ' + (series ? "episode" : "film") + '</a><br><button onclick="getAnother()" style="margin-top: 64px;">Zoek andere video...</button>';
+        
+        loadVideoPlayer(link);
+        break;
+        
+    case "ishared":
+        footnote.innerHTML = '<a class="atitle" href="' + link + '" target="_blank" style="font-size: 48px; border-radius: 16px; border: 4px solid black; background: rgba(0, 80, 40, 0.5); padding: 12px 128px; font-weight: bold;">Bekijk ' + (series ? "episode" : "film") + '</a><br><br><br><br><br>Je zal de videopagina opnieuw moeten herladen.<br>Er kan een extensie vereist zijn om de video te kunnen bekijken in de browser.<br><br><br><button onclick="getAnother()" style="margin-top: 64px;">Zoek andere video...</button>';
+        break;
+        
+    case "gorillavid_flash":
+    case "videohub":
+    case "vidspace":
+    case "streamland":
+    case "vidshark":
+    case "hdwide":
+    case "stormvid":
+        footnote.innerHTML = '<a class="atitle" href="' + link + '" target="_blank" style="font-size: 48px; border-radius: 16px; border: 4px solid black; background: rgba(0, 80, 40, 0.5); padding: 12px 128px; font-weight: bold;">Bekijk ' + (series ? "episode" : "film") + '</a><br><br><br><br><br>De video vereist Flash om te kunnen afspelen.<br><br><br><button onclick="getAnother()" style="margin-top: 64px;">Zoek andere video...</button>';
+        break;
+    }
+};
+
+var showSerie = function (json) {
+    if (json === null) {
+        note.innerHTML = "Kan geen verbinding maken met de server";
+        return;
+    }
+    
+    var post = JSON.parse(json);
+    
+    localStorage.setItem(currentTitle, "bekeken");
+    saveWatchStatus();
+    
+    release = post["Release"];
+    genre = post["Genre"];
+    description = post["Description"];
+    episodeNumber = post["Number"];
+    
+    var selectHTML = "<select onchange='getSeason(this.selectedIndex + 1);' style='font: 18px Verdana; font-weight: bold; color: rgb(200, 80, 80);'>";
+    
+    for (var i = 1; i <= episodeNumber; i += 1) {
+        selectHTML += "<option>" + i + "</option>";
+    }
+    
+    selectHTML += "</select>";
+    
+    note.innerHTML = "";
+    infodiv.innerHTML = '<table style="border: 4px solid black; padding: 12px 24px 12px 12px; background: rgba(0, 20, 20, 0.3);"><tr><td><img src="' + currentImage + '" width="81"></img></td><td style="width: 12px"></td><td style="font-size: 14px;"><div style="float: left;">Genre: <span style="color: rgb(0, 160, 160); font-weight: bold;">' + genre + '</span></div>&nbsp;&nbsp;&nbsp;&nbsp;<div style="float: right;">Datum van publicatie: <span style="color: rgb(0, 160, 160); font-weight: bold;">' + release + '</span></div><br><br><span style="font-size: 10px;"><i>' + description + '</i></span></td></tr></table><br><br><span style="color: rgb(230, 230, 230); font-size: 22px;"><b>' + currentTitle + '</b></span>: <span style="font-size: 22px;"><a class="awatched" href="javascript:void(0)" onclick="getSeason(season)">seizoen </a></span>' + selectHTML;
+};
+
+var getSeason = function (s) {
+    season = s;
+    
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                showEpisodes(xhr.responseText);
+            } else {
+                showEpisodes(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("event=findseason&season=" + season + "&url=" + encodeURIComponent(serieURL));
+    note.innerHTML = "Zoeken naar episodes van seizoen " + season + "...";
+};
+
+var showEpisodes = function (json) {
+    clearList(true);
+    
+    if (json === null) {
+        note.innerHTML = "Kan geen verbinding maken met de server";
+        return;
+    }
+    
+    var post = JSON.parse(json);
+    
+    if (!post["Valid"]) {
+        note.innerHTML = post["Message"];
+        return;
+    }
+    
+    titles = post["Titles"];
+    urls = post["Urls"];
+    
+    if (titles === null) {
+        note.innerHTML = "";
+        footnote.innerHTML = "Geen videobestanden gevonden voor seizoen " + season;
+        return;
+    }
+    
+    note.innerHTML = "Kies de episode die je wilt bekijken";
+    
+    for (var i = 0; i < titles.length; i += 1) {
+        var label = document.createElement("li");
+        var watchedHTML;
+        
+        if (localStorage.getItem(titles[i]) !== null) {
+            watchedHTML = "<td name='watched' style='color: rgb(20, 180, 80);'>Reeds bekeken</td>";
+        } else {
+            watchedHTML = "<td name='watched'>Nog niet bekeken</td>";
+        }
+        
+        if (series) {
+            label.innerHTML = '<div style="height: 100px;"><a class="atitle" href="javascript:void(0)" onclick="getEpisode(' + i + ')" style="float: left;"><table><tr><td style="width: 90px;"><img src="' + currentImage + '" height="94"></img></td><td style="width: 64px;"></td><td>' + titles[i] + '</td><td style="width: 0px;"></td><td></td></tr></table></a><a class="awatched" href="javascript:void(0)" onclick="toggleWatched(' + "`" + titles[i] + "`" + ', ' + i + '); return false;" style="float: right; text-align: right;"><table style="margin: 12px 12px 0px 0px;"><tr><td style="height: 24px;"></td></tr><tr>' + watchedHTML + '</tr></table></a></div>';
+        }
+        
+        list.appendChild(label);
+    }
+};
+
+var getEpisode = function(n) {
+    currentTitle = titles[n];
+    currentURL = urls[n];
+    
+    clearList(true);
+    
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                localStorage.setItem(currentTitle, "bekeken");
+                saveWatchStatus();
+                
+                if (n < titles.length - 1) {
+                    previousdiv.innerHTML = "<button onclick='getEpisode(" + (n + 1) + ")'>← Vorige episode</button>";
+                }
+                
+                if (n > 0) {
+                    nextdiv.innerHTML = "<button onclick='getEpisode(" + (n - 1) + ")'>Volgende episode →</button>";
+                }
+                
+                showVideo(xhr.responseText);
+            } else {
+                showVideo(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("event=findepisode&url=" + encodeURIComponent(currentURL));
+    note.innerHTML = "Zoeken naar episode...";
+};
+
+var getAnother = function () {
+    clearList(true);
+    
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                showVideo(xhr.responseText);
+            } else {
+                showVideo(null);
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+    if (series) {
+        xhr.send("event=findanotherepisode&url=" + encodeURIComponent(currentURL) + "&i=" + iPause + "&j=" + jPause);
+    } else {
+        xhr.send("event=findanotherfilm&url=" + encodeURIComponent(currentURL) + "&i=" + iPause + "&j=" + jPause);
+    }
+    
+    note.innerHTML = "Zoeken naar ander bestand...";
+};
+
+var loadVideoPlayer = function (source) {
+    while (playerdiv.firstChild) {
+        playerdiv.firstChild.src = "";
+        playerdiv.removeChild(playerdiv.firstChild);
+    }
+    
+    player = document.createElement("video");
+    player.width = 640;
+    player.preload = "auto";
+    player.src = source;
+    player.autoplay = true;
+    player.controls = true;
+    player.style = "display: block; background: black; border: 3px solid black;";
+    player.oncanplay = function () {
+        note.innerHTML = "";
+    };
+    player.onerror = function () {
+        note.innerHTML = "Er is iets foutgelopen met het laden van de video";
+    };
+    
+    playerdiv.appendChild(player);
+    playertable.style.display = "block";
+};
+
+var toggleWatched = function (title, i) {
+    var child = document.getElementsByName("watched")[i];
+    
+    if (localStorage.getItem(title) === null) {
+        child.innerHTML = "Reeds bekeken";
+        child.style = "color: rgb(20, 180, 80);";
+        localStorage.setItem(title, "bekeken");
+        saveWatchStatus();
+    } else {
+        child.innerHTML = "Nog niet bekeken";
+        child.style = "";
+        localStorage.removeItem(title);
+        saveWatchStatus();
+    }
+};
+
+var clearList = function (keepInfo) {
+    while (list.firstChild) {
+        list.removeChild(list.firstChild);
+    }
+    
+    playertable.style.display = "none";
+    
+    if (player) {
+        player.src = "";
+        player.autoplay = false;
+        player.oncanplay = function () {};
+        player.onerror = function () {};
+    }
+    
+    while (previousdiv.firstChild) {
+        previousdiv.removeChild(previousdiv.firstChild);
+    }
+    
+    while (playerdiv.firstChild) {
+        playerdiv.removeChild(playerdiv.firstChild);
+    }
+    
+    while (nextdiv.firstChild) {
+        nextdiv.removeChild(nextdiv.firstChild);
+    }
+    
+    if (!keepInfo) {
+        infodiv.innerHTML = "";
+    }
+    
+    videotitle.innerHTML = "";
+    tools.innerHTML = "";
+    footnote.innerHTML = "";
+};
+
+var addSubtitles = function (event) {    
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    
+    reader.onload = function (evt) {
+        var pos = file.name.lastIndexOf(".");
+        var ext = "vtt";
+        
+        if (pos >= 0) {
+            ext = file.name.slice(pos + 1);
+        }
+        
+        var contents = evt.target.result;
+        
+        if (ext == "srt") {
+            contents = srtToVtt(contents);
+        }
+        
+        currentSubs = contents;
+        
+        var blob = new Blob([currentSubs], {type: "text/vtt"});
+        
+        track = document.createElement("track");
+        track.kind = "captions";
+        track.srclang = "en";
+        track.setAttribute("default", "true");
+        track.mode = "showing";
+        track.src = URL.createObjectURL(blob);
+        
+        player.appendChild(track);
+        
+        tools.innerHTML = '<br><br>Verschuif ondertitels (seconden):<br><br><button onclick="shiftVtt(document.getElementById(' + "'shifter'" + ').value, -1)">←</button>&nbsp;<input id="shifter" type="text" size="10">&nbsp;<button onclick="shiftVtt(document.getElementById(' + "'shifter'" + ').value, 1)">→</button>';
+    }
+    
+    reader.readAsText(file);
+};
+
+var srtToVtt = function (contents) {
+    var lines = contents.replace(/\r/g, "").split("\n");
+    var blockLine = 0;
+    
+    for (var i = 0; i < lines.length; i += 1) {
+        var line = lines[i];
+        
+        if (line.trim() === "") {
+            blockLine = 0;
+        } else {
+            blockLine += 1;
+        }
+        
+        if (blockLine === 2) {
+            lines[i] = line.replace(/,/g, ".");
+        }
+    }
+    
+    return "WEBVTT\n\n" + lines.join("\n");
+};
+
+var shiftVtt = function (time, direction) {
+    time = time.replace(",", ".");
+    
+    if (isNaN(time)) {
+        return;
+    }
+    
+    var dt = parseFloat(time) * direction;
+    var contents = currentSubs;
+    var lines = contents.replace(/\r/g, "").split("\n");
+    var blockLine = 0;
+    
+    for (var i = 0; i < lines.length; i += 1) {
+        var line = lines[i];
+        
+        if (line.trim() === "") {
+            blockLine = 0;
+        } else {
+            blockLine += 1;
+        }
+        
+        if ((blockLine === 1 || blockLine === 2) && line.indexOf("-" + "->") >= 0) {
+            var times = line.split("-" + "->");
+            
+            lines[i] = shiftTime(times[0], dt) + " -" + "-> " + shiftTime(times[1], dt);
+        }
+    }
+    
+    currentSubs = lines.join("\n");
+    
+    var blob = new Blob([currentSubs], {type: "text/vtt"});
+    
+    note.innerHTML = "De video is aan het laden met gewijzigde ondertiteling...";
+    loadVideoPlayer(player.src);
+    
+    track = document.createElement("track");
+    track.kind = "captions";
+    track.srclang = "en";
+    track.setAttribute("default", "true");
+    track.mode = "showing";
+    track.src = URL.createObjectURL(blob);
+    
+    player.appendChild(track);
+};
+
+var shiftTime = function (format, dt) {    
+    var parts = format.trim().split(":");
+    var millis = parseInt(parts[2].replace(".", ""));
+    
+    millis += parseInt(parts[1]) * 60 * 1000;
+    millis += parseInt(parts[0]) * 60 * 60 * 1000;
+    millis += Math.floor(dt * 1000);
+    
+    var shifted = "";
+    var hours = Math.floor(millis / (60 * 60 * 1000));
+    
+    if (hours < 10) {
+        shifted += "0";
+    }
+    
+    shifted += hours + ":";
+    
+    if (hours > 0) {
+        millis %= hours * 60 * 60 * 1000;
+    }
+    
+    var minutes = Math.floor(millis / (60 * 1000));
+    
+    if (minutes < 10) {
+        shifted += "0";
+    }
+    
+    shifted += minutes + ":";
+    
+    if (minutes > 0) {
+        millis %= minutes * 60 * 1000;
+    }
+    
+    var seconds = Math.floor(millis / 1000);
+    
+    if (seconds < 10) {
+        shifted += "0";
+    }
+    
+    shifted += seconds + ".";
+    
+    if (seconds > 0) {
+        millis %= seconds * 1000;
+    }
+    
+    if (millis < 100) {
+        shifted += "0";
+        
+        if (millis < 10) {
+            shifted += "0";
+        }
+    }
+    
+    return shifted + millis;
+};
+
+var escapeHTML = function (str) {
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&/g, "&amp;").replace(/ /g, "&nbsp;");
+};
+
+var loadWatchStatus = function () {
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("POST", "http://192.168.0.100:3000/", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                if (xhr.responseText !== "error") {
+                    var items = JSON.parse(xhr.responseText);
+                    
+                    localStorage.clear();
+                    
+                    for (item in items) {
+                        if (items.hasOwnProperty(item)) {
+                            localStorage.setItem(item, items[item]);
+                        }
+                    }
+                } else {
+                    localStorage.setItem("__extern_bewaren__", "jep");
+                }
+            }
+        }
+    };
+    
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("event=loadwatchstatus");
+};
+
+var saveWatchStatus = function () {
+    if (localStorage.getItem("__extern_bewaren__") !== null) {
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open("POST", "http://192.168.0.100:3000/", true);    
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("event=savewatchstatus&data=" + JSON.stringify(localStorage));
+    }
+};
+
+var clearWatchStatus = function () {
+    var externally = (localStorage.getItem("__extern_bewaren__") !== null);
+    
+    localStorage.clear();
+    
+    if (externally) {
+        localStorage.setItem("__extern_bewaren__", "jep");
+        saveWatchStatus();
+    }
+};
+
+var toggleSettingsDisplay = function () {
+    if (settingscontainer.style.display == "inline") {
+        settingscontainer.style.display = "none";
+    } else {
+        settingscontainer.style.display = "inline";
+    }
+};
+
+window.addEventListener("load", function () {
+    if (localStorage.getItem("__extern_bewaren__") !== null) {
+        loadWatchStatus();
+        store_browser.checked = false;
+        store_server.checked = true;
+    }
+});
+</script>
+</body>
+</html>
