@@ -32,6 +32,7 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var mouseX = 0;
 var mouseY = 0;
+var holding = false;
 var x = 100;
 var y = 100;
 
@@ -43,8 +44,11 @@ function show() {
 }
 
 window.onmousedown = function (evt) {
-    x = mouseX;
-    y = mouseY;
+    holding = true;
+};
+
+window.onmouseup = function (evt) {
+    holding = false;
 };
 
 window.onmousemove = function (evt) {
@@ -55,9 +59,15 @@ window.onmousemove = function (evt) {
 window.ontouchstart = function (evt) {
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
-    
-    x = mouseX;
-    y = mouseY;
+    holding = true;
+};
+
+window.ontouchend = function (evt) {
+    holding = false;
+};
+
+window.ontouchcancel = function (evt) {
+    holding = false;
 };
 
 window.ontouchmove = function (evt) {
@@ -70,6 +80,13 @@ function loop() {
     
     ctx.fillStyle = "red";
     ctx.fillRect(x, y, 32, 32);
+    
+    if (holding) {
+        var len = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2)) / 10;
+        var dir = Math.atan2(y - mouseY, mouseX - x);
+        x += Math.cos(dir) * len;
+        y -= Math.sin(dir) * len;
+    }
     
     window.requestAnimationFrame(loop);
 }
