@@ -40,6 +40,8 @@ var holding = false;
 var x = 100;
 var y = 100;
 
+screen.orientation.lock("portrait");
+
 function show() {
     menu.style.display = "none";
     canvas.style.display = "block";
@@ -76,7 +78,7 @@ window.ontouchcancel = function (evt) {
 
 window.ontouchmove = function (evt) {
     evt.preventDefault();
-    //evt.stopImmediatePropagation();
+    evt.stopImmediatePropagation();
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
 };
