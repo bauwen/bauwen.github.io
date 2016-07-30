@@ -58,7 +58,6 @@ window.onmousemove = function (evt) {
 };
 
 window.ontouchstart = function (evt) {
-    evt.preventDefault();
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
     holding = true;
