@@ -52,11 +52,13 @@ window.onmouseup = function (evt) {
 };
 
 window.onmousemove = function (evt) {
+    evt.preventDefault();
     mouseX = evt.pageX - window.scrollX;
     mouseY = evt.pageY - window.scrollY;
 };
 
 window.ontouchstart = function (evt) {
+    evt.preventDefault();
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
     holding = true;
