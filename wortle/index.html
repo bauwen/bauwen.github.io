@@ -11,6 +11,7 @@
 </head>
 <body style="margin: 0px; background-color: salmon; border: 3px solid red">
 
+<span id="size"></span>
 <div align="center">
     <h1>Testy</h1><br>
     <button onclick="show()">Click here please</button>
@@ -23,6 +24,10 @@
 function show() {
     document.getElementById("message").style.display = "block";
 }
+
+window.onload = function () {
+    document.getElementById("size").innerHTML = "(" + window.innerWidth + ", " + window.innerHeight + ")";
+};
 </script>
 
 </body>
