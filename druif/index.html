@@ -16,7 +16,7 @@
     
     #title {
         font-size: 48px;
-        margin: 24px;
+        margin: 18px;
     }
     
     #canvas {
@@ -28,7 +28,7 @@
         background-color: transparent;
         border: 2px solid salmon;
         color: salmon;
-        font: 14px Courier New, monospace;
+        font: 14px Consolas, Courier New, monospace;
         min-width: 170px;
         max-width: 170px;
         padding: 2px;
@@ -39,16 +39,18 @@
         background-color: transparent;
         border: 2px solid salmon;
         color: salmon;
-        font: 16px Courier New, monospace;
+        font: 16px Consolas, Courier New, monospace;
         padding: 2px 8px;
+        outline: none;
     }
     
     .button:hover {
         background-color: salmon;
         border: 2px solid salmon;
         color: rgb(40, 40, 40);
-        font: 16px Courier New, monospace;
+        font: 16px Consolas, Courier New, monospace;
         padding: 2px 8px;
+        outline: none;
     }
     
     #container {
@@ -79,8 +81,11 @@
     </div>
     
     <div style="margin-top: 48px">
-        <button class="button">Upload</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="button">Remove</button><br><br>
-        <button class="button">Start!</button>
+        <div>
+            <button class="button" style="float: left">Upload Robot</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="button" style="float: right">Remove Robot</button>
+        </div><br><br>
+        <button class="button" style="padding: 2px 120px">Start!</button>
     </div>
 </div>
 </div>
