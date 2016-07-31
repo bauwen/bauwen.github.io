@@ -9,22 +9,56 @@
     body {
         margin: 0px;
         background-color: rgb(40, 40, 40);
+        color: salmon;
+        font-family: Courier New, monospace;
+        overflow: hidden;
     }
     
     #title {
-        font: 48px Courier New, monospace;
+        font-size: 48px;
         margin: 24px;
-        color: salmon;
     }
     
     #canvas {
         border: 3px solid salmon;
+        margin-bottom: 12px;
+    }
+    
+    #list {
+        background-color: transparent;
+        border: 2px solid salmon;
+        color: salmon;
+        font: 14px Courier New, monospace;
+        min-width: 170px;
+        max-width: 170px;
+        padding: 2px;
+        float: right;
+    }
+    
+    .button {
+        background-color: transparent;
+        border: 2px solid salmon;
+        color: salmon;
+        font: 16px Courier New, monospace;
+        padding: 2px 8px;
+    }
+    
+    .button:hover {
+        background-color: salmon;
+        border: 2px solid salmon;
+        color: rgb(40, 40, 40);
+        font: 16px Courier New, monospace;
+        padding: 2px 8px;
     }
     
     #container {
-        width: 350px;
-        height: 511px;
-        border: 1px solid white;
+        width: 307px;
+        min-width: 307px;
+        max-width: 307px;
+        height: 567px;
+        min-height: 567px;
+        max-height: 567px;
+        border: 0px solid white;
     }
     </style>
 </head>
@@ -32,18 +66,28 @@
 
 <div align="center">
 <div id="container">
-    <span id="e" style="color: salmon"></span>
     <div id="title">Gridbots</div>
+    
     <canvas id="canvas" width="300" height="300"></canvas>
+    
+    <div>
+        <span style="font-size: 24px; float: left">Robots:</span>
+        <select id="list">
+            <option>CrazyBot</option>
+            <option>Gangsta 2.0</option>
+        </select>
+    </div>
+    
+    <div style="margin-top: 48px">
+        <button class="button">Upload</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="button">Remove</button><br><br>
+        <button class="button">Start!</button>
+    </div>
 </div>
 </div>
 
 <script>
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-
-var e = document.getElementById("e");
-e.innerHTML = "(" + window.innerWidth + ", " + window.innerHeight + ")";
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
