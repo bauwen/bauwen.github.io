@@ -15,8 +15,9 @@
     }
     
     #title {
-        font-size: 42px;
+        font-size: 46px;
         margin: 12px;
+        margin-top: 4vh;
     }
     
     #canvas {
@@ -54,6 +55,15 @@
         outline: none;
     }
     
+    #special {
+        padding: 4px 61px;
+        border: 8px solid salmon;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 22px;
+        border-radius: 28px;
+    }
+    
     #container {
         width: 307px;
         min-width: 307px;
@@ -82,21 +92,169 @@
     </div>
     
     <div style="margin-top: 48px">
-        <button class="button" style="padding: 4px 60px; border: 10px solid salmon; margin-bottom: 20px; font-weight: bold; font-size: 22px">Start Battle</button>
+        <button id="special" onclick="act()" class="button">Start Battle</button>
         <div>
-            <button class="button" style="float: left">Upload Robot</button>
-            <button class="button" style="float: right">Remove Robot</button>
+            <!-- <button onclick="upload()" class="button" style="float: left">Upload Robot</button> -->
+            <label for="uploader" class="button" style="float: left; padding: 3px 8px">Upload Robot</label>
+            <input id="uploader" type="file" style="display: none">
+            <button onclick="remove()" class="button" style="float: right">Remove Robot</button>
         </div>
     </div>
 </div>
 </div>
 
 <script>
+var list = document.getElementById("list");
+var buttonAct = document.getElementById("special");
+var buttonUpload = document.getElementById("uploader");
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+var speed = 10;
+var timer = speed;
+var running = false;
+var bots = {};
+var nextId = 1;
+var grid = [];
+var gridWidth = 10;
+var gridHeight = 10;
+
+for (var i = 0; i < gridWidth; i += 1) {
+    var column = [];
+    for (var j = 0; j < gridHeight; j += 1) {
+        column.push(0);
+    }
+    grid.push(column);
+}
+
+var colors = [
+    "red",
+    "yellow",
+    "cyan",
+    "lime",
+    "fuchsia",
+    "salmon",
+    "white",
+    "orange"
+];
+
+function act() {
+    if (running) {
+        stop();
+    } else {
+        start();
+    }
+}
+
+buttonUpload.onchange = function (event) {
+    var reader = new FileReader();
+    
+    reader.onload = function (evt) {
+        eval(evt.target.result);
+    };
+    
+    reader.readAsText(event.target.files[0]);
+};
+
+function remove() {
+    
+}
+
+function start() {
+    buttonAct.innerHTML = "Stop Battle";
+    timer = speed;
+    running = true;
+}
+
+function stop() {
+    buttonAct.innerHTML = "Start Battle";
+    running = false;
+}
+
 function loop() {
+    if (running) {
+        if (timer > 0) {
+            timer -= 1;
+        } else {
+            timer = speed;
+            
+            for (var id in bots) {
+                if (bots.hasOwnProperty(id)) {
+                    var bot = bots[id];
+                    var others = [];
+                    
+                    for (var other in bots) {
+                        if (bots.hasOwnProperty(other)) {
+                            others.push(bots[other].state);
+                        }
+                    }
+                    
+                    var action = bot.body.call(bot.state, others, {
+                        get width() {
+                            return gridWidth;
+                        },
+                        
+                        get height() {
+                            return gridHeight;
+                        }
+                    });
+                    
+                    switch (action) {
+                        case "move":
+                            var xx = bot.x + (bot.direction == "east" ? 1 : (bot.direction == "west" ? -1 : 0));
+                            var yy = bot.y + (bot.direction == "south" ? 1 : (bot.direction == "north" ? -1 : 0));
+                            
+                            if (0 <= xx && xx < gridWidth && 0 <= yy && yy < gridHeight) {
+                                grid[bot.x][bot.y] = 0;
+                                grid[xx][yy] = bot.id;
+                                bot.x = xx;
+                                bot.y = yy;
+                            }
+                            
+                            break;
+                            
+                        case "north":
+                        case "east":
+                        case "south":
+                        case "west":
+                            bot.direction = action;
+                            break;
+                            
+                        default:
+                            alert("Unknown action in " + bot.name + ": " + action);
+                            stop();
+                    }
+                }
+            }
+        }
+    }
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgb(40, 40, 40)";
+    
+    for (var i = 0; i < gridWidth; i += 1) {
+        for (var j = 0; j < gridHeight; j += 1) {
+            var id = grid[i][j];
+            
+            if (id > 0) {
+                ctx.fillStyle = colors[id - 1];
+                ctx.fillRect(i * 30 + 2, j * 30 + 2, 30 - 4, 30 - 4);
+                
+                ctx.beginPath();
+                ctx.moveTo(i * 30 + 15, j * 30 + 15);
+                
+                // 0 -> 90 | 1 -> 0 | 2 -> 270 | 3 -> 180
+                var index = ["north", "east", "south", "west"].indexOf(bots[id].direction);
+                var radians = (index + 1) * 90 / 180 * Math.PI;
+                ctx.lineTo(i * 30 + 15 - Math.cos(radians) * 15, j * 30 + 15 - Math.sin(radians) * 15);
+                ctx.stroke();
+                
+                ctx.fillStyle = "white";
+                //ctx.fillText(bots[id].direction, i * 30, j * 30 - 16);
+            }
+        }
+    }
+    
     
     ctx.lineWidth = 2;
     ctx.strokeStyle = "rgb(60, 60, 60)";
@@ -117,6 +275,42 @@ function loop() {
 }
 
 window.onload = loop;
+
+function Gridbot(name, body) {
+    var option = document.createElement("option");
+    option.text = name;
+    list.add(option);
+    list.selectedIndex = list.options.length - 1;
+    
+    var self = this;
+    
+    self.id = nextId++;
+    self.name = name;
+    self.body = body;
+    self.x = Math.floor(Math.random() * gridWidth);
+    self.y = Math.floor(Math.random() * gridHeight);
+    while (grid[self.x][self.y] > 0) {
+        self.x = Math.floor(Math.random() * gridWidth);
+        self.y = Math.floor(Math.random() * gridHeight);
+    }
+    self.direction = ["north", "east", "south", "west"][Math.floor(Math.random() * 4)];
+    self.state = {
+        get x() {
+            return self.x + 1;
+        },
+        
+        get y() {
+            return self.y + 1;
+        },
+        
+        get direction() {
+            return self.direction;
+        }
+    };
+    
+    grid[self.x][self.y] = self.id;
+    bots[self.id] = self;
+}
 </script>
 
 </body>
