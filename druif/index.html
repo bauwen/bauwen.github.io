@@ -13,25 +13,37 @@
     
     #title {
         font: 48px Courier New, monospace;
-        margin: 32px;
+        margin: 24px;
         color: salmon;
     }
     
     #canvas {
         border: 3px solid salmon;
     }
+    
+    #container {
+        width: 350px;
+        height: 511px;
+        border: 1px solid white;
+    }
     </style>
 </head>
 <body>
 
 <div align="center">
+<div id="container">
+    <span id="e" style="color: salmon"></span>
     <div id="title">Gridbots</div>
-    <canvas id="canvas" width="320" height="320"></canvas>
+    <canvas id="canvas" width="300" height="300"></canvas>
+</div>
 </div>
 
 <script>
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+
+var e = document.getElementById("e");
+e.innerHTML = "(" + window.innerWidth + ", " + window.innerHeight + ")";
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -41,13 +53,13 @@ function loop() {
     
     for (var i = 1; i < 10; i += 1) {
         ctx.beginPath();
-        ctx.moveTo(i * 32, 0);
-        ctx.lineTo(i * 32, canvas.height);
+        ctx.moveTo(i * 30, 0);
+        ctx.lineTo(i * 30, canvas.height);
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.moveTo(0, i * 32);
-        ctx.lineTo(canvas.width, i * 32);
+        ctx.moveTo(0, i * 30);
+        ctx.lineTo(canvas.width, i * 30);
         ctx.stroke();
     }
     
