@@ -94,10 +94,6 @@ window.onmousemove = function (event) {
 window.ontouchstart = function (event) {
     mouseX = event.touches[0].pageX - window.scrollX - canvas.offsetLeft;
     mouseY = event.touches[0].pageY - window.scrollY - canvas.offsetTop;
-    /*if (!clicked) {
-        switchLights(Math.floor(mouseX / cellSize), Math.floor(mouseY / cellSize));
-    }
-    clicked = true;*/
 };
 
 window.ontouchend = function (event) {
@@ -183,4 +179,4 @@ setTimeout(function () {
 </script>
 
 </body>
-</html
+</html>
