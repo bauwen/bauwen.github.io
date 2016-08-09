@@ -1,102 +1,274 @@
 <!DOCTYPE html>
 <head>
-    <title>Testy</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-    <meta name="apple-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>ABCentral</title>
+    <script>
+    var browsock={connect:function(e,n){return new function(){var s=new WebSocket("ws://"+e+":"+n+"/app"),t={};s.onmessage=function(e){var n=JSON.parse(e.data);t.hasOwnProperty(n.message[0])&&t[n.message[0]].apply(this,n.data)},this.send=function(e){s.send(JSON.stringify({message:[e],data:Array.prototype.slice.call(arguments,1)}))},this.receive=function(e,n){t[e]=n},this.disconnected=function(e){s.onclose=e}}}};
+    </script>
     <style>
-    body {
-        margin: 0px;
-        background-color: salmon;
-        border: 3px solid red;
-        
-        max-width: 100%;
-        max-height: 100%;
-        overflow: hidden;
+    #listNames li {
+        padding-top: 12px;
     }
     
-    #message {
-        font-size: 64px;
+    #people li {
+        padding-top: 12px;
+    }
+    
+    a {
+        text-decoration: none;
+        outline: none;
     }
     </style>
 </head>
-<body>
 
-<div id="menu" align="center">
-    <h1>Testy</h1><br>
-    <button onclick="show()">Click here please</button>
+<body style="background: white; color: black; font-family: Verdana;">
+
+<div id="lobby" style="margin: 32px; margin-left: 64px; display: block;">
+    <div align="right">
+        <input type="text" size="50" style="color: red; background-color: white; border: none; text-align: right; font-size: 32px; font-weight: bold;"></input>
+    </div>
+    <span style="font-size: 36px; font-style: italic; color: rgb(80, 80, 80);">Spelers aangemeld:</span>
+    <div align="center">
+        <ul id="listNames" style="list-style-type: none; font-size: 42px; font-weight: bold; overflow: auto; margin-top: 32px; height: 320px;"></ul>
+    </div>
+    <div align="right">
+        <br><br>
+        <button onclick="startGame();">Starten maar!</button>
+    </div>
+    <div style="margin-top: 48px;">
+        <input id="cat1" type="text" style="font-size: 20px; border: 1px solid black;">&nbsp;
+        <input id="cat2" type="text" style="font-size: 20px; border: 1px solid black;">&nbsp;
+        <input id="cat3" type="text" style="font-size: 20px; border: 1px solid black;">&nbsp;
+        <input id="cat4" type="text" style="font-size: 20px; border: 1px solid black;">&nbsp;
+        <input id="cat5" type="text" style="font-size: 20px; border: 1px solid black;">
+    </div>
 </div>
-<canvas id="canvas" style="display: none"></canvas>
+
+<div id="interletter" style="margin: 32px; display: none;">
+    <div align="center" style="margin-top: 180px;">
+        <a id="letterPicker" href="#" onclick="nextLetter(); return false;" style="text-decoration: none; font-size: 48px;">Kies volgende letter</a>
+        <span id="letterShow" style="font-size: 299px; color: black; font-weight: bold; display: none;"></span>
+        <a id="stopShow" href="#" onclick="advance(); return false;" style="font-size: 199px; color: red; font-weight: bold; display: none;">STOP!</a>
+    </div>
+</div>
+
+<div id="results" style="margin: 64px; display: none;">
+    <div align="right">
+        <button onclick="nextItem();">Volgende...</button>
+    </div>
+    <div id="category" style="font-size: 72px; font-weight: bold; margin-top: 32px;"></div>
+    <ul id="people" style="list-style-type: none; font-size: 48px; font-weight: bold; margin-top: 64px;"></ul>
+</div>
 
 <script>
-var menu = document.getElementById("menu");
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-var mouseX = 0;
-var mouseY = 0;
-var holding = false;
-var x = 100;
-var y = 100;
+var lobby = document.getElementById("lobby");
+var listNames = document.getElementById("listNames");
 
-function show() {
-    menu.style.display = "none";
-    canvas.style.display = "block";
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 6;
-}
+var interLetter = document.getElementById("interletter");
+var letterPicker = document.getElementById("letterPicker");
+var letterShow = document.getElementById("letterShow");
+var stopShow = document.getElementById("stopShow");
+//var personName = document.getElementById("personName");
+var cat1 = document.getElementById("cat1");
+var cat2 = document.getElementById("cat2");
+var cat3 = document.getElementById("cat3");
+var cat4 = document.getElementById("cat4");
+var cat5 = document.getElementById("cat5");
 
-window.onmousedown = function (evt) {
-    holding = true;
-};
+var gcat1 = document.getElementById("gcat1");
+var gcat2 = document.getElementById("gcat2");
+var gcat3 = document.getElementById("gcat3");
+var gcat4 = document.getElementById("gcat4");
+var gcat5 = document.getElementById("gcat5");
 
-window.onmouseup = function (evt) {
-    holding = false;
-};
+var category = document.getElementById("category");
+var people = document.getElementById("people");
 
-window.onmousemove = function (evt) {
-    mouseX = evt.pageX - window.scrollX;
-    mouseY = evt.pageY - window.scrollY;
-};
+var ip = window.location.href.slice(window.location.href.indexOf('?') + 1);
 
-window.ontouchstart = function (evt) {    
-    mouseX = evt.touches[0].pageX - window.scrollX;
-    mouseY = evt.touches[0].pageY - window.scrollY;
-    holding = true;
-};
+var socket = browsock.connect(ip, "3000");
+var players = {};
+var count = 0;
+var categories = [];
+var alphabet = [];
+var items = {};
+var current = 0;
+var points = {};
+var started = false;
+var theletter = "";
 
-window.ontouchend = function (evt) {
-    holding = false;
-};
-
-window.ontouchcancel = function (evt) {
-    holding = false;
-};
-
-window.ontouchmove = function (evt) {
-    evt.preventDefault();
-    evt.stopImmediatePropagation();
-    mouseX = evt.touches[0].pageX - window.scrollX;
-    mouseY = evt.touches[0].pageY - window.scrollY;
-};
-
-function loop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = "red";
-    ctx.fillRect(x, y, 32, 32);
-    
-    if (holding) {
-        var len = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2)) / 10;
-        var dir = Math.atan2(y - mouseY, mouseX - x);
-        x += Math.cos(dir) * len;
-        y -= Math.sin(dir) * len;
+for (var i = 65; i <= 90; i += 1) {
+    if (i === 81 || i === 88 || i === 89) {
+        continue;
     }
     
-    window.requestAnimationFrame(loop);
+    alphabet.push(i);
 }
 
-window.onload = loop;
+socket.receive("central someone joined", function (name, id) {
+    if (started) {
+        return;
+    }
+    
+    players[id] = name;
+    count += 1;
+    
+    var li = document.createElement("li");
+    
+    li.innerHTML = name;
+    listNames.appendChild(li);
+});
+
+socket.receive("central someone left", function (id) {
+    var names = listNames.childNodes;
+    
+    for (var i = 0; i < names.length; i += 1) {
+        if (names[i].innerHTML == players[id]) {
+            listNames.removeChild(names[i]);
+            break;
+        }
+    }
+    
+    delete players[id];
+    count -= 1;
+});
+
+function startGame() {
+    lobby.style.display = "none";
+    interletter.style.display = "block";
+    categories.push(cat1.value);
+    categories.push(cat2.value);
+    categories.push(cat3.value);
+    categories.push(cat4.value);
+    categories.push(cat5.value);
+    
+    for (person in players) {
+        if (players.hasOwnProperty(person)) {
+            points[person] = 0;
+        }
+    }
+    
+    started = true;
+}
+
+function nextLetter() {
+    letterPicker.style.display = "none";
+    letterShow.style.display = "block";
+    
+    var l = 0;
+    var ran = alphabet.length * 5 + Math.floor(Math.random() * alphabet.length);
+    var c = 0;
+    
+    function loopletters() {
+        letterShow.innerHTML = String.fromCharCode(alphabet[l]);
+        c += 1;
+        
+        if (c === ran + 1) {
+            theletter = String.fromCharCode(alphabet[l]).toLowerCase();
+            socket.send("game started", categories);
+            alphabet.splice(l, 1);
+        } else {
+            requestAnimationFrame(loopletters);
+        }
+        
+        l = (l + 1) % alphabet.length;
+    }
+    
+    loopletters();
+}
+
+socket.receive("central stop first!", function (id, list) {
+    items[id] = list;
+    
+    letterShow.style.display = "none";
+    //personName.innerHTML = players[id];
+    stopShow.style.display = "block";
+});
+
+socket.receive("central stop second!", function (id, list) {
+    items[id] = list;
+});
+
+function advance() {
+    stopShow.style.display = "none";
+    interletter.style.display = "none";
+    results.style.display = "block";
+    current = 0;
+    nextItem();
+}
+
+function nextItem() {
+    if (current > categories.length) {
+        letterPicker.style.display = "block";
+        stopShow.style.display = "none";
+        interletter.style.display = "block";
+        results.style.display = "none";
+        return;
+    }
+    
+    while (people.firstChild) {
+        people.removeChild(people.firstChild);
+    }
+    
+    if (current === categories.length) {
+        category.innerHTML = "<i>SCORES</i>";
+        for (person in players) {
+            if (players.hasOwnProperty(person)) {
+                var li = document.createElement("li");
+                
+                li.innerHTML = "<span style='width: 300px;'>" + players[person] + ":</span>&nbsp;&nbsp;&nbsp&nbsp;<span style='color: rgb(128, 128, 0);'>" + points[person] + "</span> punten";
+                people.appendChild(li);
+            }
+        }
+    } else {
+        category.innerHTML = categories[current];
+        
+        for (person in players) {
+            if (players.hasOwnProperty(person)) {
+                var col = "green";
+                var item = items[person][current].toLowerCase().trim();
+                
+                if (theletter.length === 0 || item.length <= 1 || item.charAt(0) !== theletter) {
+                    col = "red";
+                } else {
+                    for (person2 in players) {
+                        if (players.hasOwnProperty(person2) && person !== person2) {
+                            if (item === items[person2][current].toLowerCase().trim()) {
+                                col = "red";
+                            }
+                        }
+                    }
+                }
+                
+                if (col === "green") {
+                    points[person] += 1;
+                }
+                
+                var li = document.createElement("li");
+                
+                li.innerHTML = "<span style='min-width: 300px;'>" + players[person] + ":</span>&nbsp;&nbsp;&nbsp&nbsp;<a href='#' onclick='change(this, " + person + "); return false;' style='color: " + col + ";'>" + item + "</a>&nbsp;&nbsp<button onclick=" + '"gaan(' + "'" + encodeURIComponent(item) + "'" + ");" + '"' + ">Googlen</button>";
+                people.appendChild(li);
+            }
+        }
+    }
+    
+    current += 1;
+}
+
+function gaan(item) {
+    open("https://www.google.be/#q=" + item, "_blank");
+}
+
+function change(elem, num) {
+    if (elem.style.color === "red") {
+        elem.style.color = "green";
+        points[num] += 1;
+    } else {
+        elem.style.color = "red";
+        points[num] -= 1;
+    }
+}
+
 </script>
 
 </body>
