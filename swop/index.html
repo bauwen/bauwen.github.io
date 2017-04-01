@@ -33,7 +33,14 @@ var mouseDown = false;
 window.onload = function () {
     window.onresize();
     
-    ws = new WebSocket("ws://localhost:3002/");
+    var host = "localhost";
+    var index = window.location.href.indexOf('?');
+    
+    if (index >= 0) {
+        host = window.location.href.slice(index + 1);
+    }
+    
+    ws = new WebSocket("ws://" + host + ":3002/");
     
     ws.onmessage = function (evt) {
         var command = evt.data;
