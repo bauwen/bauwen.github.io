@@ -109,6 +109,10 @@ window.onkeypress = function (evt) {
     
     var keyChar = evt.which;
     
+    if (keyChar == 0) {
+        return;
+    }
+    
     ws.send("key typed " + keyChar);
 };
 
@@ -159,7 +163,9 @@ function draw(data) {
         var width = parseInt(parts[3]);
         var height = parseInt(parts[4]);
         var filled = parts[5] == "true";
+        var color = parts[6];
         
+        setColor(color);
         drawRectangle(x, y, width, height, filled);
         break;
         
@@ -168,7 +174,9 @@ function draw(data) {
         var y = parseInt(parts[2]);
         var radius = parseInt(parts[3]);
         var filled = parts[4] == "true";
+        var color = parts[5];
         
+        setColor(color);
         drawCircle(x, y, radius, filled);
         break;
         
@@ -177,21 +185,25 @@ function draw(data) {
         var y1 = parseInt(parts[2]);
         var x2 = parseInt(parts[3]);
         var y2 = parseInt(parts[4]);
+        var color = parts[5];
         
+        setColor(color);
         drawLine(x1, y1, x2, y2);
         break;
         
     case "text":
         var x = parseInt(parts[1]);
         var y = parseInt(parts[2]) + 11;
-        var text = parts.slice(3, parts.length - 1).join(" ");
-        var centered = parts[parts.length - 1] == "true";
+        var text = parts.slice(3, parts.length - 2).join(" ");
+        var centered = parts[parts.length - 2] == "true";
+        var color = parts[parts.length - 1];
         
         if (centered) {
             ctx.textAlign = "center";
             y -= textHeight / 3;
         }
         
+        setColor(color);
         drawText(x, y, text);
         break;
         
@@ -199,8 +211,9 @@ function draw(data) {
         var x = parseInt(parts[1]);
         var y = parseInt(parts[2]) + 11;
         var width = parseInt(parts[3]);
-        var text = parts.slice(4, parts.length - 1).join(" ");
-        var right = parts[parts.length - 1] == "true";
+        var text = parts.slice(4, parts.length - 2).join(" ");
+        var right = parts[parts.length - 2] == "true";
+        var color = parts[parts.length - 1];
         
         while (true) {
             var stringWidth = ctx.measureText(text).width;
@@ -216,19 +229,22 @@ function draw(data) {
             }
         }
         
+        setColor(color);
         drawText(x, y, text);
         break;
         
     case "texthighlight":
         var x = parseInt(parts[1]);
         var y = parseInt(parts[2]);
-        var text = parts.slice(3, parts.length - 2).join(" ");
-        var padx = parseInt(parts[parts.length - 2]);
-        var pady = parseInt(parts[parts.length - 1]);
+        var text = parts.slice(3, parts.length - 3).join(" ");
+        var padx = parseInt(parts[parts.length - 3]);
+        var pady = parseInt(parts[parts.length - 2]);
+        var color = parts[parts.length - 1];
         
         var width = ctx.measureText(text).width;
         var height = textHeight;
         
+        setColor(color);
         drawRectangle(x - padx, y - pady, width + padx * 2, height + pady * 2);
         drawText(x, y + 11, text);
         break;
@@ -237,6 +253,11 @@ function draw(data) {
         console.log("Unkown drawable '" + parts[0] + "'");
         break;
     }
+}
+
+function setColor(color) {
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
 }
 
 function drawRectangle(x, y, width, height, filled) {
