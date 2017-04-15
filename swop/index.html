@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
     <title>Classr</title>
     <meta charset="utf-8">
@@ -74,8 +75,9 @@ window.onresize = function () {
 
 // Input Events (outgoing)
 
-window.onclick = function (evt) {
+window.onmousedown = function (evt) {
     evt.preventDefault();
+    mouseDown = true;
     
     var x = evt.pageX;
     var y = evt.pageY;
@@ -89,7 +91,17 @@ window.ondblclick = function (evt) {
     var x = evt.pageX;
     var y = evt.pageY;
     
-    //ws.send("mouse clicked " + x + " " + y + " 2");
+    ws.send("mouse clicked " + x + " " + y + " 2");
+};
+
+window.onmouseup = function (evt) {
+    evt.preventDefault();
+    mouseDown = false;
+    
+    var x = evt.pageX;
+    var y = evt.pageY;
+    
+    ws.send("mouse released " + x + " " + y);
 };
 
 window.onkeypress = function (evt) {
@@ -97,7 +109,21 @@ window.onkeypress = function (evt) {
     
     var keyChar = evt.which;
     
-    ws.send("key pressed " + keyChar);
+    ws.send("key typed " + keyChar);
+};
+
+window.onkeydown = function (evt) {
+    var keyCode = evt.which;
+    
+    if (keyCode == 13) {
+        keyCode = 10;
+    }
+    
+    if (keyCode == 46) {
+        keyCode = 127;
+    }
+    
+    ws.send("key pressed " + keyCode);
 };
 
 window.onmousemove = function (evt) {
@@ -109,14 +135,6 @@ window.onmousemove = function (evt) {
     var y = evt.pageY;
     
     ws.send("mouse dragged " + x + " " + y);
-};
-
-window.onmousedown = function (evt) {
-    mouseDown = true;
-};
-
-window.onmouseup = function (evt) {
-    mouseDown = false;
 };
 
 
@@ -174,7 +192,7 @@ function draw(data) {
             y -= textHeight / 3;
         }
         
-        drawText(x, y, text, centered);
+        drawText(x, y, text);
         break;
         
     case "textstub":
@@ -198,7 +216,21 @@ function draw(data) {
             }
         }
         
-        drawTextStub(x, y, width, text);
+        drawText(x, y, text);
+        break;
+        
+    case "texthighlight":
+        var x = parseInt(parts[1]);
+        var y = parseInt(parts[2]);
+        var text = parts.slice(3, parts.length - 2).join(" ");
+        var padx = parseInt(parts[parts.length - 2]);
+        var pady = parseInt(parts[parts.length - 1]);
+        
+        var width = ctx.measureText(text).width;
+        var height = textHeight;
+        
+        drawRectangle(x - padx, y - pady, width + padx * 2, height + pady * 2);
+        drawText(x, y + 11, text);
         break;
         
     default:
@@ -233,11 +265,7 @@ function drawLine(x1, y1, x2, y2) {
     ctx.stroke();
 }
 
-function drawText(x, y, text, centered) {
-    ctx.fillText(text, x, y);
-}
-
-function drawTextStub(x, y, width, text) {
+function drawText(x, y, text) {
     ctx.fillText(text, x, y);
 }
 </script>
