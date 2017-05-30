@@ -1,0 +1,389 @@
+<!DOCTYPE>
+<head>
+    <meta charset="utf-8">
+    <title>Stippel</title>
+    <style>
+        body {
+            margin: 24px;
+            background-color: black;
+            color: rgb(200, 200, 200);
+            font-family: Verdana;
+        }
+        
+        #canvas-map {
+            background-color: white;
+            background-image: url("stippelmap.png");
+            background-size: 840px 480px;
+        }
+        
+        #div-color {
+            display: inline-block;
+            width: 60px;
+            height: 25px;
+            background-color: red;
+            float: right;
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+
+
+
+<table style="font-size: 14px">
+    <tr><td>
+        <canvas id="canvas-map" width="840" height="480"></canvas>
+    </td><td style="padding-left: 24px">
+        <div style="border: 0px solid red">
+            <div>
+                Klik op de kaart hiernaast om knopen toe te<br>
+                voegen voor een bepaalde stippellijn.<br>
+                Gebruik de spatiebalk om de vorige knoop te<br>
+                verwijderen, of klik op de kaart aan het einde<br>
+                van een animatie om opnieuw te beginnen.
+            </div>
+            <br><br><br>
+            
+            <button onclick="addLine()">Voeg stippellijn toe</button> &nbsp;&nbsp;
+            <button onclick="removeLine()">Verwijder stippellijn</button>
+            <br><br><br><br><br>
+            
+            <select id="select-line">
+                <option>Stippellijn 1</option>
+            </select>
+            <div id="div-color"></div>
+            
+            <br><br><br>
+            Start na &nbsp;<input id="input-timeout" type="text" size="6" placeholder="0,0" style="padding: 2px 4px">&nbsp; seconden
+            
+            <br><br><br><br><br><br>
+            <center>
+                Snelheid:
+                <select id="select-speed">
+                    <option>0.5</option>
+                    <option>1</option>
+                    <option>2</option>
+                </select>
+                &nbsp;&nbsp;
+                <button style="font-size: 18px; padding: 2px 48px;" onclick="play()">Speel af!</button>
+            </center>
+        </div>
+    </td></tr>
+</table>
+
+<script>
+    function $(id) {
+        return document.getElementById(id);
+    }
+    
+    $("select-speed").selectedIndex = 1;
+    
+    var ctx = $("canvas-map").getContext("2d");
+    ctx.fillStyle = "red";
+    ctx.font = "bold 72px Verdana";
+    ctx.fillText("Klik op mij", 210, 250);
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Klik op mij", 210, 250);
+    
+    var started = false;
+    
+    var colors = [
+        "red",
+        "blue",
+        "green",
+        "fuchsia",
+        "orange",
+        "yellow",
+        "black",
+        "cyan",
+        "gray"
+    ];
+    
+    var mouseDown = false;
+    var mouseX = 0;
+    var mouseY = 0;
+    
+    var line;
+    var lines = [new Stippellijn(colors[0])];
+    updateLine(0);
+    
+    var playing = false;
+    
+    var t = 0;
+    var segment = 2;
+    var step = 16;
+    setSpeed(0.1);
+    
+    function Stippellijn(color) {
+        this.color = color;
+        this.timeout = 0;
+        
+        var nodes = [];
+        var path = [];
+        
+        this.pushNode = (x, y) => {
+            nodes.push(x, y);
+            
+            if (nodes.length < 4) {
+                path.push(x, y);
+                return;
+            }
+            
+            
+            // verdeel elke verbinding in segmenten van gelijke lengte
+            // zodat de "nodes" uniform worden verdeeld over het pad
+            // (dit laat ons toe om overal door te lopen met ongeveer 
+            //  dezelfde snelheid, of het nu dichtbeknopte bochten zijn,
+            //  of lange rechte stukken)
+            
+            var i = nodes.length - 4;
+            var x1 = nodes[i];
+            var y1 = nodes[i + 1];
+            var x2 = x;
+            var y2 = y;
+            
+            var dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            var frac = segment / dist;
+            
+            for (var s = frac; s < 1; s += frac) {
+                path.push((1 - s) * x1 + s * x2, (1 - s) * y1 + s * y2);
+            }
+            
+            path.push(x2, y2);
+        };
+        
+        this.popNode = () => {
+            nodes.pop();
+            nodes.pop();
+            
+            if (nodes.length < 2) {
+                nodes = [];
+                path = [];
+            } else {
+                x = nodes[nodes.length - 2];
+                y = nodes[nodes.length - 1];
+                
+                for (var i = path.length - 2; i >= 0; i -= 2) {
+                    if (x === path[i] && y === path[i + 1]) {
+                        break;
+                    }
+                    
+                    path.pop();
+                    path.pop();
+                }
+            }
+        };
+        
+        this.clearNodes = () => {
+            nodes = [];
+            path = [];
+        };
+        
+        this.drawNodePath = () => {
+            if (nodes.length < 2) {
+                return;
+            }
+            
+            var i;
+            
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([]);
+            
+            ctx.beginPath();
+            ctx.moveTo(nodes[0], nodes[1]);
+            
+            for (i = 2; i < nodes.length; i += 2) {
+                ctx.lineTo(nodes[i], nodes[i + 1]);
+            }
+            
+            ctx.stroke();
+            
+            for (i = 0; i < nodes.length; i += 2) {
+                ctx.beginPath();
+                ctx.arc(nodes[i], nodes[i + 1], 3, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+        };
+        
+        this.drawAnimation = () => {
+            if (path.length < 2) {
+                return;
+            }
+            
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 4;
+            ctx.setLineDash([10, 10]);
+            
+            ctx.beginPath();
+            ctx.moveTo(path[0], path[1]);
+            
+            var tt = Math.min(t - this.timeout * step * 60, path.length / 2);
+            
+            for (i = 2; i < 2 * tt; i += 2) {
+                ctx.lineTo(path[i], path[i + 1]);
+            }
+            
+            ctx.stroke();
+        };
+    }
+    
+    function render() {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        var i;
+        
+        if (playing) {
+            t += step;
+            
+            for (i = 0; i < lines.length; ++i) {
+                lines[i].drawAnimation();
+            }
+        } else {
+            for (i = 0; i < lines.length; ++i) {
+                lines[i].drawNodePath();
+            }
+        }
+        
+        requestAnimationFrame(render);
+    }
+    
+    function updateLine(index) {
+        line = lines[index];
+        
+        $("div-color").style.backgroundColor = line.color;
+        $("input-timeout").value = line.timeout === 0 ? "" : (line.timeout + "").replace(".", ",");
+    }
+    
+    function addLine() {
+        var index = lines.length;
+        
+        if (index >= 9) {
+            return;
+        }
+        
+        var option = document.createElement("option");
+        
+        option.innerHTML = "Stippellijn " + (index + 1);
+        $("select-line").add(option);
+        $("select-line").selectedIndex = index;
+        
+        lines.push(new Stippellijn(colors[index]));
+        updateLine(index);
+    }
+    
+    function removeLine() {
+        var index = lines.length - 1;
+        
+        if (index === 0) {
+            return;
+        }
+         
+        $("select-line").remove(index);
+        $("select-line").selectedIndex = index - 1;
+        
+        lines.pop();
+        updateLine(index - 1);
+    }
+    
+    function play() {        
+        t = 0;
+        playing = true;
+    }
+    
+    $("select-line").addEventListener("change", function () {
+        updateLine(this.selectedIndex);
+    });
+    
+    $("input-timeout").addEventListener("input", function () {
+        var value = this.value.trim().replace(",", ".");
+        
+        if (value === "") {
+            line.timeout = 0;
+            return;
+        }
+        
+        var timeout = parseFloat(value);
+        
+        if (isNaN(timeout)) {
+            line.timeout = 0;
+            return;
+        }
+        
+        line.timeout = timeout;
+    });
+    
+    function setSpeed(speed) {
+        step = 32 * speed / segment;
+    }
+    
+    $("select-speed").addEventListener("change", function () {
+        var index = this.selectedIndex;
+        
+        switch (index) {
+        case 0:
+            setSpeed(0.02);
+            break;
+        case 1:
+            setSpeed(0.1);
+            break;
+        case 2:
+            setSpeed(0.4);
+            break;
+        }
+    });
+    
+    ctx.canvas.addEventListener("mousedown", function (evt) {
+        evt.preventDefault();
+        
+        if (!started) {
+            requestAnimationFrame(render);
+            started = true;
+        }
+        
+        if (!mouseDown && playing) {
+            playing = false;
+            line.clearNodes();
+        }
+        
+        mouseDown = true;
+    });
+    
+    ctx.canvas.addEventListener("mouseup", function (evt) {
+        if (mouseDown && !playing) {
+            line.pushNode(mouseX, mouseY);
+        }
+        
+        mouseDown = false;
+    });
+    
+    ctx.canvas.addEventListener("mousemove", function (evt) {
+        var bcr = ctx.canvas.getBoundingClientRect();
+        mouseX = evt.pageX - scrollX - bcr.left;
+        mouseY = evt.pageY - scrollY - bcr.top;
+    });
+    
+    window.addEventListener("keydown", function (evt) {
+        var key = evt.which;
+        
+        if (key == 32) {  // space
+            evt.preventDefault();
+            
+            if (playing) {
+                playing = false;
+                return;
+            }
+            
+            line.popNode();
+        }
+    });
+    
+    window.addEventListener("keyup", function (evt) {
+        if (evt.which == 32) {  // space
+            evt.preventDefault();
+        }
+    });
+</script>
+
+</body>
+</html>
