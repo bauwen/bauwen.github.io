@@ -168,7 +168,7 @@ function isInsideBox(x, y, bx, by, bw, bh) {
 
 function isInsideSector(x, y, cx, cy, cr, ang1, ang2) {
     var dis = Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
-    var dir = (360 - Math.atan2(cy - y, cx - x)) % 360;
+    var dir = (360 - Math.atan2(cy - y, cx - x) * 180 / Math.PI) % 360;
     
     if (ang1 < ang2) {
         return dis < cr && ang1 <= dir && dir < ang2;
