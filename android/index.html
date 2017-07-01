@@ -17,6 +17,7 @@
 </head>
 <body>
 
+<button onclick="create()">Create Server</button>
 <button onclick="test()">Android API Test</button>
 <span id="text" style="color: white;"></span>
 
@@ -27,6 +28,11 @@ function test() {
     } else {
         android.passTest("Johnny McMillroy");
     }
+}
+
+function create() {
+    android.createServer(4002);
+    android.passTest("Created server on port 4002");
 }
 
 function show(text) {
