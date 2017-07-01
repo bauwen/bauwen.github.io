@@ -34,47 +34,64 @@
 <script>
 var ctx = document.getElementById("display").getContext("2d");
 
-ctx.lineWidth = 2;
-ctx.globalAlpha = 0.5;
-
-var cx = 153;
-var cy = 450;
-var cr = 100;
-
+ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
+ctx.lineWidth = 2;
 
-ctx.beginPath();
-ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
-ctx.stroke();
+function renderBackground() {
+    ctx.globalAlpha = 0.5;
 
-ctx.beginPath();
-ctx.moveTo(cx + Math.cos(Math.PI / 4) * cr, cy - Math.sin(Math.PI / 4) * cr);
-ctx.lineTo(cx + Math.cos(5 * Math.PI / 4) * cr, cy - Math.sin(5 * Math.PI / 4) * cr);
-ctx.stroke();
+    var cx = 153;
+    var cy = 450;
+    var cr = 100;
 
-ctx.beginPath();
-ctx.moveTo(cx + Math.cos(3 * Math.PI / 4) * cr, cy - Math.sin(3 * Math.PI / 4) * cr);
-ctx.lineTo(cx + Math.cos(7 * Math.PI / 4) * cr, cy - Math.sin(7 * Math.PI / 4) * cr);
-ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
+    ctx.stroke();
 
-var bx = 153;
-var by = 70;
-var br = 60;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(Math.PI / 4) * cr, cy - Math.sin(Math.PI / 4) * cr);
+    ctx.lineTo(cx + Math.cos(5 * Math.PI / 4) * cr, cy - Math.sin(5 * Math.PI / 4) * cr);
+    ctx.stroke();
 
-ctx.strokeRect(bx - br/2, by - br/2, br, br);
-ctx.strokeRect(bx - 80 - br/2, by + 80 - br/2, br, br);
-ctx.strokeRect(bx + 80 - br/2, by + 80 - br/2, br, br);
-ctx.strokeRect(bx - br/2, by + 160 - br/2, br, br);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(3 * Math.PI / 4) * cr, cy - Math.sin(3 * Math.PI / 4) * cr);
+    ctx.lineTo(cx + Math.cos(7 * Math.PI / 4) * cr, cy - Math.sin(7 * Math.PI / 4) * cr);
+    ctx.stroke();
+
+    var bx = 153;
+    var by = 70;
+    var br = 60;
+
+    ctx.strokeRect(bx - br/2, by - br/2, br, br);
+    ctx.strokeRect(bx - 80 - br/2, by + 80 - br/2, br, br);
+    ctx.strokeRect(bx + 80 - br/2, by + 80 - br/2, br, br);
+    ctx.strokeRect(bx - br/2, by + 160 - br/2, br, br);
+}
+
+function render() {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    renderBackground();
+    
+    if (mouseDown) {
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 40, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    
+    requestAnimationFrame(render);
+}
 
 var mouseX = 0;
 var mouseY = 0;
+var mouseDown = false;
 
 window.onmousedown = function (evt) {
-
+    mouseDown = true;
 };
 
 window.onmouseup = function (evt) {
-
+    mouseDown = false;
 };
 
 window.onmousemove = function (evt) {
@@ -85,14 +102,15 @@ window.onmousemove = function (evt) {
 window.ontouchstart = function (evt) {    
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
+    mouseDown = true;
 };
 
 window.ontouchend = function (evt) {
-
+    mouseDown = false;
 };
 
 window.ontouchcancel = function (evt) {
-
+    mouseDown = false;
 };
 
 window.ontouchmove = function (evt) {
@@ -102,6 +120,8 @@ window.ontouchmove = function (evt) {
     mouseX = evt.touches[0].pageX - window.scrollX;
     mouseY = evt.touches[0].pageY - window.scrollY;
 };
+
+window.onload = render;
 </script>
 
 </body>
