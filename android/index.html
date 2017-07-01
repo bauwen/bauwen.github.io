@@ -17,11 +17,15 @@
 </head>
 <body>
 
-<button onclick="test">Android API Test</button>
+<button onclick="test()">Android API Test</button>
 
 <script>
 function test() {
-    android.passTest("Johnny McMillroy");
+    if (!android) {
+        alert("Not Android.");
+    } else {
+        android.passTest("Johnny McMillroy");
+    }
 }
 </script>
 
