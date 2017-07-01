@@ -142,15 +142,17 @@ function render() {
     for (var i = 0; i < touches.length; i++) {
         var touch = touches[i];
         
-        press("a", isInsideBox(touch.x, touch.y, bx - br/2, by - bo - br/2, br, br));
-        press("d", isInsideBox(touch.x, touch.y, bx - bo - br/2, by - br/2, br, br));
-        press("b", isInsideBox(touch.x, touch.y, bx + bo - br/2, by - br/2, br, br));
-        press("c", isInsideBox(touch.x, touch.y, bx - br/2, by + bo - br/2, br, br));
-        
-        press("right", isInsideSector(touch.x, touch.y, cx, cy, cr, 315, 45));
-        press("down", isInsideSector(touch.x, touch.y, cx, cy, cr, 225, 315));
-        press("left", isInsideSector(touch.x, touch.y, cx, cy, cr, 135, 225));
-        press("up", isInsideSector(touch.x, touch.y, cx, cy, cr, 45, 135));
+        if (touch.y < 300) {
+            press("a", isInsideBox(touch.x, touch.y, bx - br/2, by - bo - br/2, br, br));
+            press("d", isInsideBox(touch.x, touch.y, bx - bo - br/2, by - br/2, br, br));
+            press("b", isInsideBox(touch.x, touch.y, bx + bo - br/2, by - br/2, br, br));
+            press("c", isInsideBox(touch.x, touch.y, bx - br/2, by + bo - br/2, br, br));
+        } else {
+            press("right", isInsideSector(touch.x, touch.y, cx, cy, cr, 315, 45));
+            press("down", isInsideSector(touch.x, touch.y, cx, cy, cr, 225, 315));
+            press("left", isInsideSector(touch.x, touch.y, cx, cy, cr, 135, 225));
+            press("up", isInsideSector(touch.x, touch.y, cx, cy, cr, 45, 135));
+        }
         
         ctx.beginPath();
         ctx.arc(touch.x, touch.y, 40, 0, 2 * Math.PI);
