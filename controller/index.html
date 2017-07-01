@@ -10,6 +10,7 @@
         margin: 0px;
         background-color: salmon;
         overflow: hidden;
+        font: 24px monospace;
     }
     
     .container {
@@ -21,30 +22,97 @@
         max-height: 587px;
         border: 0px solid white;
     }
+    
+    input {
+        padding: 2px 4px;
+        font: 24px monospace;
+    }
+    
+    button {
+        font: 24px monospace;
+        padding: 8px 24px;
+    }
     </style>
 </head>
 <body>
 
 <div align="center">
     <div class="container">
-        <canvas id="display" width="307" height="587" style="background-color: orange;"></canvas>
+        <div id="lobby" style="width: 307px; height: 587px; background-color: orange; display: block;">
+            <br><br>
+            <b>IP Address:</b><br><br>
+            <input id="address" type="text" size="16" value="127.0.0.1"><br><br><br><br>
+            <b>Port Number:</b><br><br>
+            <input id="port" type="text" size="16" value="7000"><br><br><br><br>
+            <button onclick="connect()">Connect</button><br><br><br>
+            <span id="error" style="color: red; font-weight: bold;"></span>
+        </div>
+        <canvas id="display" width="307" height="587" style="background-color: orange; display: none;"></canvas>
     </div>
 </div>
 
 <script>
-var ctx = document.getElementById("display").getContext("2d");
+function $(id) {
+    return document.getElementById(id);
+}
+
+var ctx = $("display").getContext("2d");
 
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
 ctx.lineWidth = 2;
 
+var cx = 153;
+var cy = 450;
+var cr = 110;
+
+var bx = 153;
+var by = 150;
+var br = 60;
+var bo = 80;
+
+var ws = null;
+
+function connect() {
+    $("lobby").style.display = "none";
+    $("display").style.display = "block";
+    
+    var address = $("address").value;
+    var port = parseInt($("port").value);
+    
+    if (isNaN(port)) {
+        showError();
+        return;
+    }
+    
+    ws = new WebSocket("ws://" + address + ":" + port + "/");
+    
+    ws.addEventListener("error", function () {
+        showError();
+    });
+    
+    ws.addEventListener("close", function () {
+        showError();
+    });
+    
+    ws.addEventListener("message", function () {
+        // not interested
+    });
+}
+
+function showError() {
+    if (ws) {
+        ws = null;
+        
+        $("error").innerHTML = "Unable to connect";
+        $("display").style.display = "none";
+        $("lobby").style.display = "block";
+    }
+}
+
 function renderBackground() {
     ctx.globalAlpha = 0.5;
-
-    var cx = 153;
-    var cy = 450;
-    var cr = 100;
-
+    
     ctx.beginPath();
     ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
     ctx.stroke();
@@ -59,22 +127,28 @@ function renderBackground() {
     ctx.lineTo(cx + Math.cos(7 * Math.PI / 4) * cr, cy - Math.sin(7 * Math.PI / 4) * cr);
     ctx.stroke();
 
-    var bx = 153;
-    var by = 70;
-    var br = 60;
-
-    ctx.strokeRect(bx - br/2, by - br/2, br, br);
-    ctx.strokeRect(bx - 80 - br/2, by + 80 - br/2, br, br);
-    ctx.strokeRect(bx + 80 - br/2, by + 80 - br/2, br, br);
-    ctx.strokeRect(bx - br/2, by + 160 - br/2, br, br);
+    ctx.strokeRect(bx - br/2, by - bo - br/2, br, br);
+    ctx.strokeRect(bx - bo - br/2, by - br/2, br, br);
+    ctx.strokeRect(bx + bo - br/2, by - br/2, br, br);
+    ctx.strokeRect(bx - br/2, by + bo - br/2, br, br);
 }
 
-function render() {
+function render() {    
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     renderBackground();
     
     for (var i = 0; i < touches.length; i++) {
         var touch = touches[i];
+        
+        press("a", isInsideBox(touch.x, touch.y, bx - br/2, by - bo - br/2, br, br));
+        press("d", isInsideBox(touch.x, touch.y, bx - bo - br/2, by - br/2, br, br));
+        press("b", isInsideBox(touch.x, touch.y, bx + bo - br/2, by - br/2, br, br));
+        press("c", isInsideBox(touch.x, touch.y, bx - br/2, by + bo - br/2, br, br));
+        
+        press("right", isInsideSector(touch.x, touch.y, cx, cy, cr, 315, 45));
+        press("down", isInsideSector(touch.x, touch.y, cx, cy, cr, 225, 315));
+        press("left", isInsideSector(touch.x, touch.y, cx, cy, cr, 135, 225));
+        press("up", isInsideSector(touch.x, touch.y, cx, cy, cr, 45, 135));
         
         ctx.beginPath();
         ctx.arc(touch.x, touch.y, 40, 0, 2 * Math.PI);
@@ -84,6 +158,58 @@ function render() {
     requestAnimationFrame(render);
 }
 
+function isInsideBox(x, y, bx, by, bw, bh) {
+    return bx <= x && x < bx + bw && by <= y && y < by + bh;
+}
+
+function isInsideSector(x, y, cx, cy, cr, ang1, ang2) {
+    var dis = Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
+    var dir = (360 - Math.atan2(cy - y, cx - x)) % 360;
+    
+    if (ang1 < ang2) {
+        return dis < cr && ang1 <= dir && dir < ang2;
+    } else {
+        return dis < cr && (ang1 <= dir || dir < ang2);
+    }
+}
+
+var pressing = {
+    "a": false,
+    "b": false,
+    "c": false,
+    "d": false,
+    "right": false,
+    "down": false,
+    "left": false,
+    "up": false
+};
+
+function press(button, pressing) {
+    if (pressing) {
+        if (!pressing[button]) {
+            sendPressed(button);
+            pressing[button] = true;
+        }
+    } else {
+        if (pressing[button]) {
+            sendReleased(button);
+            pressing[button] = false;
+        }
+    }
+}
+
+function sendPressed(button) {
+    if (ws) {
+        ws.send("pressed " + button);
+    }
+}
+
+function sendReleased(button) {
+    if (ws) {
+        ws.send("released " + button);
+    }
+}
+
 var mouseX = 0;
 var mouseY = 0;
 var mouseDown = false;
@@ -91,23 +217,7 @@ var mouseDown = false;
 var touches = [];
 var rect = ctx.canvas.getBoundingClientRect();
 
-/*
-window.onmousedown = function (evt) {
-    mouseDown = true;
-};
-
-window.onmouseup = function (evt) {
-    mouseDown = false;
-};
-
-window.onmousemove = function (evt) {
-    mouseX = evt.pageX - window.scrollX - rect.left;
-    mouseY = evt.pageY - window.scrollY - rect.top;
-};
-*/
-
 function updateTouches(evt) {
-    console.log("touching...");
     touches = [];
     
     for (var i = 0; i < evt.touches.length; i++) {
