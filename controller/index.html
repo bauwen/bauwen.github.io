@@ -16,9 +16,9 @@
         width: 307px;
         min-width: 307px;
         max-width: 307px;
-        height: 567px;
-        min-height: 567px;
-        max-height: 567px;
+        height: 587px;
+        min-height: 587px;
+        max-height: 587px;
         border: 0px solid white;
     }
     </style>
@@ -27,15 +27,18 @@
 
 <div align="center">
     <div class="container">
-        <canvas id="display" width="307" height="567" style="background-color: orange;"></canvas>
+        <canvas id="display" width="307" height="587" style="background-color: orange;"></canvas>
     </div>
 </div>
 
 <script>
 var ctx = document.getElementById("display").getContext("2d");
 
+ctx.lineWidth = 2;
+ctx.globalAlpha = 0.5;
+
 var cx = 153;
-var cy = 440;
+var cy = 450;
 var cr = 100;
 
 ctx.strokeStyle = "black";
@@ -54,12 +57,14 @@ ctx.moveTo(cx + Math.cos(3 * Math.PI / 4) * cr, cy - Math.sin(3 * Math.PI / 4) *
 ctx.lineTo(cx + Math.cos(7 * Math.PI / 4) * cr, cy - Math.sin(7 * Math.PI / 4) * cr);
 ctx.stroke();
 
-var bs = 50;
+var bx = 153;
+var by = 70;
+var br = 60;
 
-ctx.strokeRect(153 - bs/2, 70 - bs/2, bs, bs);
-ctx.strokeRect(153 - 80 - bs/2, 70 + 80 - bs/2, bs, bs);
-ctx.strokeRect(153 + 80 - bs/2, 70 + 80 - bs/2, bs, bs);
-ctx.strokeRect(153 - bs/2, 70 + 160 - bs/2, bs, bs);
+ctx.strokeRect(bx - br/2, by - br/2, br, br);
+ctx.strokeRect(bx - 80 - br/2, by + 80 - br/2, br, br);
+ctx.strokeRect(bx + 80 - br/2, by + 80 - br/2, br, br);
+ctx.strokeRect(bx - br/2, by + 160 - br/2, br, br);
 
 var mouseX = 0;
 var mouseY = 0;
