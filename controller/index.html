@@ -73,9 +73,11 @@ function render() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     renderBackground();
     
-    if (mouseDown) {
+    for (var i = 0; i < touches.length; i++) {
+        var touch = touches[i];
+        
         ctx.beginPath();
-        ctx.arc(mouseX, mouseY, 40, 0, 2 * Math.PI);
+        ctx.arc(touch.x, touch.y, 40, 0, 2 * Math.PI);
         ctx.fill();
     }
     
@@ -86,6 +88,10 @@ var mouseX = 0;
 var mouseY = 0;
 var mouseDown = false;
 
+var touches = [];
+var rect = ctx.canvas.getBoundingClientRect();
+
+/*
 window.onmousedown = function (evt) {
     mouseDown = true;
 };
@@ -95,32 +101,32 @@ window.onmouseup = function (evt) {
 };
 
 window.onmousemove = function (evt) {
-    var rect = ctx.canvas.getBoundingClientRect();
     mouseX = evt.pageX - window.scrollX - rect.left;
     mouseY = evt.pageY - window.scrollY - rect.top;
 };
+*/
 
-window.ontouchstart = function (evt) {
-    var rect = ctx.canvas.getBoundingClientRect();
-    mouseX = evt.touches[0].pageX - window.scrollX - rect.left;
-    mouseY = evt.touches[0].pageY - window.scrollY - rect.top;
-    mouseDown = true;
-};
+function updateTouches(evt) {
+    console.log("touching...");
+    touches = [];
+    
+    for (var i = 0; i < evt.touches.length; i++) {
+        touches.push({
+            x: evt.touches[i].pageX - window.scrollX - rect.left,
+            y: evt.touches[i].pageY - window.scrollY - rect.top
+        });
+    }
+}
 
-window.ontouchend = function (evt) {
-    mouseDown = false;
-};
-
-window.ontouchcancel = function (evt) {
-    mouseDown = false;
-};
+window.ontouchstart = updateTouches;
+window.ontouchend = updateTouches;
+window.ontouchcancel = updateTouches;
 
 window.ontouchmove = function (evt) {
     evt.preventDefault();
     evt.stopImmediatePropagation();
     
-    mouseX = evt.touches[0].pageX - window.scrollX;
-    mouseY = evt.touches[0].pageY - window.scrollY;
+    updateTouches(evt);
 };
 
 window.onload = render;
