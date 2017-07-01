@@ -274,7 +274,7 @@ function updateTouches(evt) {
     }
 }
 
-/*
+
 window.onmousedown = function (evt) {
     //console.log("mousedown");
     touches = [{
@@ -294,18 +294,18 @@ window.onmouseup = function (evt) {
     //console.log("mouseup");
     touches = [];
 };
-*/
 
+/*
 window.ontouchstart = updateTouches;
 window.ontouchend = updateTouches;
 window.ontouchcancel = updateTouches;
 
-window.ontouchmove = function (evt) {
+window.ontouchmove = updateTouches; /*function (evt) {
     evt.preventDefault();
     evt.stopImmediatePropagation();
     
     updateTouches(evt);
-};
+};*/
 
 window.onload = render;
 </script>
