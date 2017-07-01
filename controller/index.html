@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<head>
+    <title>Controller</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <meta name="apple-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+    body {
+        margin: 0px;
+        background-color: salmon;
+        overflow: hidden;
+    }
+    
+    .container {
+        width: 307px;
+        min-width: 307px;
+        max-width: 307px;
+        height: 567px;
+        min-height: 567px;
+        max-height: 567px;
+        border: 0px solid white;
+    }
+    </style>
+</head>
+<body>
+
+<div align="center">
+    <div class="container">
+        <canvas id="display" width="307" height="567" style="background-color: orange;"></canvas>
+    </div>
+</div>
+
+<script>
+var ctx = document.getElementById("display").getContext("2d");
+
+var cx = 153;
+var cy = 440;
+var cr = 100;
+
+ctx.strokeStyle = "black";
+
+ctx.beginPath();
+ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(cx + Math.cos(Math.PI / 4) * cr, cy - Math.sin(Math.PI / 4) * cr);
+ctx.lineTo(cx + Math.cos(5 * Math.PI / 4) * cr, cy - Math.sin(5 * Math.PI / 4) * cr);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(cx + Math.cos(3 * Math.PI / 4) * cr, cy - Math.sin(3 * Math.PI / 4) * cr);
+ctx.lineTo(cx + Math.cos(7 * Math.PI / 4) * cr, cy - Math.sin(7 * Math.PI / 4) * cr);
+ctx.stroke();
+
+var bs = 50;
+
+ctx.strokeRect(153 - bs/2, 70 - bs/2, bs, bs);
+ctx.strokeRect(153 - 80 - bs/2, 70 + 80 - bs/2, bs, bs);
+ctx.strokeRect(153 + 80 - bs/2, 70 + 80 - bs/2, bs, bs);
+ctx.strokeRect(153 - bs/2, 70 + 160 - bs/2, bs, bs);
+
+var mouseX = 0;
+var mouseY = 0;
+
+window.onmousedown = function (evt) {
+
+};
+
+window.onmouseup = function (evt) {
+
+};
+
+window.onmousemove = function (evt) {
+    mouseX = evt.pageX - window.scrollX;
+    mouseY = evt.pageY - window.scrollY;
+};
+
+window.ontouchstart = function (evt) {    
+    mouseX = evt.touches[0].pageX - window.scrollX;
+    mouseY = evt.touches[0].pageY - window.scrollY;
+};
+
+window.ontouchend = function (evt) {
+
+};
+
+window.ontouchcancel = function (evt) {
+
+};
+
+window.ontouchmove = function (evt) {
+    evt.preventDefault();
+    evt.stopImmediatePropagation();
+    
+    mouseX = evt.touches[0].pageX - window.scrollX;
+    mouseY = evt.touches[0].pageY - window.scrollY;
+};
+</script>
+
+</body>
+</html>
