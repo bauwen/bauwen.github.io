@@ -74,9 +74,6 @@ var bo = 80;
 var ws = null;
 
 function connect() {
-    $("lobby").style.display = "none";
-    $("display").style.display = "block";
-    
     var address = $("address").value;
     var port = parseInt($("port").value);
     
@@ -86,6 +83,11 @@ function connect() {
     }
     
     ws = new WebSocket("ws://" + address + ":" + port + "/");
+    
+    ws.addEventListener("open", function () {
+        $("lobby").style.display = "none";
+        $("display").style.display = "block";
+    });
     
     ws.addEventListener("error", function () {
         showError();
