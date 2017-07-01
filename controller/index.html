@@ -95,13 +95,15 @@ window.onmouseup = function (evt) {
 };
 
 window.onmousemove = function (evt) {
-    mouseX = evt.pageX - window.scrollX;
-    mouseY = evt.pageY - window.scrollY;
+    var rect = ctx.canvas.getBoundingClientRect();
+    mouseX = evt.pageX - window.scrollX - rect.left;
+    mouseY = evt.pageY - window.scrollY - rect.top;
 };
 
-window.ontouchstart = function (evt) {    
-    mouseX = evt.touches[0].pageX - window.scrollX;
-    mouseY = evt.touches[0].pageY - window.scrollY;
+window.ontouchstart = function (evt) {
+    var rect = ctx.canvas.getBoundingClientRect();
+    mouseX = evt.touches[0].pageX - window.scrollX - rect.left;
+    mouseY = evt.touches[0].pageY - window.scrollY - rect.top;
     mouseDown = true;
 };
 
