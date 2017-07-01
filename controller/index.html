@@ -186,8 +186,8 @@ var pressing = {
     "up": false
 };
 
-function press(button, pressing) {
-    if (pressing) {
+function press(button, isPressing) {
+    if (isPressing) {
         if (!pressing[button]) {
             sendPressed(button);
             pressing[button] = true;
