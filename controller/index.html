@@ -39,7 +39,7 @@
 <div align="center">
     <div class="container">
         <span id="log"></span>
-        <div id="lobby" style="width: 307px; height: 587px; background-color: orange; display: block;">
+        <div id="lobby" style="width: 307px; height: 587px; background-color: darkorange; display: block;">
             <br><br>
             <b>IP Address:</b><br><br>
             <input id="address" type="text" size="16" value="127.0.0.1"><br><br><br><br>
@@ -274,7 +274,7 @@ function updateTouches(evt) {
         });
     }
     
-    $("log").innerHTML = touches.length + " (" + touches[0].x + ", " + touches[0].y + ")";
+    $("log").innerHTML = "* " + touches.length + " (" + touches[0].x + ", " + touches[0].y + ")";
 }
 
 /*
