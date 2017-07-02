@@ -274,7 +274,8 @@ function updateTouches(evt) {
         });
     }
     
-    $("log").innerHTML = "* " + touches.length + " (" + touches[0].x + ", " + touches[0].y + ")";
+    if (touches.length > 0)
+        $("log").innerHTML = "* " + touches.length + " (" + touches[0].x + ", " + touches[0].y + ")";
 }
 
 /*
