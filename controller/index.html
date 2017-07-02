@@ -74,6 +74,24 @@ var bo = 80;
 
 var ws = null;
 
+var pressing = {
+    "a": false,
+    "b": false,
+    "c": false,
+    "d": false,
+    "right": false,
+    "down": false,
+    "left": false,
+    "up": false
+};
+
+var mouseX = 0;
+var mouseY = 0;
+var mouseDown = false;
+
+var touches = [];
+var rect = ctx.canvas.getBoundingClientRect();
+
 function connect() {
     var address = $("address").value;
     var port = parseInt($("port").value);
@@ -218,17 +236,6 @@ function isInsideSector(x, y, cx, cy, cr, ang1, ang2) {
     }
 }
 
-var pressing = {
-    "a": false,
-    "b": false,
-    "c": false,
-    "d": false,
-    "right": false,
-    "down": false,
-    "left": false,
-    "up": false
-};
-
 function press(button, isPressing) {
     if (isPressing) {
         if (!pressing[button]) {
@@ -257,13 +264,6 @@ function sendReleased(button) {
     }
 }
 
-var mouseX = 0;
-var mouseY = 0;
-var mouseDown = false;
-
-var touches = [];
-var rect = ctx.canvas.getBoundingClientRect();
-
 function updateTouches(evt) {
     touches = [];
     
@@ -274,7 +274,7 @@ function updateTouches(evt) {
         });
     }
     
-    $("log").innerHTML = touches.length;
+    $("log").innerHTML = touches.length + " (" + touches[0].x + ", " + touches[0].y + ")";
 }
 
 /*
