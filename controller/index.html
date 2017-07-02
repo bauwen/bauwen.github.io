@@ -38,6 +38,7 @@
 
 <div align="center">
     <div class="container">
+        <span id="log"></span>
         <div id="lobby" style="width: 307px; height: 587px; background-color: orange; display: block;">
             <br><br>
             <b>IP Address:</b><br><br>
@@ -272,9 +273,11 @@ function updateTouches(evt) {
             y: evt.touches[i].pageY - window.scrollY - rect.top
         });
     }
+    
+    $("log").innerHTML = touches.length;
 }
 
-
+/*
 window.onmousedown = function (evt) {
     //console.log("mousedown");
     touches = [{
@@ -294,18 +297,18 @@ window.onmouseup = function (evt) {
     //console.log("mouseup");
     touches = [];
 };
+*/
 
-/*
 window.ontouchstart = updateTouches;
 window.ontouchend = updateTouches;
 window.ontouchcancel = updateTouches;
 
-window.ontouchmove = updateTouches; /*function (evt) {
+window.ontouchmove = function (evt) {
     evt.preventDefault();
     evt.stopImmediatePropagation();
     
     updateTouches(evt);
-};*/
+};
 
 window.onload = render;
 </script>
