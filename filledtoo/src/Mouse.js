@@ -78,7 +78,12 @@ function Mouse(element) {
     });
     */
     
+    function log(t) {
+        document.getElementById("thing").innerHTML = t;
+    }
+    
     element.addEventListener("touchstart", function (event) {
+        log("starting touch!");
         var rect = element.getBoundingClientRect();
         var touch = event.touches[0];
         var button = 0;
@@ -96,6 +101,7 @@ function Mouse(element) {
     });
     
     element.addEventListener("touchend", function (event) {
+        log("ending touch!");
         var button = 0;
         
         if (buttonsDown[button]) {
@@ -120,6 +126,9 @@ function Mouse(element) {
     });
     
     element.addEventListener("touchmove", function (event) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        
         var rect = element.getBoundingClientRect();
         var touch = event.touches[0];
         
