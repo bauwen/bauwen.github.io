@@ -1,4 +1,5 @@
 function Mouse(element) {
+    /*
     var preventDefault = true;
     var preventDefaultCases = null;
     
@@ -9,6 +10,7 @@ function Mouse(element) {
             preventDefaultCases = null;
         }
     }
+    */
     
     var names = ["Left", "Middle", "Right", "Fourth", "Fifth"];
     var buttons = {};
