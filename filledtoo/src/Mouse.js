@@ -128,14 +128,17 @@ function Mouse(element) {
     });
     
     element.addEventListener("touchmove", function (event) {
-        evt.preventDefault();
-        evt.stopImmediatePropagation();
+        //evt.preventDefault();
+        //evt.stopImmediatePropagation();
+        
         
         var rect = element.getBoundingClientRect();
         var touch = event.touches[0];
         
         x = touch.pageX - window.scrollX - rect.left;
         y = touch.pageY - window.scrollY - rect.top;
+        
+        log("moving:", x, "|", y);
     });
     
     return {
