@@ -4,7 +4,7 @@ var LEVELS = [
     "oooooooooooooooo" +
     "oooooooooooooooo" +
     "oooooooooooooooo" +
-    "oooooox..@oooooo" +
+    "ooox..@ooooooooo" +
     "oooooooooooooooo" +
     "oooooooooooooooo" +
     "oooooooooooooooo" +
