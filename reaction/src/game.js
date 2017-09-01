@@ -22,13 +22,18 @@ var scoreMode2 = -1;
 
 var menuStarted = false;
 
+function getMsTime() {
+    //return (new Date()).getTime();
+    return performance.now();
+}
+
 function Overlay() {
     this.scene = "";
     this.size = 500;
     this.out = false;
     
     this.update = function () {
-        ctx.fillStyle = "rgb(40, 40, 40)";
+        ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.globalAlpha = Math.max(0, Math.min(this.size / 300, 1));
         
         if (this.out) {
@@ -36,7 +41,7 @@ function Overlay() {
             //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             
             if (this.size < 500) {
-                this.size += (550 - this.size) / 6;
+                this.size += (550 - this.size) / 8;
             } else {
                 game.enterScene(this.scene);
             }
@@ -58,14 +63,15 @@ function Overlay() {
 }
 
 function drawButton(text, x, y, callback) {
-    var color1 = "white";
+    var color1 = "rgb(240, 240, 240)";
     var color2 = "rgb(20, 20, 20)";
     var w = 230;
     var h = 60;
     var hover = mouseInBox(x - w / 2, y - h / 2, w, h);
     var l = 2;
+    var s = 0;
     
-    ctx.font = "24px gamefont, monospace";
+    ctx.font = "24px gamefont, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
@@ -73,8 +79,14 @@ function drawButton(text, x, y, callback) {
     ctx.fillRect(x - w / 2, y - h / 2, w, h);
     
     if (hover) {
+        
+        /*
+        ctx.fillStyle = color2;
+        ctx.fillRect(x - w / 2 + l, y - h / 2 + l, w - 2 * l, h - 2 * l);
         ctx.fillStyle = color1;
-        ctx.fillRect(x - w / 2, y - h / 2, w, h);
+        ctx.fillRect(x - w / 2 + s, y - h / 2 + s, w - 2 * s, h - 2 * s);
+        */
+        
         ctx.fillStyle = color2;
         ctx.fillText(text, x, y);
         
@@ -116,7 +128,7 @@ game.addObject("obj_menu", {
         drawButton("Play Mode 1", cx, cy - 100, this.gotoMode1);
         drawButton("Play Mode 2", cx, cy + 80, this.gotoMode2);
         
-        ctx.font = "18px gamefont, monospace";
+        ctx.font = "18px gamefont, sans-serif";
         ctx.fillStyle = "rgb(220, 220, 50)";
         
         ctx.fillText("Your highscore: " + (scoreMode1 < 0 ? "n/a" : scoreMode1 + " ms"), cx, cy - 100 + 65);
@@ -166,8 +178,8 @@ game.addObject("obj_mode1", {
                 self.highscore = true;
                 
                 if (scoreMode1 > 0) {
-                    localStorage.setItem("highscore1", scoreMode1);
-                    window.api.submitStat(window.STAT_SCORE1, scoreMode1);
+                    localStorage.setItem("highscore1", scoreMode1 * 1000);
+                    window.api.submitStat(window.STAT_SCORE1, scoreMode1 * 1000);
                 }
             } else {
                 self.tween.set(20);
@@ -188,7 +200,7 @@ game.addObject("obj_mode1", {
     },
     
     update: function () {
-        ctx.font = "22px gamefont, monospace";
+        ctx.font = "22px gamefont, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
@@ -205,13 +217,14 @@ game.addObject("obj_mode1", {
         }
         else if (this.state === 1) {  // waiting
             ctx.fillStyle = "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText("0 ms", cx, cy - 5);
             
             if (this.timer > 0) {
                 this.timer -= 1;
             } else {
-                this.time = (new Date()).getTime();
+                game.playSound("snd_show");
+                this.time = getMsTime();
                 this.state = 2;
             }
             
@@ -223,11 +236,12 @@ game.addObject("obj_mode1", {
             }
         }
         else if (this.state === 2) {  // counting
-            this.ms = Math.floor((new Date()).getTime() - this.time);
+            //this.ms = Math.round(getMsTime() - this.time);
+            this.ms = Math.round((getMsTime() - this.time) * 100) / 100;
             
             ctx.fillStyle = "white";
             fillCircle(cx, cy - 140, 60);
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.ms + " ms", cx, cy - 5);
             
             if (game.mousePressed("Left")) {
@@ -247,7 +261,7 @@ game.addObject("obj_mode1", {
                 fillCircle(cx, cy - 140, 70 + this.tween.get());
                 
                 ctx.fillStyle = "black";
-                ctx.font = "16px gamefont, monospace";
+                ctx.font = "16px gamefont, sans-serif";
                 ctx.fillText("NEW", cx, cy - 150);
                 ctx.fillText("HIGHSCORE!", cx, cy - 130);
             } else {
@@ -256,7 +270,7 @@ game.addObject("obj_mode1", {
             }
             
             ctx.fillStyle = this.highscore ? "rgb(230, 230, 30)" : "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.ms + " ms", cx, cy - 5);
             
             drawButton("Replay", cx, cy + 90, this.start);
@@ -267,7 +281,7 @@ game.addObject("obj_mode1", {
             fillCircle(cx, cy - 140, 70 + this.tween.get());
             
             ctx.fillStyle = "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.failMessage, cx, cy - 5);
             
             drawButton("Replay", cx, cy + 90, this.start);
@@ -323,8 +337,8 @@ game.addObject("obj_mode2", {
                 self.highscore = true;
                 
                 if (scoreMode2 > 0) {
-                    localStorage.setItem("highscore2", scoreMode2);
-                    window.api.submitStat(window.STAT_SCORE2, scoreMode2);
+                    localStorage.setItem("highscore2", scoreMode2 * 1000);
+                    window.api.submitStat(window.STAT_SCORE2, scoreMode2 * 1000);
                 }
             } else {
                 self.tween.set(20);
@@ -357,7 +371,7 @@ game.addObject("obj_mode2", {
     },
     
     update: function () {
-        ctx.font = "22px gamefont, monospace";
+        ctx.font = "22px gamefont, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
@@ -375,13 +389,14 @@ game.addObject("obj_mode2", {
         }
         else if (this.state === 1) {  // waiting
             ctx.fillStyle = "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText("0 ms", cx, cy - 5);
             
             if (this.timer > 0) {
                 this.timer -= 1;
             } else {
-                this.time = (new Date()).getTime();
+                game.playSound("snd_show");
+                this.time = getMsTime();
                 this.state = 2;
             }
             
@@ -394,7 +409,8 @@ game.addObject("obj_mode2", {
         }
         else if (this.state === 2) {  // counting
             if (this.clicks === 0) {
-                this.ms = Math.floor((new Date()).getTime() - this.time);
+                //this.ms = Math.round(getMsTime() - this.time);
+                this.ms = Math.round((getMsTime() - this.time) * 100) / 100;
             } else {
                 if (this.timeout > 0) {
                     this.timeout -= 1;
@@ -409,12 +425,12 @@ game.addObject("obj_mode2", {
             
             ctx.fillStyle = "white";
             fillCircle(cx, cy - 140, 60);
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.ms + " ms", cx, cy - 5);
             
-            ctx.font = "64px gamefont, monospace";
+            ctx.font = "64px gamefont, sans-serif";
             ctx.fillStyle = "rgb(20, 20, 20)";
-            ctx.fillText(this.count - this.clicks*0, cx, cy - 140);
+            ctx.fillText(this.count - this.clicks*0, cx, cy - 140 + 2);
             
             if (game.mousePressed("Left")) {
                 this.clicks += 1;
@@ -438,7 +454,7 @@ game.addObject("obj_mode2", {
                 fillCircle(cx, cy - 140, 70 + this.tween.get());
                 
                 ctx.fillStyle = "black";
-                ctx.font = "16px gamefont, monospace";
+                ctx.font = "16px gamefont, sans-serif";
                 ctx.fillText("NEW", cx, cy - 150);
                 ctx.fillText("HIGHSCORE!", cx, cy - 130);
             } else {
@@ -447,7 +463,7 @@ game.addObject("obj_mode2", {
             }
             
             ctx.fillStyle = this.highscore ? "rgb(230, 230, 30)" : "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.ms + " ms", cx, cy - 5);
             
             if (this.wait > 0) {
@@ -462,7 +478,7 @@ game.addObject("obj_mode2", {
             fillCircle(cx, cy - 140, 70 + this.tween.get());
             
             ctx.fillStyle = "white";
-            ctx.font = "48px gamefont, monospace";
+            ctx.font = "48px gamefont, sans-serif";
             ctx.fillText(this.failMessage, cx, cy - 5);
             
             if (this.wait > 0) {
@@ -511,6 +527,8 @@ window.addEventListener("load", function () {
                 if (scoreMode1 > 0) {
                     window.api.submitStat(window.STAT_SCORE1, scoreMode1);
                 }
+                
+                scoreMode1 /= 1000;
             }
             
             if (localStorage.getItem("highscore2")) {
@@ -519,13 +537,19 @@ window.addEventListener("load", function () {
                 if (scoreMode2 > 0) {
                     window.api.submitStat(window.STAT_SCORE2, scoreMode2);
                 }
+                
+                scoreMode2 /= 1000;
             }
         }
         
         game.loadAssets({
             fonts: {
-                timeout: 1,
+                timeout: 1000,
                 "gamefont": "src/font.ttf"
+            },
+            
+            sounds: {
+                "snd_show": "src/snd_show.wav"
             }
         }, {
             finish: function () {
