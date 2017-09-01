@@ -25,8 +25,8 @@ function Overlay() {
     this.out = false;
     
     this.update = function () {
-        ctx.fillStyle = "rgb(0, 0, 0)";
-        ctx.globalAlpha = Math.max(0, Math.min(this.size / 500, 1));
+        ctx.fillStyle = "rgb(60, 60, 60)";
+        ctx.globalAlpha = Math.max(0, Math.min(this.size / 300, 1));
         
         if (this.out) {
             fillCircle(ctx.canvas.width / 2, ctx.canvas.height / 2, this.size);
@@ -180,7 +180,7 @@ game.addObject("obj_mode1", {
     },
     
     update: function () {
-        ctx.font = "28px gamefont, monospace";
+        ctx.font = "22px gamefont, monospace";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
@@ -349,7 +349,7 @@ game.addObject("obj_mode2", {
     },
     
     update: function () {
-        ctx.font = "28px gamefont, monospace";
+        ctx.font = "22px gamefont, monospace";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
