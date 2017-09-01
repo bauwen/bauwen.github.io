@@ -1,4 +1,5 @@
 var canvas = document.getElementById("display");
+
 var game = new Game(canvas);
 var ctx = game.ctx;
 
@@ -19,21 +20,23 @@ try {
 var scoreMode1 = -1;
 var scoreMode2 = -1;
 
+var menuStarted = false;
+
 function Overlay() {
     this.scene = "";
     this.size = 500;
     this.out = false;
     
     this.update = function () {
-        ctx.fillStyle = "rgb(60, 60, 60)";
+        ctx.fillStyle = "rgb(40, 40, 40)";
         ctx.globalAlpha = Math.max(0, Math.min(this.size / 300, 1));
         
         if (this.out) {
             fillCircle(ctx.canvas.width / 2, ctx.canvas.height / 2, this.size);
             //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             
-            if (this.size < 495) {
-                this.size += (500 - this.size) / 6;
+            if (this.size < 500) {
+                this.size += (550 - this.size) / 6;
             } else {
                 game.enterScene(this.scene);
             }
@@ -89,6 +92,11 @@ function drawButton(text, x, y, callback) {
 game.addObject("obj_menu", {
     create: function () {
         this.overlay = new Overlay();
+        
+        if (!menuStarted) {
+            this.overlay.size = 0;
+            menuStarted = true;
+        }
         
         var self = this;
         
@@ -189,7 +197,7 @@ game.addObject("obj_mode1", {
         
         if (this.state === 0) {  // explaining
             ctx.fillStyle = "white";
-            ctx.fillText("Tap when the white dot appears.", cx, cy - 100);
+            ctx.fillText("Tap when a white dot appears.", cx, cy - 100);
             ctx.fillText("As fast as you can.", cx, cy - 60);
             
             drawButton("Okay", cx, cy + 50, this.start);
@@ -358,7 +366,7 @@ game.addObject("obj_mode2", {
         
         if (this.state === 0) {  // explaining
             ctx.fillStyle = "white";
-            ctx.fillText("When the white dot appears,", cx, cy - 140);
+            ctx.fillText("When a white dot appears,", cx, cy - 140);
             ctx.fillText("tap as many times as displayed.", cx, cy - 100);
             ctx.fillText("As fast as you can.", cx, cy - 60);
             
