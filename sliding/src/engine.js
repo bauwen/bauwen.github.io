@@ -68,8 +68,8 @@ function Game(canvas, useViews) {
         
         event.preventDefault();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
+        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
         
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
@@ -92,8 +92,8 @@ function Game(canvas, useViews) {
     window.addEventListener("mousemove", function (event) {
         var rect = canvas.getBoundingClientRect();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
+        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
     });
     
     this.objects = {};

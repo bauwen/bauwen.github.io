@@ -1479,11 +1479,13 @@ function drawLevelButton(n, x, y, selected, state) {
 var banner;
 
 window.addEventListener("load", function () {
-    console.log("Not a correct site: " + window.parent.location.hostname);
     
     if (!checkCorrectSite()) {
+        console.log("Not a correct site: " + window.parent.location.hostname);
         return;
     }
+    
+    canvas.style.backgroundColor = "rgb(180, 100, 60)";
     
     banner = new Image();
     banner.src = "src/images/img_coolmathgamesbanner.png";
@@ -1636,6 +1638,8 @@ function loadScreen() {
     });
 }
 
+var WIDTH_RATIO = 0;
+var HEIGHT_RATIO = 0;
 var topDiv = document.getElementById("top");
 topDiv.style.marginTop = "0px";
 resizeIt();

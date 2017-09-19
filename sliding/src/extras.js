@@ -33,6 +33,9 @@ function resizeIt() {
         sw = w;
     }
     
+    WIDTH_RATIO = c.width / sw;
+    HEIGHT_RATIO = c.height / sh;
+    
     c.style.width = Math.floor(sw) + "px";
     c.style.height = Math.floor(sh) + "px";
     topDiv.style.marginTop = Math.floor((h - sh) / 2) + "px";
