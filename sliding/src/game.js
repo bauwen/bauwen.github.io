@@ -1479,9 +1479,9 @@ function drawLevelButton(n, x, y, selected, state) {
 var banner;
 
 window.addEventListener("load", function () {
+    console.log("Not a correct site: " + window.parent.location.hostname);
     
     if (!checkCorrectSite()) {
-        console.log("Not a correct site: " + window.parent.location.hostname);
         return;
     }
     
