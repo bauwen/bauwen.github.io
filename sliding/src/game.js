@@ -434,24 +434,6 @@ game.addObject("obj_levelcontroller", {
             ctx.fillText("Congratulations!", ctx.canvas.width / 2, 100);
             ctx.fillText("Thank you for playing!", ctx.canvas.width / 2, 370);
         }
-        
-        // TODO: REMOVE DEBUGGING
-        
-        /*
-        if (game.keyboardPressed("1") && levelnumber > 0) {
-            levelnumber -= 1;
-            gotoLevel(levelnumber);
-        }
-        
-        if (game.keyboardPressed("2") && levelnumber < LEVELS.length - 1) {
-            levelnumber += 1;
-            gotoLevel(levelnumber);
-        }
-        
-        if (game.keyboardPressed("u")) {
-            unlocked[levelnumber] = true;
-        }
-        //*/
     }
 });
 
@@ -1161,13 +1143,13 @@ function updateGameMenu() {
 }
 
 var helptext = [
-    "Control this sliding thing to reach the hole",//"The player you control to reach this hole:",
+    "Control this sliding thing to reach the hole",
     "A rotator makes the sliding thing turn 90 degrees clockwise.",
     "A portal teleports the sliding thing to the other portal.",
     "A block can be pushed when the sliding thing is moving.",
     "Collect all coins to open the sealed hole",
-    "Game by Diamonax",
-    "Music by Kevin MacLeod (\"Miami Viceroy\")"
+    "",//"Game by Diamonax",
+    "Music by Kevin MacLeod"// (\"Miami Viceroy\")"
 ];
 
 function updateHelpMenu() {
@@ -1479,9 +1461,7 @@ function drawLevelButton(n, x, y, selected, state) {
 var banner;
 
 window.addEventListener("load", function () {
-    
     if (!checkCorrectSite()) {
-        console.log("Not a correct site: " + window.parent.location.hostname);
         return;
     }
     
@@ -1605,35 +1585,10 @@ function loadScreen() {
         }
     }, {
         progress: function (p) {
-            /*
-            var w = 300;
-            var h = 30;
-            var x = ctx.canvas.width / 2 - w / 2;
-            var y = ctx.canvas.height / 2 - h / 2;
-            var s = 8;
-            
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "rgb(100, 60, 20)";
-            ctx.strokeRect(x - s, y - s, w + 2 * s, h + 2 * s);
-            
-            ctx.fillStyle = "rgb(100, 60, 20)";
-            ctx.fillRect(x, y, w * p, h);
-            */
             progt = p;
         },
         
         finish: function () {
-            /*
-            for (var i = 0; i < LEVELS.length; i++) {
-                LEVELIMAGES.push(getLevelImage(getLevel(i)));
-            }
-            
-            if (MUSIC) game.playMusic("mus_play", true);
-            game.run();
-            game.enterScene("scn_level");
-            */
         }
     });
 }

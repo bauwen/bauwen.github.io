@@ -103,7 +103,7 @@ function gotoLevel(n) {
         localStorage.setItem("levels", JSON.stringify(unlocked));
     }
     
-    if (!levelmenu && !helpmenu && lastlevel !== HELP_LEVEL) {
+    if (n < 40 && !levelmenu && !helpmenu && lastlevel !== HELP_LEVEL) {
         if (lastlevel === n) {
             cmgReplay(n + 1);
         } else {
