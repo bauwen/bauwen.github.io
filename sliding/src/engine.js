@@ -425,31 +425,12 @@ Game.prototype = {
                     return;
                 }
                 
-                var channel = new Audio(); 
-                
-                var loadedEvent = function () {
-                    channel.removeEventListener("canplaythrough", loadedEvent, false);
-                    
-                    channels.push(channel);
-                    loadChannel(i + 1);
-                };
-                
-                channel.preload = "auto";
+                var channel = new Audio();
                 channel.src = soundAssets[index + 1];
-                channel.addEventListener("canplaythrough", loadedEvent, false);
-                
-                /*
                 channel.onloadeddata = function () {
                     channels.push(channel);
-                    //loadChannel(i + 1);
-                };
-                */
-                
-                /*
-                window.setTimeout(function () {
                     loadChannel(i + 1);
-                }, 120);
-                */
+                };
             }
             
             loadChannel(0);
@@ -462,28 +443,13 @@ Game.prototype = {
             }
             
             var audio = new Audio();
-            
-            var loadedEvent = function () {
-                audio.removeEventListener("canplaythrough", loadedEvent, false);
-                
-                self.music[musicAssets[index]] = audio;  
-                count += 1;
-                progress(count / total);    
-                window.setTimeout(loadMusic, 1, index + 2);
-            };
-            
-            audio.preload = "auto";
             audio.src = musicAssets[index + 1];
-            audio.addEventListener("canplaythrough", loadedEvent, false);
-            
-            /*
             audio.onloadeddata = function () {
                 self.music[musicAssets[index]] = audio;  
                 count += 1;
                 progress(count / total);    
                 window.setTimeout(loadMusic, 1, index + 2);
             };
-            */
         }
         
         function loadFonts() {

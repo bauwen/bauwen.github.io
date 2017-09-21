@@ -1469,7 +1469,15 @@ window.addEventListener("load", function () {
     
     banner = new Image();
     banner.src = "src/images/img_coolmathgamesbanner.png";
-    banner.onload = function () { setTimeout(loadScreen, 11); };
+    banner.onload = function () { 
+        //setTimeout(loadScreen, 11);
+        
+        var fc = function () {
+            window.removeEventListener("click", fc, false);
+            loadScreen();
+        };
+        window.addEventListener("click", fc, false);
+    };
 });
 
 function loadScreen() {   
