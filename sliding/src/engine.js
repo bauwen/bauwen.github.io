@@ -532,7 +532,13 @@ Game.prototype = {
     },
     
     pauseMusic: function (name) {
-        this.music[name].pause();
+        var music = this.music[name];
+        
+        if (music === undefined) {
+            return;
+        }
+        
+        music.pause();
     },
     
     setMusicTime: function (name, time) {
