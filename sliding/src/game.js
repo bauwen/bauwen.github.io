@@ -1469,7 +1469,7 @@ window.addEventListener("load", function () {
     }
     
     canvas.style.backgroundColor = "rgb(180, 100, 60)";
-    
+    /*
     var ua = navigator.userAgent;
     
     if (/Android/.test(ua)) {
@@ -1498,7 +1498,7 @@ window.addEventListener("load", function () {
     
     deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
     if (deviceOS) console.log(deviceOS + " detected");
-    
+    */
     banner = new Image();
     banner.src = "src/images/img_coolmathgamesbanner.png";
     banner.onload = function () { setTimeout(loadScreen, 11); };
@@ -1567,9 +1567,22 @@ function loadScreen() {
                 LEVELIMAGES.push(getLevelImage(getLevel(i)));
             }
             
-            if (MUSIC) game.playMusic("mus_play", true);
-            game.run();
-            game.enterScene("scn_level");
+            var fc = function () {
+                window.removeEventListener("click", fc, false);
+                
+                game.playSound("snd_click");
+                
+                game.playMusic("mus_play", true);
+                game.pauseMusic("mus_play");
+                
+                window.setTimeout(function () {
+                    if (MUSIC) game.playMusic("mus_play", true);
+                    game.run();
+                    game.enterScene("scn_level");
+                }, 4000);
+            };
+            
+            window.addEventListener("click", fc, false);
         }
         
         if (progv < progt) {
