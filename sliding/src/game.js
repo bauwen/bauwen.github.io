@@ -1460,9 +1460,6 @@ function drawLevelButton(n, x, y, selected, state) {
 }
 
 var banner;
-var deviceOS = "";
-var browserSafari = false;
-var deviceMobile = false;
 
 window.addEventListener("load", function () {
     if (!checkCorrectSite()) {
@@ -1470,35 +1467,6 @@ window.addEventListener("load", function () {
     }
     
     canvas.style.backgroundColor = "rgb(180, 100, 60)";
-    
-    var ua = navigator.userAgent;
-    
-    if (/Android/.test(ua)) {
-        deviceOS = "android";
-    }
-    else if (/iP[ao]d|iPhone/i.test(ua)) {
-        deviceOS = "ios";
-    }
-    else if (/Windows Phone/i.test(ua) || /IEMobile/i.test(ua)) {
-        deviceOS = "windowsphone";
-    }
-    else if (/Linux/.test(ua)) {
-        deviceOS = "linux";
-    }
-    else if (/Mac OS/.test(ua)) {
-        deviceOS = "macos";
-    }
-    else if (/Windows/.test(ua)) {
-        deviceOS = "windows";
-    }
-    
-    if (/Safari/.test(ua) && !(/Chrome\/(\d+)/.test(ua)) && (deviceOS === "ios" || deviceOS === "macos")) {
-        console.log("safari detected");
-        browserSafari = true;
-    }
-    
-    deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
-    if (deviceOS) console.log(deviceOS + " detected");
     
     banner = new Image();
     banner.src = "src/images/img_coolmathgamesbanner.png";

@@ -1,5 +1,9 @@
 // HTML5 Game Engine
 
+var deviceOS = "";
+var browserSafari = false;
+var deviceMobile = false;
+
 function Game(canvas, useViews) {
     var self = this;
     
@@ -70,44 +74,50 @@ function Game(canvas, useViews) {
     this.mouseX = 0;
     this.mouseY = 0;
     
-    canvas.addEventListener("mousedown", function (event) {
-        var rect = canvas.getBoundingClientRect();
-        var button = event.button;
-        
-        event.stopPropagation();
-        event.preventDefault();
-        
-        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
-        
-        if (!self.buttonsDown[button]) {
-            self.buttonsDown[button] = true;
-            self.buttonsPressed[button] = true;
-        }
-    });
+    detectEnv();
     
-    window.addEventListener("mouseup", function (event) {
-        var rect = canvas.getBoundingClientRect();
-        var button = event.button;
-        
-        event.stopPropagation();
-        event.preventDefault();
-        
-        if (self.buttonsDown[button]) {
-            self.buttonsDown[button] = false;
-            self.buttonsReleased[button] = true;
-        }
-    });
+    if (!deviceMobile) {
     
-    window.addEventListener("mousemove", function (event) {
-        var rect = canvas.getBoundingClientRect();
+        window.addEventListener("mousedown", function (event) {
+            var rect = canvas.getBoundingClientRect();
+            var button = event.button;
+            
+            event.stopPropagation();
+            event.preventDefault();
+            
+            self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+            self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+            
+            if (!self.buttonsDown[button]) {
+                self.buttonsDown[button] = true;
+                self.buttonsPressed[button] = true;
+            }
+        });
         
-        event.stopPropagation();
-        event.preventDefault();
+        window.addEventListener("mouseup", function (event) {
+            var rect = canvas.getBoundingClientRect();
+            var button = event.button;
+            
+            event.stopPropagation();
+            event.preventDefault();
+            
+            if (self.buttonsDown[button]) {
+                self.buttonsDown[button] = false;
+                self.buttonsReleased[button] = true;
+            }
+        });
         
-        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
-    });
+        window.addEventListener("mousemove", function (event) {
+            var rect = canvas.getBoundingClientRect();
+            
+            event.stopPropagation();
+            event.preventDefault();
+            
+            self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+            self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        });
+    
+    }
     
     window.addEventListener("touchstart", function (event) {
         var rect = canvas.getBoundingClientRect();
