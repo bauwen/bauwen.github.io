@@ -109,6 +109,7 @@ function Game(canvas, useViews) {
         var button = 0;
         var touch = event.touches[0];
         
+        event.stopPropagation();
         event.preventDefault();
         
         self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
@@ -148,6 +149,7 @@ function Game(canvas, useViews) {
         var rect = canvas.getBoundingClientRect();
         var touch = event.touches[0];
         
+        event.stopPropagation();
         event.preventDefault();
         
         self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;

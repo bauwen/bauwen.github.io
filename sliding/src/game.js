@@ -1226,7 +1226,8 @@ function updateHelpMenu() {
         if (SOUND) game.playSound("snd_click");
         fading = true;
         fadingEvent = function () {
-            gotoLevel(MENU_LEVEL);
+            //gotoLevel(MENU_LEVEL);
+            gotoLevel(prevlevel);
         };
     }
     
