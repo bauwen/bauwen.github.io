@@ -69,7 +69,7 @@ function Game(canvas, useViews) {
     this.buttonsReleased = [false, false, false];
     this.mouseX = 0;
     this.mouseY = 0;
-    /*
+    
     canvas.addEventListener("mousedown", function (event) {
         var rect = canvas.getBoundingClientRect();
         var button = event.button;
@@ -103,7 +103,7 @@ function Game(canvas, useViews) {
         self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
         self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
     });
-    */
+    
     window.addEventListener("touchstart", function (event) {
         var rect = canvas.getBoundingClientRect();
         var button = 0;
