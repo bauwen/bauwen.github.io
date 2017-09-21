@@ -126,9 +126,9 @@ function Game(canvas, useViews) {
         
         //event.preventDefault();
         
-        if (!self.buttonsDown[button]) {
-            self.buttonsDown[button] = true;
-            self.buttonsPressed[button] = true;
+        if (self.buttonsDown[button]) {
+            self.buttonsDown[button] = false;
+            self.buttonsReleased[button] = true;
         }
     });
     
@@ -138,9 +138,9 @@ function Game(canvas, useViews) {
         
         //event.preventDefault();
         
-        if (!self.buttonsDown[button]) {
-            self.buttonsDown[button] = true;
-            self.buttonsPressed[button] = true;
+        if (self.buttonsDown[button]) {
+            self.buttonsDown[button] = false;
+            self.buttonsReleased[button] = true;
         }
     });
     
