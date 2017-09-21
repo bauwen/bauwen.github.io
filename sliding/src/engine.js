@@ -35,6 +35,10 @@ function Game(canvas, useViews) {
     window.addEventListener("keydown", function (event) {
         var key = event.key;
         
+        if (!key) {
+            key = translateKeyCode(event.which || event.keyCode);
+        }
+        
         event.preventDefault();
         
         if (!self.keysDown[key]) {
@@ -45,6 +49,10 @@ function Game(canvas, useViews) {
     
     window.addEventListener("keyup", function (event) {
         var key = event.key;
+        
+        if (!key) {
+            key = translateKeyCode(event.which || event.keyCode);
+        }
         
         event.preventDefault();
         
@@ -553,3 +561,49 @@ Game.prototype = {
         this.music[name].muted = muted;
     }
 };
+
+function translateKeyCode(code) {
+    switch (code + "") {
+        case "8": return "Backspace";
+        case "9": return "Tab";
+        case "13": return "Enter";
+        case "16": return "Shift";
+        case "17": return "Control";
+        case "18": return "Alt";
+        case "27": return "Escape";
+        case "32": return " ";
+        case "37": return "ArrowLeft";
+        case "38": return "ArrowUp";
+        case "39": return "ArrowRight";
+        case "40": return "ArrowDown";
+        // ... digits ...
+        case "65": return "a";
+        case "66": return "b";
+        case "67": return "c";
+        case "68": return "d";
+        case "69": return "e";
+        case "70": return "f";
+        case "71": return "g";
+        case "72": return "h";
+        case "73": return "i";
+        case "74": return "j";
+        case "75": return "k";
+        case "76": return "l";
+        case "77": return "m";
+        case "78": return "n";
+        case "79": return "o";
+        case "80": return "p";
+        case "81": return "q";
+        case "82": return "r";
+        case "83": return "s";
+        case "84": return "t";
+        case "85": return "u";
+        case "86": return "v";
+        case "87": return "w";
+        case "88": return "x";
+        case "89": return "y";
+        case "90": return "z";
+    };
+    
+    return code + "";
+}

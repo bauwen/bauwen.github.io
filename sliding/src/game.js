@@ -1149,7 +1149,7 @@ var helptext = [
     "A block can be pushed when the sliding thing is moving.",
     "Collect all coins to open the sealed hole",
     "",//"Game by Diamonax",
-    "Music by Kevin MacLeod"// (\"Miami Viceroy\")"
+    "Music by Kevin MacLeod (\"Miami Viceroy\")"
 ];
 
 function updateHelpMenu() {
@@ -1469,7 +1469,7 @@ window.addEventListener("load", function () {
     }
     
     canvas.style.backgroundColor = "rgb(180, 100, 60)";
-    /*
+    
     var ua = navigator.userAgent;
     
     if (/Android/.test(ua)) {
@@ -1498,7 +1498,7 @@ window.addEventListener("load", function () {
     
     deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
     if (deviceOS) console.log(deviceOS + " detected");
-    */
+    
     banner = new Image();
     banner.src = "src/images/img_coolmathgamesbanner.png";
     banner.onload = function () { setTimeout(loadScreen, 11); };
@@ -1511,6 +1511,13 @@ function loadScreen() {
                 var ll = JSON.parse(localStorage.getItem("levels"));
                 unlocked = ll;
             } catch (err) {}
+            
+            if (!unlocked || unlocked.length < 40) {
+                unlocked = [];
+                for (var i = 0; i < 40; i++) {
+                    unlocked.push(false);
+                }
+            }
         }
         
         if (localStorage.getItem("music")) {
@@ -1567,22 +1574,9 @@ function loadScreen() {
                 LEVELIMAGES.push(getLevelImage(getLevel(i)));
             }
             
-            var fc = function () {
-                window.removeEventListener("click", fc, false);
-                
-                game.playSound("snd_click");
-                
-                game.playMusic("mus_play", true);
-                game.pauseMusic("mus_play");
-                
-                window.setTimeout(function () {
-                    if (MUSIC) game.playMusic("mus_play", true);
-                    game.run();
-                    game.enterScene("scn_level");
-                }, 4000);
-            };
-            
-            window.addEventListener("click", fc, false);
+            if (MUSIC) game.playMusic("mus_play", true);
+            game.run();
+            game.enterScene("scn_level");
         }
         
         if (progv < progt) {

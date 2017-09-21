@@ -184,20 +184,6 @@ function updateLevelStates() {
     }
 }
 
-/*
-function drawText(text, x, y, size) {
-    ctx.font = size + "px fnt_game, sans-serif";
-    
-    ctx.fillStyle = "black";
-    ctx.globalAlpha = 0.2;
-    ctx.fillText(text, x + 2, y + 2);
-    ctx.globalAlpha = 1;
-    
-    ctx.fillStyle = "white";
-    ctx.fillText(text, x, y);
-}
-*/
-
 function drawLine(x1, y1, x2, y2) {
     ctx.beginPath();
     ctx.moveTo(x1, y1);
