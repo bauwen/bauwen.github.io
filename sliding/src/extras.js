@@ -36,9 +36,11 @@ function resizeIt() {
 
 function checkCorrectSite() {
     return true;
+    /*
     var hostname = parent.location.hostname;
     
     return (hostname === "" || hostname.indexOf("coolmath-games.com") >= 0);
+    */
 }
 
 function cmgStart() {

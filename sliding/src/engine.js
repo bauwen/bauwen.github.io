@@ -409,7 +409,7 @@ Game.prototype = {
                     count += soundAssets.length;
                     progress(count / total);
                     loadMusic(0);
-                }, 4000);
+                }, 3000);
                 console.log("skipped s");
                 return;
             }
@@ -450,7 +450,7 @@ Game.prototype = {
         
         function loadMusic(index) {
             if (index >= musicAssets.length || deviceMobile) {
-                window.setTimeout(finish, 1000);
+                window.setTimeout(finish, 2000);
                 return;
             }
             

@@ -857,7 +857,7 @@ game.addObject("obj_player", {
             }
             
             if (game.mouseReleased("Left")) {
-                if (!mouseSwiped) {
+                if (!mouseSwiped && game.mouseY < 470) {
                     var mdir = -Math.atan2(game.mouseY - (OFFSETY + this.y + CELL / 2), game.mouseX - (OFFSETX + this.x + CELL / 2)) * 180 / Math.PI;
                     mdir = (mdir + 360) % 360;
                     
@@ -1492,7 +1492,7 @@ window.addEventListener("load", function () {
     }
     
     if (/Safari/.test(ua) && (deviceOS === "ios" || deviceOS === "macos")) {
-        console.log("Safari detected");
+        console.log("safari detected");
         browserSafari = true;
     }
     
