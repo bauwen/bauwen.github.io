@@ -74,6 +74,7 @@ function Game(canvas, useViews) {
         var rect = canvas.getBoundingClientRect();
         var button = event.button;
         
+        event.stopPropagation();
         event.preventDefault();
         
         self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
@@ -89,6 +90,7 @@ function Game(canvas, useViews) {
         var rect = canvas.getBoundingClientRect();
         var button = event.button;
         
+        event.stopPropagation();
         event.preventDefault();
         
         if (self.buttonsDown[button]) {
@@ -99,6 +101,9 @@ function Game(canvas, useViews) {
     
     window.addEventListener("mousemove", function (event) {
         var rect = canvas.getBoundingClientRect();
+        
+        event.stopPropagation();
+        event.preventDefault();
         
         self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
         self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;

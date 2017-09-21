@@ -1514,6 +1514,7 @@ function loadScreen() {
             } catch (err) {}
             
             if (!unlocked || unlocked.length < 40) {
+                console.log("invalid levels detected");
                 unlocked = [];
                 for (var i = 0; i < 40; i++) {
                     unlocked.push(false);
