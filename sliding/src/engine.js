@@ -340,7 +340,7 @@ Game.prototype = {
         var fontAssets = [];
         var progress = body.progress || function (p) {};
         var finish = body.finish || function () {};
-        var channelCount = 4;
+        var channelCount = 2;
         var fontTimeout = 1;
         
         if (assets.images) {
@@ -404,6 +404,16 @@ Game.prototype = {
         }
         
         function loadSound(index) {
+            if (browserSafari || deviceMobile) {
+                window.setTimeout(function () {
+                    count += soundAssets.length;
+                    progress(count / total);
+                    loadMusic(0);
+                }, 4000);
+                console.log("skipped s");
+                return;
+            }
+            
             if (index >= soundAssets.length) {
                 loadMusic(0);
                 return;
@@ -429,16 +439,18 @@ Game.prototype = {
                 channel.src = soundAssets[index + 1];
                 channel.onloadeddata = function () {
                     channels.push(channel);
-                    loadChannel(i + 1);
+                    //loadChannel(i + 1);
                 };
+                channel.preload = "auto";
+                window.setTimeout(function () { loadChannel(i + 1); }, 100);
             }
             
             loadChannel(0);
         }
         
         function loadMusic(index) {
-            if (index >= musicAssets.length) {
-                window.setTimeout(finish, 500);
+            if (index >= musicAssets.length || deviceMobile) {
+                window.setTimeout(finish, 1000);
                 return;
             }
             
@@ -450,6 +462,7 @@ Game.prototype = {
                 progress(count / total);    
                 window.setTimeout(loadMusic, 1, index + 2);
             };
+            audio.preload = "auto";
         }
         
         function loadFonts() {
@@ -483,6 +496,15 @@ Game.prototype = {
     playSound: function (name) {
         //switch (name) {case "snd_rotator": case "snd_teleport": return;}
         var sound = this.sounds[name];
+        
+        if (sound === undefined) {
+            return;
+        }
+        
+        if (sound.channels === undefined || sound.channels.length === 0) {
+            return;
+        }
+        
         var channel = sound.channels[sound.currentChannel];
         
         sound.currentChannel = (sound.currentChannel + 1) % sound.channels.length;
@@ -500,6 +522,10 @@ Game.prototype = {
     
     playMusic: function (name, loop) {
         var music = this.music[name];
+        
+        if (music === undefined) {
+            return;
+        }
         
         music.loop = loop || false;
         music.play();
