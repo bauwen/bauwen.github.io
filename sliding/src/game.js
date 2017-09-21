@@ -1491,7 +1491,7 @@ window.addEventListener("load", function () {
         deviceOS = "windows";
     }
     
-    if (/Safari/.test(ua) && (deviceOS === "ios" || deviceOS === "macos")) {
+    if (/Safari/.test(ua) && !(/Chrome\/(\d+)/.test(ua)) && (deviceOS === "ios" || deviceOS === "macos")) {
         console.log("safari detected");
         browserSafari = true;
     }
