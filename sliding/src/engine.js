@@ -104,6 +104,56 @@ function Game(canvas, useViews) {
         self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
     });
     
+    window.addEventListener("touchstart", function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var button = 0;
+        var touch = event.touches[0];
+        
+        //event.preventDefault();
+        
+        self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        
+        if (!self.buttonsDown[button]) {
+            self.buttonsDown[button] = true;
+            self.buttonsPressed[button] = true;
+        }
+    });
+    
+    window.addEventListener("touchend", function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var button = 0;
+        
+        //event.preventDefault();
+        
+        if (!self.buttonsDown[button]) {
+            self.buttonsDown[button] = true;
+            self.buttonsPressed[button] = true;
+        }
+    });
+    
+    window.addEventListener("touchcancel", function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var button = 0;
+        
+        //event.preventDefault();
+        
+        if (!self.buttonsDown[button]) {
+            self.buttonsDown[button] = true;
+            self.buttonsPressed[button] = true;
+        }
+    });
+    
+    window.addEventListener("touchmove", function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var touch = event.touches[0];
+        
+        //event.preventDefault();
+        
+        self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+    });
+    
     this.objects = {};
     this.instances = [];
     this.instanceGroups = {};
