@@ -6,13 +6,13 @@ function Tween(damping, stiffness) {
 }
 
 Tween.prototype = {
-    get() {
+    get: function () {
         this.speed = this.damping * this.speed - this.delta / this.stiffness;
         this.delta += this.speed;
         return this.delta;
     },
     
-    set(value) {
+    set: function (value) {
         this.delta = value;
         this.speed = 0;
     }

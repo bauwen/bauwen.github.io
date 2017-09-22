@@ -37,11 +37,15 @@ function Game(canvas, useViews) {
     this.keysReleased = {};
     
     window.addEventListener("keydown", function (event) {
+        /*
         var key = event.key;
         
         if (!key) {
             key = translateKeyCode(event.which || event.keyCode);
         }
+        */
+        
+        var key = translateKeyCode(event.which || event.keyCode || event.key);
         
         event.preventDefault();
         
@@ -52,11 +56,15 @@ function Game(canvas, useViews) {
     });
     
     window.addEventListener("keyup", function (event) {
+        /*
         var key = event.key;
         
         if (!key) {
             key = translateKeyCode(event.which || event.keyCode);
         }
+        */
+        
+        var key = translateKeyCode(event.which || event.keyCode || event.key);
         
         event.preventDefault();
         
@@ -85,8 +93,8 @@ function Game(canvas, useViews) {
             event.stopPropagation();
             event.preventDefault();
             
-            self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-            self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+            self.mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+            self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
             
             if (!self.buttonsDown[button]) {
                 self.buttonsDown[button] = true;
@@ -113,8 +121,8 @@ function Game(canvas, useViews) {
             event.stopPropagation();
             event.preventDefault();
             
-            self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-            self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+            self.mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+            self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
         });
     
     }
@@ -127,8 +135,8 @@ function Game(canvas, useViews) {
         event.stopPropagation();
         event.preventDefault();
         
-        self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-        self.mouseY = (touch.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
         
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
@@ -167,8 +175,8 @@ function Game(canvas, useViews) {
         event.stopPropagation();
         event.preventDefault();
         
-        self.mouseX = (touch.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
-        self.mouseY = (touch.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
     });
     
     this.objects = {};
