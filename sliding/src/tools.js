@@ -103,10 +103,21 @@ function gotoLevel(n) {
         localStorage.setItem("levels", JSON.stringify(unlocked));
     }
     
+    /*
     if (n < 40 && !levelmenu && !helpmenu && lastlevel !== HELP_LEVEL) {
         if (lastlevel === n) {
             cmgReplay(n + 1);
         } else {
+            cmgStartLevel(n + 1);
+        }
+    }
+    */
+    
+    if (n < 40) {
+        if (lastlevel === n) {
+            cmgReplay(n + 1);
+        }
+        else if (lastlevel === MENU_LEVEL) {
             cmgStartLevel(n + 1);
         }
     }

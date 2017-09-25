@@ -1148,7 +1148,7 @@ var helptext = [
     "A portal teleports the sliding thing to the other portal.",
     "A block can be pushed when the sliding thing is moving.",
     "Collect all coins to open the sealed hole",
-    "",//"Game by Diamonax",
+    "Game by Diamonax",
     "Music by Kevin MacLeod (\"Miami Viceroy\")"
 ];
 
@@ -1481,7 +1481,7 @@ function loadScreen() {
                 unlocked = ll;
             } catch (err) {}
             
-            if (!unlocked || unlocked.length < 40) {
+            if (!unlocked || !unlocked.length || unlocked.length !== 40) {
                 console.log("invalid levels detected");
                 unlocked = [];
                 for (var i = 0; i < 40; i++) {
