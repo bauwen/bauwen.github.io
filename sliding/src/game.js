@@ -1468,9 +1468,7 @@ window.addEventListener("load", function () {
     
     canvas.style.backgroundColor = "rgb(180, 100, 60)";
     
-    banner = new Image();
-    banner.src = "src/images/img_coolmathgamesbanner.png";
-    banner.onload = function () { setTimeout(loadScreen, 11); };
+    setTimeout(loadScreen, 11);
 });
 
 function loadScreen() {   
@@ -1506,10 +1504,8 @@ function loadScreen() {
         var w = 300;
         var h = 30;
         var x = ctx.canvas.width / 2 - w / 2;
-        var y = ctx.canvas.height / 2 - h / 2 + 200;
+        var y = ctx.canvas.height / 2 - h / 2;
         var s = 8;
-        var imx = ctx.canvas.width / 2 - banner.naturalWidth / 2;
-        var imy = 30;
         
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
@@ -1518,13 +1514,12 @@ function loadScreen() {
         ctx.strokeStyle = "black";
         ctx.strokeRect(x - s + 2, y - s + 2, w + 2 * s, h + 2 * s);
         
-        ctx.font = "28px fnt_game, sans-serif";
+        ctx.font = "42px fnt_game, sans-serif";
         
         ctx.fillStyle = "black";
         ctx.fillRect(x + 2, y + 2, w * Math.min(1, progv), h);
-        //ctx.fillText("A Sliding Thing", x + w / 2 + 2, y - 30 + 2);
+        ctx.fillText("A Sliding Thing", x + w / 2 + 2, y - 40 + 2);
         
-        ctx.fillRect(imx + 5, imy + 5, banner.naturalWidth, banner.naturalHeight);
         ctx.globalAlpha = 1;
         
         ctx.lineWidth = 4;
@@ -1533,9 +1528,7 @@ function loadScreen() {
         
         ctx.fillStyle = "rgb(100, 60, 20)";
         ctx.fillRect(x, y, w * Math.min(1, progv), h);
-        //ctx.fillText("A Sliding Thing", x + w / 2, y - 30);
-        
-        ctx.drawImage(banner, imx, imy);
+        ctx.fillText("A Sliding Thing", x + w / 2, y - 40);
         
         if (progv < 1) {
             window.requestAnimationFrame(loadloop);
