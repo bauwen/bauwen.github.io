@@ -75,6 +75,8 @@ game.addObject("obj_controller", {
                 self.level.y = Math.floor(ctx.canvas.height / 2);
                 self.sliding = false;
             }
+            
+            cmgReplay(self.number + 2);
         };
     },
     
@@ -388,15 +390,25 @@ game.addObject("obj_level", {
                 return;
             }
             
+            var teleported = false;
+            
             var t = self.trails.pop();
             while (t.tunnel) {
                 t = self.trails.pop();
-                self.clicked = false;
+                teleported = true;
+                //self.clicked = false;
             }
             
             self.px = t.x;
             self.py = t.y;
             self.pdir = t.prevdir;
+            
+            if (teleported && self.clicked) {
+                var ox = Math.floor(ctx.canvas.width / 2) - WIDTH * CELL / 2;
+                var oy = Math.floor(ctx.canvas.height / 2) - HEIGHT * CELL / 2;
+                self.clickX = game.mouseX - (ox + self.px * CELL + CELL / 2);
+                self.clickY = game.mouseY - (oy + self.py * CELL + CELL / 2); 
+            }
             
             if (SOUND) game.playSound("snd_undo");
         };
@@ -503,12 +515,17 @@ game.addObject("obj_level", {
                 this.clicked && xx < ox + this.px * CELL) {
                 if (this.pdir === 0) {
                     this.goBack();
+                    xx = ox + Math.floor((game.mouseX - this.clickX - ox) / CELL) * CELL;
+                    yy = oy + Math.floor((game.mouseY - this.clickY - oy) / CELL) * CELL;
                 }
                 else if (this.canMove(-1, 0)) {
                     this.trails.push(new this.Trail(this.px, this.py, this.pdir, 180));
                     this.pdir = 180;
                     this.px -= 1;
                     if (SOUND) game.playSound("snd_step");
+                } else {
+                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
                 }
                 this.moved = true;
             }
@@ -517,12 +534,17 @@ game.addObject("obj_level", {
                 this.clicked && xx > ox + this.px * CELL) {
                 if (this.pdir === 180) {
                     this.goBack();
+                    xx = ox + Math.floor((game.mouseX - this.clickX - ox) / CELL) * CELL;
+                    yy = oy + Math.floor((game.mouseY - this.clickY - oy) / CELL) * CELL;
                 }
                 else if (this.canMove(1, 0)) {
                     this.trails.push(new this.Trail(this.px, this.py, this.pdir, 0));
                     this.pdir = 0;
                     this.px += 1;
                     if (SOUND) game.playSound("snd_step");
+                } else {
+                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
                 }
                 this.moved = true;
             }
@@ -531,12 +553,17 @@ game.addObject("obj_level", {
                 this.clicked && yy < oy + this.py * CELL) {
                 if (this.pdir === 270) {
                     this.goBack();
+                    xx = ox + Math.floor((game.mouseX - this.clickX - ox) / CELL) * CELL;
+                    yy = oy + Math.floor((game.mouseY - this.clickY - oy) / CELL) * CELL;
                 }
                 else if (this.canMove(0, -1)) {
                     this.trails.push(new this.Trail(this.px, this.py, this.pdir, 90));
                     this.pdir = 90;
                     this.py -= 1;
                     if (SOUND) game.playSound("snd_step");
+                } else {
+                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
                 }
                 this.moved = true;
             }
@@ -545,12 +572,17 @@ game.addObject("obj_level", {
                 this.clicked && yy > oy + this.py * CELL) {
                 if (this.pdir === 90) {
                     this.goBack();
+                    xx = ox + Math.floor((game.mouseX - this.clickX - ox) / CELL) * CELL;
+                    yy = oy + Math.floor((game.mouseY - this.clickY - oy) / CELL) * CELL;
                 }
                 else if (this.canMove(0, 1)) {
                     this.trails.push(new this.Trail(this.px, this.py, this.pdir, 270));
                     this.pdir = 270;
                     this.py += 1;
                     if (SOUND) game.playSound("snd_step");
+                } else {
+                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
                 }
                 this.moved = true;
             }
@@ -567,7 +599,9 @@ game.addObject("obj_level", {
                     obj = this.level.get(this.px, this.py);
                 }
                 
-                this.clicked = false;
+                this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
+                //this.clicked = false;
                 break;
         
             case "target":
@@ -772,7 +806,13 @@ game.addScene("scn_levels", {
     }
 });
 
+var banner;
+
 window.addEventListener("load", function () {
+    if (!checkCorrectSite()) {
+        return;
+    }
+    
     if (game.getLocalStorage("music")) {
         MUSIC = game.getLocalStorage("music") === "on" ? true : false;
     }
@@ -780,6 +820,17 @@ window.addEventListener("load", function () {
     if (game.getLocalStorage("sounds")) {
         SOUND = game.getLocalStorage("sounds") === "on" ? true : false;
     }
+    
+    banner = new Image();
+    banner.src = "src/banner.png";
+    banner.onload = function () {
+        window.setTimeout(startLoading, 2);
+    };
+});
+    
+function startLoading() {
+    var bw = banner.naturalWidth;
+    var bh = banner.naturalHeight;
     
     game.loadAssets({
         sounds: {
@@ -798,7 +849,24 @@ window.addEventListener("load", function () {
         }
     }, {
         progress: function (p) {
+            var ctx = game.canvasctx;
+            var lw = 400;
+            var lh = 20;
+            var s = 4;
             
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.lineWidth = 2;
+            
+            ctx.strokeStyle = "rgb(150, 150, 50)";
+            ctx.strokeRect(ctx.canvas.width / 2 - lw / 2, ctx.canvas.height - 100, lw, lh);
+            
+            ctx.fillStyle = "rgb(150, 70, 20)";
+            ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - 100 + s, (lw - 2 * s) * p, lh - 2 * s);
+            
+            var h = 400;
+            var w = bw * h / bh;
+            
+            ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
         },
         
         finish: function () {
@@ -813,4 +881,4 @@ window.addEventListener("load", function () {
             game.enterScene("scn_levels");
         }
     });
-});
+}

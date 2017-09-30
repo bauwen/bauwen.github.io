@@ -452,7 +452,7 @@ Game.prototype = {
         var progress = body.progress || function (p) {};
         var finish = body.finish || function () {};
         var channelCount = 4;
-        var fontTimeout = 1;
+        var fontTimeout = 2000;
         
         if (assets.images) {
             for (var name in assets.images) {
@@ -543,7 +543,7 @@ Game.prototype = {
                 
                 setTimeout(function () {
                     loadChannel(i + 1);
-                }, 10);
+                }, 100);
             }
             
             loadChannel(0);
@@ -551,7 +551,7 @@ Game.prototype = {
         
         function loadMusic(index) {
             if (index >= musicAssets.length) {
-                window.setTimeout(finish, 500);
+                window.setTimeout(finish, 3000);
                 return;
             }
             
@@ -606,7 +606,7 @@ Game.prototype = {
     playSound: function (name) {
         var sound = this.sounds[name];
         
-        if (!sound) {
+        if (!sound || sound.channels.length === 0) {
             return;
         }
         
