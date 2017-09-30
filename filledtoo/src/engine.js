@@ -215,39 +215,26 @@ function Game(width, height) {
         var h = Math.floor(window.innerHeight);
         var c = self.canvas;
         
-        c.width = Math.max(480, w);
-        c.height = Math.max(480, h);
-        self.ctx.canvas.width = c.width;
-        self.ctx.canvas.height = c.height;
+        c.width = Math.max(540, w);
+        c.height = Math.max(420, h);
         
-        if (c.width === w && c.height === h) {
-            WIDTH_RATIO = 1;
-            HEIGHT_RATIO = 1;
-            c.style.width = w + "px";
-            c.style.height = h + "px";
+        var r = w / h;
+        var sr = c.width / c.height;
+        
+        if (r > sr) {
+            c.width = c.height * w / h;
         } else {
-            var sw = c.width;
-            var sh = c.height;
-            
-            var r = w / h;
-            var sr = sw / sh;
-            
-            if (r > sr) {
-                sw *= h / sh;
-                sh = h;
-            } else {
-                sh *= w / sw;
-                sw = w;
-            }
-            
-            WIDTH_RATIO = c.width / sw;
-            HEIGHT_RATIO = c.height / sh;
-            
-            c.style.width = Math.floor(sw) + "px";
-            c.style.height = Math.floor(sh) + "px";
+            c.height = c.width * h / w;
         }
         
-        //container.style.marginTop = Math.floor((h - sh) / 2) + "px";
+        WIDTH_RATIO = c.width / w;
+        HEIGHT_RATIO = c.height / h;
+        
+        c.style.width = w + "px";
+        c.style.height = h + "px";
+        
+        self.ctx.canvas.width = c.width;
+        self.ctx.canvas.height = c.height;
     };
     
     window.addEventListener("resize", resizeHandler);
