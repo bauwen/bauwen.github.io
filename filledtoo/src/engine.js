@@ -452,7 +452,7 @@ Game.prototype = {
         this.nextScene = this.scenes[scene];
     },
     
-    trackInstance(instance) {
+    trackInstance: function (instance) {
         this.viewX = Math.max(0, Math.min(instance.x - this.canvas.width / 2, this.scene.width - this.canvas.width));
         this.viewY = Math.max(0, Math.min(instance.y - this.canvas.height / 2, this.scene.height - this.canvas.height));
     },
