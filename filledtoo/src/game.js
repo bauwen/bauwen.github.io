@@ -420,6 +420,10 @@ game.addObject("obj_level", {
             ctx.fillRect(x + 2, y + CELL - s - 1, s - 1, s - 1);
             ctx.fillRect(x + CELL - s - 1, y + CELL - s - 1, s - 1, s - 1);
         };
+        
+        this.moved = false;
+        this.clickX = 0;
+        this.clickY = 0;
     },
     
     update: function () {
@@ -444,39 +448,45 @@ game.addObject("obj_level", {
         
         if (this.hasControl) {
             if (game.mousePressed("Left")) {
-                if (IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
+                //IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
+                if (IsMouseInBox(0, 80, ctx.canvas.width, ctx.canvas.height - 160)) {
                     this.clicked = true;
-                } else {
-                    for (var i = 0; i < this.trails.length; i++) {
-                        var t = this.trails[i];
+                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
+                }
+            }
+            
+            if (game.mouseReleased("Left") && !this.moved && !IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
+                for (var i = 0; i < this.trails.length; i++) {
+                    var t = this.trails[i];
+                    
+                    if (IsMouseInBox(ox + t.x * CELL, oy + t.y * CELL, CELL, CELL) && !t.tunnel) {
+                        var u = this.trails.pop();
                         
-                        if (IsMouseInBox(ox + t.x * CELL, oy + t.y * CELL, CELL, CELL) && !t.tunnel) {
-                            var u = this.trails.pop();
-                            
-                            while (u !== t) {
-                                u = this.trails.pop();
-                            }
-                            
-                            this.px = t.x;
-                            this.py = t.y;
-                            this.pdir = t.prevdir;
-                            
-                            if (SOUND) game.playSound("snd_undo");
-                            
-                            this.clicked = true;
+                        while (u !== t) {
+                            u = this.trails.pop();
                         }
+                        
+                        this.px = t.x;
+                        this.py = t.y;
+                        this.pdir = t.prevdir;
+                        
+                        if (SOUND) game.playSound("snd_undo");
+                        
+                        this.clicked = true;
                     }
                 }
             }
             
             if (!game.mouseDown("Left")) {
                 this.clicked = false;
+                this.moved = false;
             }
             
             var xx, yy;
-            if (this.clicked) {
-                xx = ox + Math.floor((game.mouseX - ox) / CELL) * CELL;
-                yy = oy + Math.floor((game.mouseY - oy) / CELL) * CELL;
+            if (this.clicked) { 
+                xx = ox + Math.floor((game.mouseX - this.clickX - ox) / CELL) * CELL;
+                yy = oy + Math.floor((game.mouseY - this.clickY - oy) / CELL) * CELL;
             }
             
             if (game.keyboardPressed(" ") ||
@@ -500,6 +510,7 @@ game.addObject("obj_level", {
                     this.px -= 1;
                     if (SOUND) game.playSound("snd_step");
                 }
+                this.moved = true;
             }
             
             if (game.keyboardPressed("ArrowRight") || game.keyboardDown("Shift") && game.keyboardDown("ArrowRight") ||
@@ -513,6 +524,7 @@ game.addObject("obj_level", {
                     this.px += 1;
                     if (SOUND) game.playSound("snd_step");
                 }
+                this.moved = true;
             }
             
             if (game.keyboardPressed("ArrowUp") || game.keyboardDown("Shift") && game.keyboardDown("ArrowUp") ||
@@ -526,6 +538,7 @@ game.addObject("obj_level", {
                     this.py -= 1;
                     if (SOUND) game.playSound("snd_step");
                 }
+                this.moved = true;
             }
             
             if (game.keyboardPressed("ArrowDown") || game.keyboardDown("Shift") && game.keyboardDown("ArrowDown") ||
@@ -539,6 +552,7 @@ game.addObject("obj_level", {
                     this.py += 1;
                     if (SOUND) game.playSound("snd_step");
                 }
+                this.moved = true;
             }
         }
         

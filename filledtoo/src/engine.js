@@ -538,8 +538,12 @@ Game.prototype = {
                 channel.src = soundAssets[index + 1];
                 channel.onloadeddata = function () {
                     channels.push(channel);
-                    loadChannel(i + 1);
+                    //loadChannel(i + 1);
                 };
+                
+                setTimeout(function () {
+                    loadChannel(i + 1);
+                }, 10);
             }
             
             loadChannel(0);
