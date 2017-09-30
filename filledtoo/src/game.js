@@ -19,10 +19,12 @@ var COLTUNNELS = [
 var WIDTH = 16;
 var HEIGHT = 9;
 var CELL = 32;
-var CONTROLLER = false;
+var CONTROLLER = null;
 
 var MUSIC = true;
 var SOUND = true;
+
+var banner;
 
 game.canvas.style.backgroundColor = COLBACK;
 
@@ -806,8 +808,6 @@ game.addScene("scn_levels", {
     }
 });
 
-var banner;
-
 window.addEventListener("load", function () {
     if (!checkCorrectSite()) {
         return;
@@ -849,22 +849,23 @@ function startLoading() {
         }
     }, {
         progress: function (p) {
+            var h = Math.max(330, window.innerHeight - 100);
+            var w = bw * h / bh;
+            
             var ctx = game.canvasctx;
-            var lw = 400;
+            var lw = w;//400;
             var lh = 20;
             var s = 4;
+            var hh = 30 + lh + 10;
             
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             
-            ctx.strokeStyle = "rgb(150, 150, 50)";
-            ctx.strokeRect(ctx.canvas.width / 2 - lw / 2, ctx.canvas.height - 100, lw, lh);
+            ctx.strokeStyle = "rgb(180, 180, 50)";
+            ctx.strokeRect(ctx.canvas.width / 2 - lw / 2, ctx.canvas.height - hh, lw, lh);
             
-            ctx.fillStyle = "rgb(150, 70, 20)";
-            ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - 100 + s, (lw - 2 * s) * p, lh - 2 * s);
-            
-            var h = 400;
-            var w = bw * h / bh;
+            ctx.fillStyle = "rgb(180, 70, 20)";
+            ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - hh + s, (lw - 2 * s) * p, lh - 2 * s);
             
             ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
         },

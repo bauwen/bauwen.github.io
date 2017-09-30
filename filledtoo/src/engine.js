@@ -280,8 +280,10 @@ Game.prototype = {
             this.scene = this.nextScene;
             this.nextScene = null;
             
+            /*
             this.ctx.canvas.width = this.scene.width;
             this.ctx.canvas.height = this.scene.height;
+            */
             
             this.scene.enter();
         }
@@ -543,7 +545,7 @@ Game.prototype = {
                 
                 setTimeout(function () {
                     loadChannel(i + 1);
-                }, 100);
+                }, 300);
             }
             
             loadChannel(0);
