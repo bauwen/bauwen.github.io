@@ -582,7 +582,14 @@ Game.prototype = {
         }
         
         function loadMusic(index) {
-            if (index >= musicAssets.length || deviceMobile) {
+            if (deviceMobile) {
+                count += 1;
+                progress(count / total);
+                window.setTimeout(finish, 2000);
+                return;
+            }
+            
+            if (index >= musicAssets.length) {
                 window.setTimeout(finish, 2000);
                 return;
             }
