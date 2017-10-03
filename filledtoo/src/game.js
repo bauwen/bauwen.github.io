@@ -1,31 +1,6 @@
 var game = new Game(640, 640);
 var ctx = game.ctx;
 
-var COLBACK = "rgb(49, 54, 49)";
-var COLGRID = "rgb(90, 95, 90)";
-var COLPLAYER = "rgb(200, 200, 60)";
-var COLTRAIL = "rgb(80, 160, 80)";
-var COLWALL = COLGRID;
-var COLTARGET = "rgb(80, 160, 80)";
-var COLBRIDGE = "rgb(160, 60, 160)";
-var COLTUNNELS = [
-    "rgb(60, 100, 180)",
-    "rgb(160, 60, 60)",
-    "rgb(190, 140, 40)",
-    "rgb(120, 180, 40)",
-    "rgb(80, 180, 180)"
-];
-
-var WIDTH = 16;
-var HEIGHT = 9;
-var CELL = 32;
-var CONTROLLER = null;
-
-var MUSIC = true;
-var SOUND = true;
-
-var banner;
-
 game.canvas.style.backgroundColor = COLBACK;
 
 game.addObject("obj_controller", {

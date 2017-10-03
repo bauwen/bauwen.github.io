@@ -396,3 +396,34 @@ function getLevelImage(level) {
 function IsMouseInBox(x, y, w, h) {
     return x < game.mouseX && game.mouseX <= x + w && y < game.mouseY && game.mouseY <= y + h;
 }
+
+function detectEnv() {
+    var ua = navigator.userAgent;
+    
+    if (/Android/.test(ua)) {
+        deviceOS = "android";
+    }
+    else if (/iP[ao]d|iPhone/i.test(ua)) {
+        deviceOS = "ios";
+    }
+    else if (/Windows Phone/i.test(ua) || /IEMobile/i.test(ua)) {
+        deviceOS = "windowsphone";
+    }
+    else if (/Linux/.test(ua)) {
+        deviceOS = "linux";
+    }
+    else if (/Mac OS/.test(ua)) {
+        deviceOS = "macos";
+    }
+    else if (/Windows/.test(ua)) {
+        deviceOS = "windows";
+    }
+    
+    if (/Safari/.test(ua) && !(/Chrome\/(\d+)/.test(ua)) && (deviceOS === "ios" || deviceOS === "macos")) {
+        console.log("safari detected");
+        browserSafari = true;
+    }
+    
+    deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
+    if (deviceOS) console.log(deviceOS + " detected");
+}

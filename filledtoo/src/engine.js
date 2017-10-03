@@ -1,4 +1,31 @@
-// HTML5 Game Engine
+var COLBACK = "rgb(49, 54, 49)";
+var COLGRID = "rgb(90, 95, 90)";
+var COLPLAYER = "rgb(200, 200, 60)";
+var COLTRAIL = "rgb(80, 160, 80)";
+var COLWALL = COLGRID;
+var COLTARGET = "rgb(80, 160, 80)";
+var COLBRIDGE = "rgb(160, 60, 160)";
+var COLTUNNELS = [
+    "rgb(60, 100, 180)",
+    "rgb(160, 60, 60)",
+    "rgb(190, 140, 40)",
+    "rgb(120, 180, 40)",
+    "rgb(80, 180, 180)"
+];
+
+var WIDTH = 16;
+var HEIGHT = 9;
+var CELL = 32;
+var CONTROLLER = null;
+
+var MUSIC = true;
+var SOUND = true;
+
+var banner;
+
+var deviceOS = "";
+var browserSafari = false;
+var deviceMobile = false;
 
 function Game(width, height) {
     var self = this;
@@ -88,6 +115,8 @@ function Game(width, height) {
         
         return s;
     };
+    
+    detectEnv();
     
     window.addEventListener("keydown", function (event) {
         var key = translateKeyCode(event.which || event.keyCode || event.key);
@@ -542,6 +571,7 @@ Game.prototype = {
                     channels.push(channel);
                     //loadChannel(i + 1);
                 };
+                channel.preload = "auto";
                 
                 setTimeout(function () {
                     loadChannel(i + 1);
@@ -552,19 +582,20 @@ Game.prototype = {
         }
         
         function loadMusic(index) {
-            if (index >= musicAssets.length) {
-                window.setTimeout(finish, 3000);
+            if (index >= musicAssets.length || deviceMobile) {
+                window.setTimeout(finish, 2000);
                 return;
             }
             
             var audio = new Audio();
             audio.src = musicAssets[index + 1];
             audio.onloadeddata = function () {
-                self.music[musicAssets[index]] = audio;  
+                self.music[musicAssets[index]] = audio;
                 count += 1;
                 progress(count / total);    
                 window.setTimeout(loadMusic, 1, index + 2);
             };
+            audio.preload = "auto";
         }
         
         function loadFonts() {
