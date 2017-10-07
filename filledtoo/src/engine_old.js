@@ -23,26 +23,12 @@ var SOUND = true;
 
 var banner;
 
-function Game(width, height, resizeMode, minWidth, minHeight) {
+var deviceOS = "";
+var browserSafari = false;
+var deviceMobile = false;
+
+function Game(width, height) {
     var self = this;
-    
-    if (!resizeMode) {
-        resizeMode = "aspectratio";
-    }
-    else if (resizeMode === "fullscreen") {
-        if (minWidth) {
-            if (!minHeight) {
-                minHeight = minWidth * height / width;
-            }
-        } else {
-            if (!minHeight) {
-                minWidth = width;
-                minHeight = height;
-            } else {
-                minWidth = minHeight * width / height;
-            }
-        }
-    }
     
     this.canvas = document.createElement("canvas");
     this.canvas.width = width || 640;
@@ -67,8 +53,8 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     
     document.body.appendChild(container);
     
-    var WIDTH_RATIO = 1;
-    var HEIGHT_RATIO = 1;
+    var WIDTH_RATIO = 0;
+    var HEIGHT_RATIO = 0;
     
     this.hasLocalStorage = false;
     
@@ -77,73 +63,6 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     } catch (err) {
         this.hasLocalStorage = false;
     }
-    
-    this.deviceOS = "";
-    this.deviceBrowser = "";
-    this.deviceDesktop = false;
-
-    var ua = navigator.userAgent;
-
-    if (/Android/.test(ua)) {
-        this.deviceOS = "android";
-    }
-    else if (/CrOS/.test(ua)) {
-        this.deviceOS = "chromeos";
-    }
-    else if (/iP[ao]d|iPhone/i.test(ua)) {
-        this.deviceOS = "ios";
-    }
-    else if (/Linux/.test(ua)) {
-        this.deviceOS = "linux";
-    }
-    else if (/Mac OS/.test(ua)) {
-        this.deviceOS = "macos";
-    }
-    else if (/Windows/.test(ua)) {
-        this.deviceOS = "windows";
-
-        if (/Windows Phone/i.test(ua)) {
-            this.deviceOS = "windowsphone";
-        }
-    }
-    
-    if ((this.deviceOS === "windows" || this.deviceOS === "macos" || this.deviceOS === "chromeos" ||
-        (this.deviceOS === "linux" && !(/Silk/.test(ua)))) && this.deviceOS !== "windowsphone") {
-        this.deviceDesktop = true;
-    }
-    
-    if (/Arora/.test(ua)) {
-        this.deviceBrowser = "arora";
-    }
-    else if (/Chrome/.test(ua)) {
-        this.deviceBrowser = "chrome";
-    }
-    else if (/Epiphany/.test(ua)) {
-        this.deviceBrowser = "epiphany";
-    }
-    else if (/Firefox/.test(ua)) {
-        this.deviceBrowser = "firefox";
-    }
-    else if (/AppleWebKit/.test(ua) && device.iOS) {
-        this.deviceBrowser = "mobilesafari";
-    }
-    else if (/MSIE (\d+\.\d+);/.test(ua)) {
-        this.deviceBrowser = "ie";
-    }
-    else if (/Midori/.test(ua)) {
-        this.deviceBrowser = "midori";
-    }
-    else if (/Opera/.test(ua)) {
-        this.deviceBrowser = "opera";
-    }
-    else if (/Safari/.test(ua)) {
-        this.deviceBrowser = "safari";
-    }
-    else if (/Trident\/(\d+\.\d+)(.*)rv:(\d+\.\d+)/.test(ua)) {
-        this.deviceBrowser = "ie";
-    }
-    
-    console.log("Browser: " + this.deviceBrowser + " | OS: " + this.deviceOS + " | " + (this.deviceDesktop ? "desktop" : "mobile"));
     
     this.keysDown = {};
     this.keysPressed = {};
@@ -165,20 +84,11 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
             case "38": return "ArrowUp";
             case "39": return "ArrowRight";
             case "40": return "ArrowDown";
-            case "48": return "0";
-            case "49": return "1";
-            case "50": return "2";
-            case "51": return "3";
-            case "52": return "4";
-            case "53": return "5";
-            case "54": return "6";
-            case "55": return "7";
-            case "56": return "8";
-            case "57": return "9";
-            case "65": return "a";
+            // ... digits ...
+            case "65": return "ArrowLeft"; //return "a";
             case "66": return "b";
             case "67": return "c";
-            case "68": return "d";
+            case "68": return "ArrowRight"; //return "d";
             case "69": return "e";
             case "70": return "f";
             case "71": return "g";
@@ -191,20 +101,22 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
             case "78": return "n";
             case "79": return "o";
             case "80": return "p";
-            case "81": return "q";
+            case "81": return "ArrowLeft"; //return "q";
             case "82": return "r";
-            case "83": return "s";
+            case "83": return "ArrowDown"; //return "s";
             case "84": return "t";
             case "85": return "u";
             case "86": return "v";
-            case "87": return "w";
+            case "87": return "ArrowUp"; //return "w";
             case "88": return "x";
             case "89": return "y";
-            case "90": return "z";
+            case "90": return "ArrowUp"; //return "z";
         }
         
         return s;
     };
+    
+    detectEnv();
     
     window.addEventListener("keydown", function (event) {
         var key = translateKeyCode(event.which || event.keyCode || event.key);
@@ -273,26 +185,6 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     };
     
     var touchStartHandler = function (event) {
-        if (!self.gestureAudioLoaded && self.assetsLoaded) {
-            for (var name in self.sounds) {
-                var sound = self.sounds[name];
-                
-                for (var i = 0; i < sound.channels.length; i++) {
-                    var channel = sound.channels[i];
-                    channel.play();
-                    channel.pause();
-                }
-            }
-            
-            for (var name in self.music) {
-                var music = self.music[name]; 
-                music.play();
-                music.pause();
-            }
-            
-            self.gestureAudioLoaded = true;
-        }
-        
         if (!touchDetected) {
             window.removeEventListener("mousedown", mouseDownHandler, false);
             window.removeEventListener("mouseup", mouseUpHandler, false);
@@ -347,39 +239,13 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     window.addEventListener("touchcancel", touchCancelHandler, false);
     window.addEventListener("touchmove", touchMoveHandler, false);
     
-    var resizeHandlerAspectRatio = function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        var c = self.canvas;
-        var sw = c.width;
-        var sh = c.height;
-        
-        var r = w / h;
-        var sr = sw / sh;
-        
-        if (r > sr) {
-            sw *= h / sh;
-            sh = h;
-        } else {
-            sh *= w / sw;
-            sw = w;
-        }
-        
-        WIDTH_RATIO = c.width / sw;
-        HEIGHT_RATIO = c.height / sh;
-        
-        c.style.width = Math.floor(sw) + "px";
-        c.style.height = Math.floor(sh) + "px";
-        container.style.marginTop = Math.floor((h - sh) / 2) + "px";
-    };
-    
-    var resizeHandlerFullscreen = function () {
+    var resizeHandler = function () {
         var w = Math.floor(window.innerWidth);
         var h = Math.floor(window.innerHeight);
         var c = self.canvas;
         
-        c.width = Math.max(minWidth, w);
-        c.height = Math.max(minHeight, h);
+        c.width = Math.max(540, w);
+        c.height = Math.max(420, h);
         
         var r = w / h;
         var sr = c.width / c.height;
@@ -400,28 +266,8 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
         self.ctx.canvas.height = c.height;
     };
     
-    switch (resizeMode) {
-        case "aspectratio":
-            resizeHandler = resizeHandlerAspectRatio;
-            window.addEventListener("resize", resizeHandler);
-            resizeHandler();
-            break;
-            
-        case "fullscreen":
-            resizeHandler = resizeHandlerFullscreen;
-            window.addEventListener("resize", resizeHandler);
-            resizeHandler();
-            break;
-            
-        case "fixed":
-            break;
-    }
-    
-    this.assetsLoaded = false;
-    this.gestureAudioLoaded = false;
-    
-    this.globalMusic = true;
-    this.globalSounds = true;
+    window.addEventListener("resize", resizeHandler);
+    resizeHandler();
     
     this.objects = {};
     this.instances = [];
@@ -463,8 +309,10 @@ Game.prototype = {
             this.scene = this.nextScene;
             this.nextScene = null;
             
+            /*
             this.ctx.canvas.width = this.scene.width;
             this.ctx.canvas.height = this.scene.height;
+            */
             
             this.scene.enter();
         }
@@ -634,8 +482,8 @@ Game.prototype = {
         var fontAssets = [];
         var progress = body.progress || function (p) {};
         var finish = body.finish || function () {};
-        var channelCount = 3;
-        var fontTimeout = 1;
+        var channelCount = 4;
+        var fontTimeout = 2000;
         
         if (assets.images) {
             for (var name in assets.images) {
@@ -681,9 +529,85 @@ Game.prototype = {
         var count = 0;
         var self = this;
         
-        function loadFonts(index) {
+        function loadImage(index) {
+            if (index >= imageAssets.length) {
+                loadSound(0);
+                return;
+            }
+            
+            var image = new Image();
+            image.src = imageAssets[index + 1];
+            image.onload = function () {
+                self.images[imageAssets[index]] = image;  
+                count += 1;
+                progress(count / total);    
+                window.setTimeout(loadImage, 1, index + 2);
+            };
+        }
+        
+        function loadSound(index) {
+            if (index >= soundAssets.length) {
+                loadMusic(0);
+                return;
+            }
+            
+            var channels = [];
+            
+            function loadChannel(i) {
+                if (i >= channelCount) {
+                    self.sounds[soundAssets[index]] = {
+                        channels: channels,
+                        currentChannel: 0
+                    };
+                    count += 1;
+                    progress(count / total);
+                    window.setTimeout(loadSound, 1, index + 2);
+                    return;
+                }
+                
+                var channel = new Audio();
+                channel.src = soundAssets[index + 1];
+                channel.onloadeddata = function () {
+                    channels.push(channel);
+                    //loadChannel(i + 1);
+                };
+                channel.preload = "auto";
+                
+                setTimeout(function () {
+                    loadChannel(i + 1);
+                }, 300);
+            }
+            
+            loadChannel(0);
+        }
+        
+        function loadMusic(index) {
+            if (deviceMobile) {
+                count += 1;
+                progress(count / total);
+                window.setTimeout(finish, 2000);
+                return;
+            }
+            
+            if (index >= musicAssets.length) {
+                window.setTimeout(finish, 2000);
+                return;
+            }
+            
+            var audio = new Audio();
+            audio.src = musicAssets[index + 1];
+            audio.onloadeddata = function () {
+                self.music[musicAssets[index]] = audio;
+                count += 1;
+                progress(count / total);    
+                window.setTimeout(loadMusic, 1, index + 2);
+            };
+            audio.preload = "auto";
+        }
+        
+        function loadFonts() {
             if (fontAssets.length === 0) {
-                window.setTimeout(loadImage, 10, 0);
+                loadImage(0);
                 return;
             }
             
@@ -701,93 +625,8 @@ Game.prototype = {
             }, fontTimeout);
         }
         
-        function loadImage(index) {
-            if (index >= imageAssets.length) {
-                window.setTimeout(loadSound, 10, 0);
-                return;
-            }
-            
-            var image = new Image();
-            image.src = imageAssets[index + 1];
-            image.onload = function () {
-                self.images[imageAssets[index]] = image;  
-                count += 1;
-                progress(count / total);    
-                window.setTimeout(loadImage, 20, index + 2);
-            };
-        }
-        
-        function loadSound(index) {
-            if (this.deviceOS === "ios" || this.deviceBrowser === "mobilesafari" || this.deviceBrowser === "safari") {
-                count += soundAssets.length / 2;
-                progress(count / total);
-                window.setTimeout(loadMusic, 10, 0);
-                return;
-            }
-            
-            if (index >= soundAssets.length) {
-                window.setTimeout(loadMusic, 10, 0);
-                return;
-            }
-            
-            var channels = [];
-            
-            function loadChannel(i) {
-                if (i >= channelCount) {
-                    self.sounds[soundAssets[index]] = {
-                        channels: channels,
-                        currentChannel: 0
-                    };
-                    count += 1;
-                    progress(count / total);
-                    window.setTimeout(loadSound, 100, index + 2);
-                    return;
-                }
-                
-                var channel = new Audio();
-                channel.src = soundAssets[index + 1];
-                channel.preload = "auto";
-                channel.onloadeddata = function () {
-                    channels.push(channel);
-                    window.setTimeout(loadChannel, 20, i + 1);
-                };
-            }
-            
-            loadChannel(0);
-        }
-        
-        function loadMusic(index) {
-            if (index >= musicAssets.length) {
-                this.assetsLoaded = true;
-                window.setTimeout(finish, 1000);
-                return;
-            }
-            
-            var audio = new Audio();
-            audio.src = musicAssets[index + 1];
-            audio.preload = "auto";
-            
-            if (this.deviceOS === "ios" || this.deviceBrowser === "mobilesafari" || this.deviceBrowser === "safari") {
-                self.music[musicAssets[index]] = audio;  
-                count += 1;
-                progress(count / total);
-                window.setTimeout(loadMusic, 2000, index + 2);
-            } else {
-                audio.onloadeddata = function () {
-                    self.music[musicAssets[index]] = audio;  
-                    count += 1;
-                    progress(count / total);    
-                    window.setTimeout(loadMusic, 20, index + 2);
-                };
-            }
-        }
-        
         progress(0);
         loadFonts();
-    },
-    
-    getImage: function (name) {
-        return this.images[name];
     },
     
     drawImage: function (name, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
@@ -800,18 +639,18 @@ Game.prototype = {
         this.ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
     },
     
+    getImage: function (name) {
+        return this.images[name];
+    },
+    
     playSound: function (name) {
         var sound = this.sounds[name];
         
-        if (!sound || sound.channels.length === 0 || !this.globalSounds) {
+        if (!sound || sound.channels.length === 0) {
             return;
         }
         
         var channel = sound.channels[sound.currentChannel];
-        
-        if (channel.readyState < 2) {
-            return;
-        }
         
         sound.currentChannel = (sound.currentChannel + 1) % sound.channels.length;
         channel.loop = false;
@@ -833,7 +672,7 @@ Game.prototype = {
     playMusic: function (name, loop) {
         var music = this.music[name];
         
-        if (!music || music.readyState < 2 || !this.globalMusic) {
+        if (!music) {
             return;
         }
         
@@ -869,46 +708,6 @@ Game.prototype = {
         }
         
         music.volume = volume;
-    },
-    
-    getGlobalMusic: function () {
-        return this.globalMusic;
-    },
-    
-    setGlobalMusic: function (on) {
-        if (this.globalMusic === on) {
-            return;
-        }
-        
-        for (var name in this.music) {
-            var music = this.music[name];
-            music.volume = on ? 1 : 0;
-            music.mute = !on;
-        }
-        
-        this.globalMusic = on;
-    },
-    
-    getGlobalSounds: function () {
-        return this.globalSounds;
-    },
-    
-    setGlobalSounds: function (on) {
-        if (this.globalSounds === on) {
-            return;
-        }
-        
-        for (var name in this.sounds) {
-            var sound = this.sounds[name];
-            
-            for (var i = 0; i < sound.channels.length; i++) {
-                var channel = sound.channels[i];
-                channel.volume = on ? 1 : 0;
-                channel.mute = !on;
-            }
-        }
-        
-        this.globalMusic = on;
     },
     
     getLocalStorage: function (name) {
