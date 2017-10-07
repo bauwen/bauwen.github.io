@@ -849,15 +849,23 @@ function startLoading() {
             loadDrawings();
             loadLevels();
             
-            /*
+            
             if (MUSIC) {
                 game.playMusic("mus_back", true);
             }
-            */
+            
+            
+            var f = function () { 
+                window.removeEventListener("click", f, false);
+                if (MUSIC) {
+                    game.playMusic("mus_back", true);
+                }
+            };
+            window.addEventListener("click", f, false);
             
             game.run();
-            game.createInstance("obj_button");
-            //game.enterScene("scn_levels");
+            //game.createInstance("obj_button");
+            game.enterScene("scn_levels");
         }
     });
 }

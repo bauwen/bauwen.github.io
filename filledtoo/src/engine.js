@@ -478,6 +478,8 @@ Game.prototype = {
             this.ctx.canvas.width = this.scene.width;
             this.ctx.canvas.height = this.scene.height;
             
+            this.resizeHandler();
+            
             this.scene.enter();
         }
         
