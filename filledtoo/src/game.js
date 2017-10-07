@@ -876,10 +876,10 @@ game.addObject("obj_button", {
         //ctx.fillRect(x - w / 2, y - h / 2, w, h);
         //ctx.strokeRect(x - w / 2, y - h / 2, w, h);
         
-        ctx.font = "36px gamefont, sans-serif";
+        ctx.font = "48px gamefont, sans-serif";
         ctx.textAlign = "center";
         ctx.fillStyle = "rgb(220, 220, 220)";
-        ctx.fillText("Click to Start", x, y + 11);
+        ctx.fillText("Click to Start", x, y - 11);
         
         if (game.mouseReleased("Left")) {
             window.setTimeout(function () {

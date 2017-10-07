@@ -273,26 +273,6 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     };
     
     var touchStartHandler = function (event) {
-        if (!self.gestureAudioLoaded && self.assetsLoaded) {
-            for (var name in self.sounds) {
-                var sound = self.sounds[name];
-                
-                for (var i = 0; i < sound.channels.length; i++) {
-                    var channel = sound.channels[i];
-                    channel.play();
-                    channel.pause();
-                }
-            }
-            
-            for (var name in self.music) {
-                var music = self.music[name]; 
-                music.play();
-                music.pause();
-            }
-            
-            self.gestureAudioLoaded = true;
-        }
-        
         if (!touchDetected) {
             window.removeEventListener("mousedown", mouseDownHandler, false);
             window.removeEventListener("mouseup", mouseUpHandler, false);
@@ -346,6 +326,39 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
     window.addEventListener("touchend", touchEndHandler, false);
     window.addEventListener("touchcancel", touchCancelHandler, false);
     window.addEventListener("touchmove", touchMoveHandler, false);
+    
+    this.assetsLoaded = false;
+    this.gestureAudioLoaded = false;
+    
+    if (this.deviceOS === "android" || this.deviceOS === "ios") {
+        var clickHandler = function (event) {
+            if (!self.gestureAudioLoaded && self.assetsLoaded) {
+                window.removeEventListener("click", clickHandler, false);
+                
+                for (var name in self.sounds) {
+                    var sound = self.sounds[name];
+                    
+                    for (var i = 0; i < sound.channels.length; i++) {
+                        var channel = sound.channels[i];
+                        channel.play();
+                        channel.pause();
+                    }
+                }
+                
+                for (var name in self.music) {
+                    var music = self.music[name]; 
+                    music.play();
+                    music.pause();
+                }
+                
+                self.gestureAudioLoaded = true;
+            }
+        };
+        
+        window.addEventListener("click", clickHandler, false);
+    } else {
+        this.gestureAudioLoaded = true;
+    }
     
     var resizeHandlerAspectRatio = function () {
         var w = window.innerWidth;
@@ -418,9 +431,6 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
         case "fixed":
             break;
     }
-    
-    this.assetsLoaded = false;
-    this.gestureAudioLoaded = false;
     
     this.globalMusic = true;
     this.globalSounds = true;
