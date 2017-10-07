@@ -882,11 +882,15 @@ game.addObject("obj_button", {
         ctx.fillText("Start Game", x, y + 11);
         
         if (game.mouseReleased("Left")) {
-            if (MUSIC) {
-                game.playMusic("mus_back", true);
-            }
-            
-            game.enterScene("scn_levels");
+            window.setTimeout(function () {
+                if (game.gestureAudioLoaded) {
+                    if (MUSIC) {
+                        game.playMusic("mus_back", true);
+                    }
+                    
+                    game.enterScene("scn_levels");
+                }
+            }, 1000);
         }
     }
 });
