@@ -272,7 +272,8 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
         self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
     };
     
-    var touchStartHandler = function (event) {
+    var fcc = function () {
+        window.removeEventListener("click", fcc, false);
         if (!self.gestureAudioLoaded && self.assetsLoaded) {
             for (var name in self.sounds) {
                 var sound = self.sounds[name];
@@ -292,6 +293,11 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
             
             self.gestureAudioLoaded = true;
         }
+    };
+    window.addEventListener("click", fcc, false);
+    
+    var touchStartHandler = function (event) {
+        
         
         if (!touchDetected) {
             window.removeEventListener("mousedown", mouseDownHandler, false);
@@ -759,7 +765,7 @@ Game.prototype = {
         function loadMusic(index) {
             if (index >= musicAssets.length) {
                 this.assetsLoaded = true;
-                window.setTimeout(finish, 1000);
+                window.setTimeout(finish, 500);
                 return;
             }
             
