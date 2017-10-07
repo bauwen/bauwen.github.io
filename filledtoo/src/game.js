@@ -842,7 +842,7 @@ function startLoading() {
             ctx.fillStyle = "rgb(180, 70, 20)";
             ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - hh + s, (lw - 2 * s) * p, lh - 2 * s);
             
-            //ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
+            ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
         },
         
         finish: function () {
@@ -873,13 +873,13 @@ game.addObject("obj_button", {
         var h = 50;
         
         ctx.lineWidth = 4;
-        ctx.fillRect(x - w / 2, y - h / 2, w, h);
-        ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+        //ctx.fillRect(x - w / 2, y - h / 2, w, h);
+        //ctx.strokeRect(x - w / 2, y - h / 2, w, h);
         
         ctx.font = "36px gamefont, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "black";
-        ctx.fillText("Start Game", x, y + 11);
+        ctx.fillStyle = "rgb(220, 220, 220)";
+        ctx.fillText("Click to Start", x, y + 11);
         
         if (game.mouseReleased("Left")) {
             window.setTimeout(function () {
@@ -890,7 +890,7 @@ game.addObject("obj_button", {
                     
                     game.enterScene("scn_levels");
                 }
-            }, 1000);
+            }, 100);
         }
     }
 });

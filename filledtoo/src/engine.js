@@ -272,8 +272,7 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
         self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
     };
     
-    var fcc = function () {
-        window.removeEventListener("click", fcc, false);
+    var touchStartHandler = function (event) {
         if (!self.gestureAudioLoaded && self.assetsLoaded) {
             for (var name in self.sounds) {
                 var sound = self.sounds[name];
@@ -293,11 +292,6 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
             
             self.gestureAudioLoaded = true;
         }
-    };
-    window.addEventListener("click", fcc, false);
-    
-    var touchStartHandler = function (event) {
-        
         
         if (!touchDetected) {
             window.removeEventListener("mousedown", mouseDownHandler, false);
@@ -406,17 +400,19 @@ function Game(width, height, resizeMode, minWidth, minHeight) {
         self.ctx.canvas.height = c.height;
     };
     
+    this.resizeHandler = function () {};
+    
     switch (resizeMode) {
         case "aspectratio":
-            resizeHandler = resizeHandlerAspectRatio;
-            window.addEventListener("resize", resizeHandler);
-            resizeHandler();
+            this.resizeHandler = resizeHandlerAspectRatio;
+            window.addEventListener("resize", this.resizeHandler);
+            this.resizeHandler();
             break;
             
         case "fullscreen":
-            resizeHandler = resizeHandlerFullscreen;
-            window.addEventListener("resize", resizeHandler);
-            resizeHandler();
+            this.resizeHandler = resizeHandlerFullscreen;
+            window.addEventListener("resize", this.resizeHandler);
+            this.resizeHandler();
             break;
             
         case "fixed":
