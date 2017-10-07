@@ -724,7 +724,7 @@ Game.prototype = {
         }
         
         function loadSound(index) {
-            if (this.deviceOS === "ios" || this.deviceBrowser === "mobilesafari" || this.deviceBrowser === "safari") {
+            if (self.deviceOS === "ios" || self.deviceBrowser === "mobilesafari" || self.deviceBrowser === "safari") {
                 count += soundAssets.length / 2;
                 progress(count / total);
                 window.setTimeout(loadMusic, 10, 0);
@@ -764,7 +764,7 @@ Game.prototype = {
         
         function loadMusic(index) {
             if (index >= musicAssets.length) {
-                this.assetsLoaded = true;
+                self.assetsLoaded = true;
                 window.setTimeout(finish, 500);
                 return;
             }
@@ -773,7 +773,7 @@ Game.prototype = {
             audio.src = musicAssets[index + 1];
             audio.preload = "auto";
             
-            if (this.deviceOS === "ios" || this.deviceBrowser === "mobilesafari" || this.deviceBrowser === "safari") {
+            if (self.deviceOS === "ios" || self.deviceBrowser === "mobilesafari" || self.deviceBrowser === "safari") {
                 self.music[musicAssets[index]] = audio;  
                 count += 1;
                 progress(count / total);

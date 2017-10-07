@@ -864,7 +864,7 @@ function startLoading() {
 
 game.addObject("obj_button", {
     update: function () {
-        ctx.strokeStyle = "lime";
+        ctx.strokeStyle = "blue";
         ctx.fillStyle = "yellow";
         
         var x = ctx.canvas.width / 2;
