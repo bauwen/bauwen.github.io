@@ -24,12 +24,22 @@
         image-rendering: pixelated;
     }
     
+    #controls {
+        margin: 0px;
+        width: 576px;
+        height: 1px;
+        background-color: rgb(10, 10, 100);
+        image-rendering: -moz-crisp-edges;
+        image-rendering: pixelated;
+    }
+    
     </style>
 </head>
 <body>
 
 <div id="container" align="center" style="margin: 0px">
 <canvas id="display" width="192" height="160"></canvas>
+<canvas id="controls" width="576" height="1"></canvas>
 </div>
 
 <script id="vertex_shader" type="x-shader/x-vertex">
@@ -64,6 +74,7 @@ void main() {
 <script src="update.js"></script>
 <script>
 var container = document.getElementById("container");
+var controls = document.getElementById("controls");
 var canvas = document.getElementById("display");
 var gl = canvas.getContext("webgl", {
     //alpha: false,
@@ -302,7 +313,7 @@ window.onkeyup = function (event) {
     keyboard[key] = false;
 };
 
-
+/*
 var mouseX = 0;
 var mouseY = 0;
 
@@ -332,8 +343,6 @@ var touchStartHandler = function (event) {
             key = RIGHT;
         }
     }
-    
-    console.log(key);
     
     keyboard[key] = true;
 };
@@ -365,6 +374,7 @@ window.addEventListener("touchstart", touchStartHandler, false);
 window.addEventListener("touchend", touchEndHandler, false);
 window.addEventListener("touchcancel", touchCancelHandler, false);
 window.addEventListener("touchmove", touchMoveHandler, false);
+*/
 
 var WIDTH_RATIO = 1;
 var HEIGHT_RATIO = 1;
@@ -392,31 +402,219 @@ function goResize() {
     
     c.style.width = Math.floor(sw) + "px";
     c.style.height = Math.floor(sh) + "px";
+    
+    var t = controls;
+    t.width = Math.floor(sw);
+    t.style.width = t.width + "px";
+    t.height = Math.floor(h - Math.floor(sh));
+    t.style.height = t.height + "px";
+    
     container.style.marginTop = "0px";//Math.floor((h - sh) / 2) + "px";
+    
+    renderControls();
 }
 
-function boyResize() {
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var c = canvas;
-    var sw = c.width;
-    var sh = c.height;
+var marginButtonHor = 3.5;
+var marginButtonVer = 2.5;
+var buttonSize = 30;
+
+function ArrowButton(direction) {
+    this.x = 0;
+    this.y = 0;
+    this.w = 0;
+    this.h = 0;
+    this.direction = direction;
     
-    sh *= w / sw;
-    sw = w;
+    this.update = function () {
+        var w = controls.width;
+        var h = controls.height;
+        var ax = w / marginButtonHor;
+        var ay = h / marginButtonVer;
+        var ar = 40;
+        var as = buttonSize;
+        
+        this.w = as;
+        this.h = as;
+        
+        switch (direction) {
+            case "left":
+                this.x = ax - ar - as/2;
+                this.y = ay - as/2;
+                break;
+                
+            case "up":
+                this.x = ax - as/2;
+                this.y = ay - ar - as/2;
+                break;
+                
+            case "right":
+                this.x = ax + ar - as/2;
+                this.y = ay - as/2;
+                break;
+                
+            case "down":
+                this.x = ax - as/2;
+                this.y = ay + ar - as/2;
+                break;
+        }
+    };
     
-    WIDTH_RATIO = c.width / sw;
-    HEIGHT_RATIO = c.height / sh;
+    this.render = function (ctx) {
+        this.update();
+        
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+    };
     
-    c.style.width = Math.floor(sw) + "px";
-    c.style.height = Math.floor(sh) + "px";
-    container.style.marginTop = "0px";//Math.floor((h - sh) / 2) + "px";
+    this.touching = function (x, y) {
+        return this.x <= x && x < this.x + this.w && this.y <= y && y < this.y + this.h;
+    };
+    
+    this.update();
 }
+
+function ActionButton(type) {
+    this.x = 0;
+    this.y = 0;
+    this.w = 0;
+    this.h = 0;
+    this.type = type;
+    
+    this.update = function () {
+        var w = controls.width;
+        var h = controls.height;
+        var ax = w - w / marginButtonHor;
+        var ay = h / marginButtonVer;
+        var ar = 30;
+        var as = buttonSize;
+        
+        this.w = as;
+        this.h = as;
+        
+        switch (type) {
+            case "0":
+                this.x = ax + ar;
+                this.y = ay - ar/2;
+                break;
+                
+            case "1":
+                this.x = ax - ar;
+                this.y = ay + ar/2;
+                break;
+        }
+    };
+    
+    this.render = function (ctx) {
+        this.update();
+        
+        ctx.fillStyle = this.type === "0" ? "yellow" : "lime";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+    };
+    
+    this.touching = function (x, y) {
+        return this.x <= x && x < this.x + this.w && this.y <= y && y < this.y + this.h;
+    };
+    
+    this.update();
+}
+
+var leftArrow = new ArrowButton("left");
+var rightArrow = new ArrowButton("right");
+var downArrow = new ArrowButton("down");
+var upArrow = new ArrowButton("up");
+
+var buttonZero = new ActionButton("0");
+var buttonOne = new ActionButton("1");
+
+var controlCtx = controls.getContext("2d");
+function renderControls() {
+    var ctx = controlCtx;
+    
+    var w = controls.width;
+    var h = controls.height;
+    
+    ctx.clearRect(0, 0, w, h);
+    
+    leftArrow.render(ctx);
+    rightArrow.render(ctx);
+    downArrow.render(ctx);
+    upArrow.render(ctx);
+    
+    buttonZero.render(ctx);
+    buttonOne.render(ctx);
+}
+//renderControls();
 
 window.onresize = goResize;
 goResize();
 
 window.onload = loop;
+
+var CW_RATIO = 1;
+var CH_RATIO = 1;
+
+
+var touchStartHandler = function (event) {
+    var rect = controls.getBoundingClientRect();
+    var touch = event.touches[0];
+    
+    event.stopPropagation();
+    event.preventDefault();
+    
+    var mouseX = (touch.pageX - window.pageXOffset - rect.left) * CW_RATIO;
+    var mouseY = (touch.pageY - window.pageYOffset - rect.top) * CH_RATIO;
+    
+    if (mouseX > controls.width / 2) return;
+    
+    var key = "";
+    
+    if (leftArrow.touching(mouseX, mouseY)) {
+        key = LEFT;
+    }
+    
+    if (rightArrow.touching(mouseX, mouseY)) {
+        key = RIGHT;
+    }
+    
+    if (downArrow.touching(mouseX, mouseY)) {
+        key = DOWN;
+    }
+    
+    if (upArrow.touching(mouseX, mouseY)) {
+        key = UP;
+    }
+    
+    if (key) {
+        keyboard[key] = true;
+    } else {
+        keyboard[RIGHT] = false;
+        keyboard[LEFT] = false;
+        keyboard[UP] = false;
+        keyboard[DOWN] = false;
+    }
+};
+
+/*
+var touchEndHandler = function (event) {
+    var rect = canvas.getBoundingClientRect();
+    var button = 0;
+    
+    keyboard[RIGHT] = false;
+    keyboard[LEFT] = false;
+    keyboard[UP] = false;
+    keyboard[DOWN] = false;
+};
+
+var touchCancelHandler = touchEndHandler;
+*/
+
+var touchMoveHandler = touchStartHandler;
+
+window.addEventListener("touchstart", touchStartHandler, false);
+//window.addEventListener("touchend", touchEndHandler, false);
+//window.addEventListener("touchcancel", touchCancelHandler, false);
+window.addEventListener("touchmove", touchMoveHandler, false);
 </script>
 
 </body>
