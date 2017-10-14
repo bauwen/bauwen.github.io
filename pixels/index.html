@@ -57,7 +57,7 @@ varying vec4 vColor;
 varying float y;
 
 void main() {
-    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
+    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a * y);
 }
 </script>
 
@@ -321,7 +321,7 @@ var touchStartHandler = function (event) {
     
     if (mouseX < canvas.width / 2) {
         if (mouseY < canvas.height / 2) {
-            key = RIGHT;
+            key = LEFT;
         } else {
             key = DOWN;
         }
@@ -329,7 +329,7 @@ var touchStartHandler = function (event) {
         if (mouseY < canvas.height / 2) {
             key = UP;
         } else {
-            key = LEFT;
+            key = RIGHT;
         }
     }
     
