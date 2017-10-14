@@ -31,15 +31,46 @@
         background-color: rgb(10, 10, 100);
         image-rendering: -moz-crisp-edges;
         image-rendering: pixelated;
+        
+        z-index: 0;
+        position: absolute;
+        left: 0px;
+        top: 0px;
     }
     
+    #concon {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    
+    #conarrows {
+        background-color: rgba(255, 0, 0, 0.2);
+        z-index: 1;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+    
+    #conbuttons {
+        background-color: rgba(255, 255, 0, 0.2);
+        z-index: 1;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
     </style>
 </head>
 <body>
 
 <div id="container" align="center" style="margin: 0px">
-<canvas id="display" width="192" height="160"></canvas>
-<canvas id="controls" width="576" height="1"></canvas>
+    <canvas id="display" width="192" height="160"></canvas>
+
+    <div id="concon">
+        <canvas id="controls" width="576" height="1"></canvas>
+        <div id="conarrows"></div>
+        <div id="conbuttons"></div>
+    </div>
 </div>
 
 <script id="vertex_shader" type="x-shader/x-vertex">
@@ -74,6 +105,8 @@ void main() {
 <script src="update.js"></script>
 <script>
 var container = document.getElementById("container");
+var conarrows = document.getElementById("conarrows");
+var conbuttons = document.getElementById("conbuttons");
 var controls = document.getElementById("controls");
 var canvas = document.getElementById("display");
 var gl = canvas.getContext("webgl", {
@@ -283,12 +316,16 @@ function rectfill(x, y, w, h) {
     }
 }
 
+var ENTER = "13";
+var SPACE = "32";
 var LEFT = "37";
 var UP = "38";
 var RIGHT = "39";
 var DOWN = "40";
 
 var keyboard = {
+    "13": false,
+    "32": false,
     "37": false,
     "38": false,
     "39": false,
@@ -312,69 +349,6 @@ window.onkeyup = function (event) {
     
     keyboard[key] = false;
 };
-
-/*
-var mouseX = 0;
-var mouseY = 0;
-
-var touchStartHandler = function (event) {
-    var rect = canvas.getBoundingClientRect();
-    var button = 0;
-    var touch = event.touches[0];
-    
-    event.stopPropagation();
-    event.preventDefault();
-    
-    mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
-    mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
-    
-    var key = "";
-    
-    if (mouseX < canvas.width / 2) {
-        if (mouseY < canvas.height / 2) {
-            key = LEFT;
-        } else {
-            key = DOWN;
-        }
-    } else {
-        if (mouseY < canvas.height / 2) {
-            key = UP;
-        } else {
-            key = RIGHT;
-        }
-    }
-    
-    keyboard[key] = true;
-};
-
-var touchEndHandler = function (event) {
-    var rect = canvas.getBoundingClientRect();
-    var button = 0;
-    
-    keyboard[RIGHT] = false;
-    keyboard[LEFT] = false;
-    keyboard[UP] = false;
-    keyboard[DOWN] = false;
-};
-
-var touchCancelHandler = touchEndHandler;
-
-var touchMoveHandler = function (event) {
-    var rect = canvas.getBoundingClientRect();
-    var touch = event.touches[0];
-    
-    event.stopPropagation();
-    event.preventDefault();
-    
-    mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
-    mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
-};
-
-window.addEventListener("touchstart", touchStartHandler, false);
-window.addEventListener("touchend", touchEndHandler, false);
-window.addEventListener("touchcancel", touchCancelHandler, false);
-window.addEventListener("touchmove", touchMoveHandler, false);
-*/
 
 var WIDTH_RATIO = 1;
 var HEIGHT_RATIO = 1;
@@ -409,14 +383,23 @@ function goResize() {
     t.height = Math.floor(h - Math.floor(sh));
     t.style.height = t.height + "px";
     
+    var sh = 25;
+    
+    conarrows.style.width = (t.width / 2 + sh) + "px";
+    conarrows.style.height = t.height + "px";
+    
+    conbuttons.style.width = (t.width / 2 - sh) + "px";
+    conbuttons.style.height = t.height + "px";
+    conbuttons.style.left = (t.width / 2 + sh) + "px";
+    
     container.style.marginTop = "0px";//Math.floor((h - sh) / 2) + "px";
     
     renderControls();
 }
 
 var marginButtonHor = 3.5;
-var marginButtonVer = 2.5;
-var buttonSize = 30;
+var marginButtonVer = 2;
+var buttonSize = 40;
 
 function ArrowButton(direction) {
     this.x = 0;
@@ -430,7 +413,7 @@ function ArrowButton(direction) {
         var h = controls.height;
         var ax = w / marginButtonHor;
         var ay = h / marginButtonVer;
-        var ar = 40;
+        var ar = 50;
         var as = buttonSize;
         
         this.w = as;
@@ -484,10 +467,10 @@ function ActionButton(type) {
     this.update = function () {
         var w = controls.width;
         var h = controls.height;
-        var ax = w - w / marginButtonHor;
+        var ax = w - w / marginButtonHor + 5;
         var ay = h / marginButtonVer;
-        var ar = 30;
-        var as = buttonSize;
+        var ar = 35;
+        var as = buttonSize + 10;
         
         this.w = as;
         this.h = as;
@@ -510,6 +493,10 @@ function ActionButton(type) {
         
         ctx.fillStyle = this.type === "0" ? "yellow" : "lime";
         ctx.fillRect(this.x, this.y, this.w, this.h);
+        
+        ctx.font = "bold 24px monospace";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.type, this.x + 18, this.y + 33);
     };
     
     this.touching = function (x, y) {
@@ -543,6 +530,21 @@ function renderControls() {
     
     buttonZero.render(ctx);
     buttonOne.render(ctx);
+    
+    var w = controls.width;
+    var h = controls.height;
+    var cx = w / marginButtonHor;
+    var cy = h / marginButtonVer;
+    
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, 100, 0, 2 * Math.PI);
+    ctx.stroke();
 }
 //renderControls();
 
@@ -557,49 +559,57 @@ var CH_RATIO = 1;
 
 var touchStartHandler = function (event) {
     var rect = controls.getBoundingClientRect();
-    var touch = event.touches[0];
+    var touch = event.targetTouches[0];
     
-    event.stopPropagation();
+    //event.stopPropagation();
     event.preventDefault();
     
     var mouseX = (touch.pageX - window.pageXOffset - rect.left) * CW_RATIO;
     var mouseY = (touch.pageY - window.pageYOffset - rect.top) * CH_RATIO;
     
-    if (mouseX > controls.width / 2) return;
+    //if (mouseX > controls.width / 2) return;
+    
+    keyboard[RIGHT] = false;
+    keyboard[LEFT] = false;
+    keyboard[UP] = false;
+    keyboard[DOWN] = false;
     
     var key = "";
     
-    if (leftArrow.touching(mouseX, mouseY)) {
-        key = LEFT;
+    var w = controls.width;
+    var h = controls.height;
+    var cx = w / marginButtonHor;
+    var cy = h / marginButtonVer;
+    var mx = mouseX;
+    var my = mouseY;
+    
+    var dis = Math.sqrt((mx - cx) * (mx - cx) + (my - cy) * (my - cy));
+    var dir = (-Math.atan2(my - cy, mx - cx) * 180 / Math.PI + 360) % 360;
+    
+    
+    if (30 < dis && dis < 100) {
+        if (dir < 45 || 315 <= dir) {
+            key = RIGHT;
+        }
+        else if (45 <= dir && dir < 135) {
+            key = UP;
+        }
+        else if (135 <= dir && dir < 225) {
+            key = LEFT;
+        }
+        else if (225 <= dir && dir < 315) {
+            key = DOWN;
+        }
     }
     
-    if (rightArrow.touching(mouseX, mouseY)) {
-        key = RIGHT;
-    }
-    
-    if (downArrow.touching(mouseX, mouseY)) {
-        key = DOWN;
-    }
-    
-    if (upArrow.touching(mouseX, mouseY)) {
-        key = UP;
-    }
     
     if (key) {
         keyboard[key] = true;
-    } else {
-        keyboard[RIGHT] = false;
-        keyboard[LEFT] = false;
-        keyboard[UP] = false;
-        keyboard[DOWN] = false;
     }
 };
 
-/*
-var touchEndHandler = function (event) {
-    var rect = canvas.getBoundingClientRect();
-    var button = 0;
-    
+
+var touchEndHandler = function (event) { 
     keyboard[RIGHT] = false;
     keyboard[LEFT] = false;
     keyboard[UP] = false;
@@ -607,14 +617,62 @@ var touchEndHandler = function (event) {
 };
 
 var touchCancelHandler = touchEndHandler;
-*/
 
 var touchMoveHandler = touchStartHandler;
 
-window.addEventListener("touchstart", touchStartHandler, false);
-//window.addEventListener("touchend", touchEndHandler, false);
-//window.addEventListener("touchcancel", touchCancelHandler, false);
-window.addEventListener("touchmove", touchMoveHandler, false);
+conarrows.addEventListener("touchstart", touchStartHandler);
+conarrows.addEventListener("touchend", touchEndHandler);
+conarrows.addEventListener("touchcancel", touchCancelHandler);
+conarrows.addEventListener("touchmove", touchMoveHandler);
+
+
+
+
+
+var touchStartHandler2 = function (event) {
+    var rect = controls.getBoundingClientRect();
+    var touch = event.targetTouches[0];
+    
+    //event.stopPropagation();
+    event.preventDefault();
+    
+    var mouseX = (touch.pageX - window.pageXOffset - rect.left) * CW_RATIO;
+    var mouseY = (touch.pageY - window.pageYOffset - rect.top) * CH_RATIO;
+    
+    //if (mouseX < controls.width / 2) return;
+    
+    keyboard[ENTER] = false;
+    keyboard[SPACE] = false;
+    
+    var key = "";
+    
+    if (buttonZero.touching(mouseX, mouseY)) {
+        key = ENTER;
+    }
+    
+    if (buttonOne.touching(mouseX, mouseY)) {
+        key = SPACE;
+    }
+    
+    if (key) {
+        keyboard[key] = true;
+    }
+};
+
+
+var touchEndHandler2 = function (event) {
+    keyboard[ENTER] = false;
+    keyboard[SPACE] = false;
+};
+
+var touchCancelHandler2 = touchEndHandler2;
+
+var touchMoveHandler2 = touchStartHandler2;
+
+conbuttons.addEventListener("touchstart", touchStartHandler2);
+conbuttons.addEventListener("touchend", touchEndHandler2);
+conbuttons.addEventListener("touchcancel", touchCancelHandler2);
+conbuttons.addEventListener("touchmove", touchMoveHandler2);
 </script>
 
 </body>
