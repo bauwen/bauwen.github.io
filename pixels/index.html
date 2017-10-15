@@ -261,6 +261,7 @@ var x = 10;
 var y = 10;
 
 var pcount = 0;
+var counted = false;
 
 function loop() {
     pcount = 0;
@@ -268,6 +269,10 @@ function loop() {
     update();
     
     render();
+    
+    if (keyboard[ENTER]) {
+        console.log("Pixels drawn last frame:", pcount);
+    }
     
     //console.log(pcount);
     
@@ -281,7 +286,7 @@ function clear() {
 }
 
 function drawPixel(x, y, color) {
-    //pcount += 1;
+    pcount += 1;
     
     color = color || globalColor;//[255, 128, 0, 255];
     setb(x, y, color[0], color[1], color[2], color[3]);
@@ -861,7 +866,7 @@ function drawSprite(index, x, y, rot) {
     var h = sprite.height;
     
     if (x + w < 0 || y + h < 0) return;
-    
+    pcount += w * h;
     // mirror/flip horizontally and vertically should be easy too!
     
     if (!rot) {
