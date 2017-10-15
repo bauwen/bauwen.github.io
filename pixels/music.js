@@ -1,13 +1,8 @@
-
-var startAudio = function() {
-    $scope = window;
-    
-    $scope.tempo = 180;
-
+var startAudio = function () {
     var conductor = new BandJS();
 
     conductor.setTimeSignature(2, 2);
-    conductor.setTempo($scope.tempo);
+    conductor.setTempo(180);
 
     var rightHand = conductor.createInstrument('square', 'oscillators'),
         leftHand = conductor.createInstrument('triangle', 'oscillators'),
@@ -483,49 +478,8 @@ var startAudio = function() {
     drum.repeatFromBeginning(500);
 
     var player = conductor.finish();
-
-    $scope.playing = $scope.paused = $scope.muted = false;
-    $scope.volume = 50;
-    $scope.currentSeconds = 0;
-    $scope.timeSlider = 0;
-    $scope.totalSeconds = conductor.getTotalSeconds();
-
-    var pauseTicker = false;
-
-    conductor.setTickerCallback(function(seconds) {
-        
-    });
-
-    conductor.setOnFinishedCallback(function() {
-        
-    });
-
-    conductor.setOnDurationChangeCallback(function() {
-        $scope.totalSeconds = conductor.getTotalSeconds();
-    });
-
-    $scope.play = function() {
-        $scope.playing = true;
-        $scope.paused = false;
-        player.play();
-    };
-
-    $scope.stop = function() {
-        $scope.playing = $scope.paused = false;
-        player.stop();
-    };
-
-    $scope.pause = function() {
-        $scope.paused = true;
-        player.pause();
-    };
-
-    $scope.updateTime = function() {
-        pauseTicker = false;
-        player.setTime($scope.currentSeconds);
-    };
     
-    play();
+    player.play();
 };
 
 startAudio();
