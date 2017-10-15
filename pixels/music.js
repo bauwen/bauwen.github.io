@@ -473,11 +473,14 @@ var startAudio = function () {
 
     drum.rest('whole');
 
+    /*
     rightHand.repeatFromBeginning(500);
     leftHand.repeatFromBeginning(500);
     drum.repeatFromBeginning(500);
+    */
 
     var player = conductor.finish();
+    player.loop(true);
     
     player.play();
 };
