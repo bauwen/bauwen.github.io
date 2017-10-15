@@ -553,7 +553,7 @@ function ActionButton(type) {
         var ax = w - marginHor;//w - w / marginButtonHor + 5;
         var ay = h / marginButtonVer;
         var ar = 35;
-        var as = buttonSize + 10;
+        var as = buttonSize + 15;
         
         this.w = as;
         this.h = as;
@@ -579,7 +579,7 @@ function ActionButton(type) {
         
         ctx.font = "bold 24px monospace";
         ctx.fillStyle = "black";
-        ctx.fillText(this.type, this.x + 18, this.y + 33);
+        ctx.fillText(this.type, this.x + 20, this.y + 35);
     };
     
     this.touching = function (x, y) {
@@ -629,7 +629,7 @@ function renderControls() {
     ctx.stroke();
     
     ctx.beginPath();
-    ctx.arc(cx, cy, 90, 0, 2 * Math.PI);
+    ctx.arc(cx, cy, 100, 0, 2 * Math.PI);
     ctx.stroke();
 }
 //renderControls();
@@ -672,7 +672,7 @@ var touchStartHandler = function (event) {
     var dir = (-Math.atan2(my - cy, mx - cx) * 180 / Math.PI + 360) % 360;
     
     
-    if (25 < dis && dis < 90) {
+    if (25 < dis && dis < 100) {
         if (dir < 45 || 315 <= dir) {
             key = RIGHT;
         }
