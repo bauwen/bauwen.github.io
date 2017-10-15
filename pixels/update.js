@@ -156,10 +156,14 @@ function update() {
     
     //for (var i = 0; i < 1; i++) circleFill(x, y, (x + y) / 10);
     
+    for (var k = 0; k < 3; k++) {
+    
     for (var i = 0; i < 192/16; i++) {
         for (var j = 0; j < 160/16; j++) {
             drawSprite(5, i * 16, j * 16);
         }
+    }
+    
     }
     
     var s = Math.floor(x + y) / 10;
