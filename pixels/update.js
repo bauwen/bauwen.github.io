@@ -22,5 +22,5 @@ function update() {
     
     setcolor(255, 128, 0);
     
-    for (var i = 0; i < 10; i++) circleFill(x, y, s); //rectfill(x, y, s, s);
+    for (var i = 0; i < 1; i++) circleFill(x, y, s); //rectfill(x, y, s, s);
 }
