@@ -20,7 +20,8 @@
         width: 576px;
         height: 480px;
         background-color: rgb(50, 50, 50);
-        
+        //image-rendering: -moz-crisp-edges;
+        //image-rendering: pixelated;
         
         z-index: 0;
         position: absolute;
@@ -32,7 +33,6 @@
         margin: 0px;
         width: 576px;
         height: 1px;
-        //background-color: rgb(10, 10, 100);
         image-rendering: -moz-crisp-edges;
         image-rendering: pixelated;
         
@@ -77,7 +77,7 @@
 <body>
 
 <div id="container" style="margin: 0px">
-    <canvas id="display" width="192" height="160"></canvas>
+    <canvas id="display" width="576" height="480"></canvas>
 
     <!--<div id="concon">-->
     <div id="controls-container">
@@ -99,9 +99,9 @@ varying float y;
 
 void main() {
     vec2 acPosition = vec2(aPosition.x + 0.5, aPosition.y + 0.5);
-    vec2 clipSpace = (acPosition / uResolution * 2.0 - 1.0) * vec2(1.0, -1.0);
+    vec2 clipSpace = (acPosition / vec2(192.0, 160.0) * 2.0 - 1.0) * vec2(1.0, -1.0);
     y = (clipSpace.y + 1.0) / 2.0;
-    gl_PointSize = 1.0;
+    gl_PointSize = 3.0;
     gl_Position = vec4(clipSpace, 0, 1);
     vColor = aColor;
 }
@@ -170,8 +170,8 @@ gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
 
 
-var wb = canvas.width;
-var hb = canvas.height;
+var wb = 192;//canvas.width;
+var hb = 160;//canvas.height;
 var gridsize = wb * hb;
 var gridbuffer = new Uint8Array(gridsize * 4);
 
@@ -424,7 +424,6 @@ function goResize() {
     
     c.style.width = Math.floor(sw) + "px";
     c.style.height = Math.floor(sh) + "px";
-    
     c.style.left = ((w - sw) / 2) + "px";
     
     if (CONTROLS) {
@@ -460,6 +459,7 @@ function goResize() {
         conbuttons.style.top = (ctop + eh) + "px";
         
     } else {
+        
         c.style.top = ((h - sh) / 2) + "px";
     }
     
