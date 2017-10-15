@@ -122,6 +122,11 @@ void main() {
 <script src="update.js"></script>
 <script>
 
+var deviceOS = "";
+var deviceBrowser = "";
+var deviceDesktop = false;
+var CONTROLS = true;
+
 // Tips:
 //      Work with color pallettes, buffer only contains int representing color
 //      within vertex shader, switch-check this int to determine right color
@@ -424,6 +429,8 @@ function goResize() {
     c.style.left = ((w - sw) / 2) + "px";
     
     if (CONTROLS) {
+    
+        c.style.top = "0px";
     
         var th = 250;
         
@@ -741,11 +748,6 @@ conbuttons.addEventListener("touchcancel", touchCancelHandler2);
 conbuttons.addEventListener("touchmove", touchMoveHandler2);
 
 
-var deviceOS = "";
-var deviceBrowser = "";
-var deviceDesktop = false;
-var CONTROLS = true;
-
 function getEnv() {
 
     var ua = navigator.userAgent;
@@ -811,12 +813,10 @@ function getEnv() {
     
     alert("Browser: " + deviceBrowser + " | OS: " + deviceOS + " | " + (deviceDesktop ? "desktop" : "mobile"));
     
-    /*
     if (deviceDesktop) {
         document.getElementById("controls-container").style.display = "none";
         CONTROLS = false;
     }
-    */
 }
 
 getEnv();
