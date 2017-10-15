@@ -1,203 +1,299 @@
-var game_event = null;
 
-var movement = { 
-    walkThrough: function (obj, speed, direction, through, callback) {
-        
-        if (speed == 0) {
-            return;
-        }
-        
-        var cell = 16;
-        var cx = Math.floor(obj.x / cell) * cell;
-        var cy = Math.floor(obj.y / cell) * cell;
-        
-        if (obj.x != cx || obj.y != cy) {
-            return;
-        }
-        
-        direction %= 360;
-        obj.rotation = direction;
-        
-        var hspeed = -((direction - 90) % 180) / 90 * speed;
-        var vspeed = ((direction - 180) % 180) / 90 * speed;
-        var x = obj.x + Math.sign(hspeed) * cell;
-        var y = obj.y + Math.sign(vspeed) * cell;
-        
-        var prevx = cx;
-        var prevy = cy;
-        
-        /*
-        if (!through && collision.check(x, y)) {
-            if (callback) {
-                callback();
-            }
-            return;
-        }
-        */
-        
-        game_event = function () {
-            obj.index = (obj.index + Math.abs(speed) / (cell / 2) + 0.001) % 4;
-            obj.x += hspeed;
-            obj.y += vspeed;
-            
-            if (obj.x == x && obj.y == y) {
-                obj.index = Math.floor(obj.index / 2) * 2;
-                
-                if (callback) {
-                    callback();
-                }
-                
-                //collision.free(prevx, prevy);
-                return true;
-            }
-            
-            return false;
-        };
-    },
-    
-    walk: function (obj, speed, direction, callback) {
-        movement.walkThrough(obj, speed, direction, false, callback);
-    }
+var update;
+
+(function () {
+
+var canvas = {
+    width: 192,
+    height: 160
 };
 
-var trail = [];
-for (var i = 0; i < 64; i++) {
-    trail.push(undefined, undefined);
+/* OPTIES */
+
+// RANGE geeft aan hoeveel blokken ver je kan kijken
+var RANGE = 20;
+
+// MAPSIZE geeft aan hoe groot de wereld is in het aantal blokken langs één zijde
+var MAPSIZE = 128;
+
+// FOV geeft de Field Of View (aantal radialen van het gezichtsveld) van de speler
+var FOV = Math.PI / 3;
+
+// PARTS geef het aantal rechthoeken dat worden getekend (hoe hoger, hoe vloeiender)
+var PARTS = 220;
+
+
+/* WERKING */
+
+var ADVANCED = true;
+var CELLSHADING = false;
+var THICKNESS = 2;
+
+var CIRCLE = 2 * Math.PI;
+
+var player = {
+    x: MAPSIZE / 2 + 0.5,
+    y: MAPSIZE / 2 + 0.5,
+    direction: 0,
+};
+
+var grid = [];
+for (var i = 0; i < MAPSIZE * MAPSIZE; i += 1) {
+    var r = Math.floor(Math.random() * 200) + 1;
+    var g = Math.floor(Math.random() * 200) + 1;
+    var b = Math.floor(Math.random() * 200) + 1;
+    grid.push((Math.random() < 0.3 ? r + g * 256 + b * 256 * 256 : 0));
 }
-var gameobjects = {};
+grid[Math.floor(player.y) * MAPSIZE + Math.floor(player.x)] = 0;
 
-gameobjects["obj_player"] = {
-    oncreate: function () {
-        this.x = 16 * 5;
-        this.y = 16 * 5;
-        this.depth = -1;
-        this.sprite = [1, 2, 1, 3];
-        this.speed = 0;
-        this.startup = 0;
-        this.walking = false;
-        this.index = 0;
-        this.rotation = 0;
-    },
-    
-    onupdate: function () {
-        //draw.object(this, 2);
-        //console.log(this.rotation);
-        drawSprite(this.sprite[Math.floor(this.index)], this.x, this.y, this.rotation / 90);
-        
-        var cell = 16;
-        var cx = Math.floor(this.x / cell) * cell;
-        var cy = Math.floor(this.y / cell) * cell;
-        
-        for (var i = 0; i < trail.length - 2; i += 2) {
-            trail[i + 0] = trail[i + 2];
-            trail[i + 1] = trail[i + 3];
-        }
-        
-        trail[trail.length - 2] = this.x + 8;
-        trail[trail.length - 1] = this.y + 8;
-        
-        if (this.x != cx || this.y != cy) {
-            return;
-        }
-        
-        var moved = false;
-        var prevdir = this.rotation;
-        
-        if (keyboard[RIGHT]) {
-            this.rotation = 0;
-            moved = true;
-        }
-        else if (keyboard[LEFT]) {
-            this.rotation = 180;
-            moved = true;
-        }
-        else if (keyboard[UP]) {
-            this.rotation = 90;
-            moved = true;
-        }
-        else if (keyboard[DOWN]) {
-            this.rotation = 270;
-            moved = true;
-        }
-         
-        if (moved) {
-            this.speed = keyboard[SPACE] ? 2 : 1;
-            
-            if (this.rotation == prevdir && this.startup == 3) {
-                this.startup = 0;
-            }
-        } else {
-            this.startup = 4;
-        }
-        
-        if (this.startup > 0) {
-            this.startup -= 1;
-        } else {
-            movement.walk(this, this.speed, this.rotation);
-        }
+var getCell = function (x, y) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    if (x < 0 || MAPSIZE <= x || y < 0 || MAPSIZE <= y) {
+        return -1;
     }
+    return grid[y * MAPSIZE + x];
 };
 
-gameobjects["obj_player"].oncreate();
+var getDirection = function (x, y) {
+    return Math.atan2(y, x) + Math.PI / 2;
+};
 
-function update() {
+var getDistance = function (x, y) {
+    return Math.sqrt(x * x + y * y);
+};
+
+function fillRect(x, y, w, h, r, g, b) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    w = Math.ceil(w);
+    h = Math.ceil(h);
+    r = Math.floor(r);
+    g = Math.floor(g);
+    b = Math.floor(b);
     
-    if (game_event) {
-        ended = game_event();
-        if (ended) {
-            game_event = null;
+    setcolor(r, g, b, 255);
+    rectfill(x, y, w, h);
+}
+
+var pressed = false;
+
+update = function () {
+    if (keyboard[ENTER]) {
+        if (!pressed) {
+            pressed = true;
+            CELLSHADING = !CELLSHADING;
         }
+    } else {
+        pressed = false;
     }
     
+    var dx = 0;
+    var dy = 0;
+
+    if (keyboard[UP]) {
+        dx = Math.cos(player.direction) * 0.05;
+        dy = -Math.sin(player.direction) * 0.05;
+    }
+    if (keyboard[DOWN]) {
+        dx = -Math.cos(player.direction) * 0.05;
+        dy = Math.sin(player.direction) * 0.05;
+    }
+    if (keyboard[LEFT]) {
+        if (keyboard[SHIFT]) {
+            dx = Math.cos(player.direction + Math.PI/2) * 0.05;
+            dy = -Math.sin(player.direction + Math.PI/2) * 0.05;
+        } else {
+            player.direction = player.direction + 0.04;
+        }
+    }
+    if (keyboard[RIGHT]) {
+        if (keyboard[SHIFT]) {
+            dx = Math.cos(player.direction - Math.PI/2) * 0.05;
+            dy = -Math.sin(player.direction - Math.PI/2) * 0.05;
+        } else {
+            player.direction = player.direction - 0.04 + CIRCLE;
+        }
+    }
+
+    if (getCell(player.x + dx, player.y) <= 0) {
+        player.x += dx;
+    }
+    if (getCell(player.x, player.y + dy) <= 0) {
+        player.y += dy;
+    }
+    player.direction %= 2 * Math.PI;
+
     /*
-    x += (keyboard[RIGHT] - keyboard[LEFT]) * 3;
-    y += (keyboard[DOWN] - keyboard[UP]) * 3;
+    var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
+    gradient.addColorStop(0, "cyan");
+    gradient.addColorStop(0.9, "white");
+    ctx.fillStyle = gradient;
+    //ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+
+    gradient = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
+    gradient.addColorStop(0, "white");
+    gradient.addColorStop(0.1, "beige");
+    ctx.fillStyle = gradient;
+    //ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
     */
     
-    //for (var i = 0; i < 1; i++) circleFill(x, y, (x + y) / 10);
     
-    for (var i = 0; i < 192/16; i++) {
-        for (var j = 0; j < 160/16; j++) {
-            drawSprite(5, i * 16, j * 16);
-        }
-    }
+    setcolor(128, 255, 255);
+    rectfill(0, 0, 192, 80);
+    setcolor(255, 220, 128);
+    rectfill(0, 80, 192, 80);
+    //*/
     
-    var s = Math.floor(x + y) / 10;
+    var prevwall = -1;
+    var prevheight = -1;
+    var prevdist = -1;
+    for (var i = 0; i < PARTS; i += 1) {
+        var angle = player.direction - FOV / 2 + FOV / PARTS * i;
+        var cos = Math.cos(angle);
+        var sin = -Math.sin(angle);
+        var x = player.x;
+        var y = player.y;
+        var wallX = -1;
+        var wallY = -1;
     
-    if (keyboard[SPACE]) {
-        setcolor(200, 200, 200);
-        rectfill(0, 0, 192, 160);
-    }
-    
-    if (!keyboard[ENTER]) {
-        setcolor(0, 255, 55);
-    } else {
-        setcolor(255, 0, 0);
-    }
-    
-    rectfill(10, 20, 20, 100);
-    rectfill(180, 140, 30, 30);
-    
-    
-    for (var i = 0; i < trail.length; i += 2) {
-        var tx = trail[i + 0];
-        var ty = trail[i + 1];
+        if (ADVANCED) {
         
-        if (tx !== undefined) {
-            drawPixel(tx, ty, [Math.floor(255 - i * 1.5), Math.floor(i * 1.5), 255, 255]);
+            // Advanced raycasting - optimal effect
+            
+            var dist = 0;
+            while (dist < RANGE) {
+                var horX, horY, verX, verY;
+                var distX = Infinity;
+                var distY = Infinity;
+
+                if (cos != 0) {
+                    horX = (cos > 0) ? Math.floor(x + 1) - x : Math.ceil(x - 1) - x;
+                    horY = horX * sin / cos;
+                    distX = Math.sqrt(Math.pow(horX, 2) + Math.pow(horY, 2));
+                }
+                if (sin != 0) {
+                    verY = (sin > 0) ? Math.floor(y + 1) - y: Math.ceil(y - 1) - y;
+                    verX = verY * cos / sin;
+                    distY = Math.sqrt(Math.pow(verX, 2) + Math.pow(verY, 2));
+                }
+
+                if (distX < distY) {
+                    x += horX;
+                    y += horY;
+                    dist += distX;
+
+                    if (cos < 0) {
+                        if (getCell(x - 0.5, y) > 0) {
+                            wallX = Math.floor(x - 0.5);
+                            wallY = Math.floor(y);
+                        }
+                    } else {
+                        if (getCell(x + 0.5, y) > 0) {
+                            wallX = Math.floor(x + 0.5);
+                            wallY = Math.floor(y);
+                        }
+                    }
+                } else {
+                    x += verX;
+                    y += verY;
+                    dist += distY;
+
+                    if (sin < 0) {
+                        if (getCell(x, y - 0.5) > 0) {
+                            wallX = Math.floor(x);
+                            wallY = Math.floor(y - 0.5);
+                        }
+                    } else {
+                        if (getCell(x, y + 0.5) > 0) {
+                            wallX = Math.floor(x);
+                            wallY = Math.floor(y + 0.5);
+                        }
+                    }
+                }
+
+                if (wallX >= 0 && wallY >= 0) {
+                    break;
+                }
+            }
+        } else {
+        
+            // Simple raycasting - suboptimal effect
+            
+            var step = 0.05;
+            for (var dist = 0; dist < RANGE; dist += step) {
+                if (getCell(x, y) > 0) {
+                    wallX = Math.floor(x);
+                    wallY = Math.floor(y);
+                    break;
+                }
+                x += cos * step;
+                y += sin * step;
+            }
         }
+        
+        if (dist == 0) {
+            dist = RANGE;
+        }
+
+        var height = -1;
+        var z = -1;
+        if (wallX >= 0 && wallY >= 0) {
+            var cell = getCell(wallX, wallY);
+            var r = cell % 256;
+            var g = Math.floor(cell % (256 * 256) / 256);
+            var b = Math.floor(cell / (256 * 356));
+
+            z = dist * Math.cos(angle - player.direction);
+            height = canvas.height / z;
+            var top = canvas.height / 2 - height / 2;
+
+            //ctx.globalAlpha = Math.max(0, 1 - z / RANGE);
+            //ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+            //ctx.fillRect((PARTS - i - 1) * canvas.width / PARTS, top, canvas.width / PARTS, height);
+            fillRect(PARTS - i - 1, top, 1, height, r, g, b);
+            
+            if (CELLSHADING) {
+                var w = (1 - z / RANGE) * THICKNESS;
+                //ctx.fillStyle = "black";
+                //ctx.fillRect((PARTS - i - 1) * canvas.width / PARTS, top, w, w);
+                //ctx.fillRect((PARTS - i - 1) * canvas.width / PARTS, top + height, w, w);
+                fillRect(PARTS - i - 1, top, w, w, 0, 0, 0);
+                fillRect(PARTS - i - 1, top + height, w, w, 0, 0, 0);
+
+                var wall = wallY * MAPSIZE + wallX;
+                if (wall != prevwall) {
+                    var maxheight = Math.max(prevheight, height);
+                    var maxtop = canvas.height / 2 - maxheight / 2;
+                    
+                    if (maxheight > height) {
+                        w = (1 - prevdist / RANGE) * THICKNESS;
+                        //ctx.globalAlpha = Math.max(0, 1 - prevdist / RANGE);
+                    }
+                    
+                    //ctx.fillRect((PARTS - i - 1) * canvas.width / PARTS, maxtop, w, maxheight);
+                    fillRect(PARTS - i - 1, maxtop, w, maxheight, 0, 0, 0);
+                }
+            }
+        } else if (CELLSHADING) {
+            if (prevwall != -1) {
+                var maxheight = Math.max(prevheight, height);
+                var maxtop = canvas.height / 2 - maxheight / 2;
+                var w = (1 - canvas.height / maxheight / RANGE) * THICKNESS;
+                //ctx.fillRect((PARTS - i - 1) * canvas.width / PARTS, maxtop, w, maxheight);
+                fillRect(PARTS - i - 1, maxtop, w, maxheight, 0, 0, 0);
+            }
+            wallX = -1;
+            wallY = 0;
+        }
+
+        prevwall = wallY * MAPSIZE + wallX;
+        prevheight = height;
+        prevdist = z;
     }
-    
-    
-    // trees
-    drawSprite(4, 16 * 2, 16 * 2);
-    drawSprite(4, 16 * 2, 16 * 4);
-    drawSprite(4, 16 * 8, 16 * 8);
-    drawSprite(4, 16 * 9, 16 * 6);
-    
-    //for (var i = 0; i < 1; i++) circleFill(x, y, s); //rectfill(x, y, s, s);
-    
-    gameobjects["obj_player"].onupdate();
-    
-    drawSprite(7, 16 * 9, 16 * 1);
-}
+
+    //ctx.globalAlpha = 1;
+    //requestAnimationFrame(mainLoop);
+};
+
+})();
