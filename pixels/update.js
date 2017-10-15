@@ -20,7 +20,7 @@ var MAPSIZE = 128;
 var FOV = Math.PI / 3;
 
 // PARTS geef het aantal rechthoeken dat worden getekend (hoe hoger, hoe vloeiender)
-var PARTS = 220;
+var PARTS = 192;
 
 
 /* WERKING */
