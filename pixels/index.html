@@ -60,7 +60,7 @@
     }
     
     #conextras {
-        background-color: rgba(160, 160, 200, 0.3);
+        background-color: rgba(50, 180, 200, 0.3);
         z-index: 2;
         position: absolute;
         left: 0px;
@@ -432,7 +432,7 @@ function goResize() {
     
         c.style.top = "0px";
     
-        var th = 250;
+        var th = 220;
         
         var t = controls;
         t.width = Math.floor(w);//Math.floor(sw);
@@ -444,19 +444,20 @@ function goResize() {
         var ch = Math.max(th, Math.floor(h - Math.floor(sh)));
         var ctop = Math.floor(h - ch);
         
-        var eh = 40;
+        var eh = 50;
+        var mhh = 25;
         
         conextras.style.width = t.width + "px";
         conextras.style.height = eh + "px";
         conextras.style.top = ctop + "px";
         
-        conarrows.style.width = t.width / 2 + "px";
+        conarrows.style.width = (t.width / 2 + mhh) + "px";
         conarrows.style.height = (ch - eh) + "px";
         conarrows.style.top = (ctop + eh) + "px";
         
-        conbuttons.style.width = t.width / 2 + "px";
+        conbuttons.style.width = (t.width / 2 - mhh) + "px";
         conbuttons.style.height = (ch - eh) + "px";
-        conbuttons.style.left = t.width / 2 + "px";
+        conbuttons.style.left = (t.width / 2 + mhh) + "px";
         conbuttons.style.top = (ctop + eh) + "px";
         
     } else {
@@ -481,13 +482,19 @@ function ArrowButton(direction) {
     this.h = 0;
     this.direction = direction;
     
+    this.cx = 0;
+    this.cy = 0;
+    
     this.update = function () {
         var w = controls.width;
         var h = controls.height;
         var ax = marginHor;//w / marginButtonHor;
-        var ay = h / marginButtonVer;
+        var ay = h / marginButtonVer + 5;
         var ar = 50;
         var as = buttonSize;
+        
+        this.cx = ax;
+        this.cy = ay;
         
         this.w = as;
         this.h = as;
@@ -515,6 +522,10 @@ function ArrowButton(direction) {
         }
     };
     
+    this.getCenter = function () {
+        return { x: this.cx, y: this.cy };
+    };
+    
     this.render = function (ctx) {
         this.update();
         
@@ -540,7 +551,7 @@ function ActionButton(type) {
     this.update = function () {
         var w = controls.width;
         var h = controls.height;
-        var ax = w - marginHor - 5;//w - w / marginButtonHor + 5;
+        var ax = w - marginHor;//w - w / marginButtonHor + 5;
         var ay = h / marginButtonVer;
         var ar = 35;
         var as = buttonSize + 10;
@@ -616,7 +627,7 @@ function renderControls() {
     ctx.stroke();
     
     ctx.beginPath();
-    ctx.arc(cx, cy, 100, 0, 2 * Math.PI);
+    ctx.arc(cx, cy, 90, 0, 2 * Math.PI);
     ctx.stroke();
 }
 //renderControls();
@@ -651,8 +662,9 @@ var touchStartHandler = function (event) {
     
     var w = controls.width;
     var h = controls.height;
-    var cx = w / marginButtonHor;
-    var cy = h / marginButtonVer;
+    var cc = leftArrow.getCenter();
+    var cx = cc.x;//w / marginButtonHor;
+    var cy = cc.y;//h / marginButtonVer;
     var mx = mouseX;
     var my = mouseY;
     
@@ -660,7 +672,7 @@ var touchStartHandler = function (event) {
     var dir = (-Math.atan2(my - cy, mx - cx) * 180 / Math.PI + 360) % 360;
     
     
-    if (25 < dis && dis < 100) {
+    if (25 < dis && dis < 90) {
         if (dir < 45 || 315 <= dir) {
             key = RIGHT;
         }
@@ -811,9 +823,9 @@ function getEnv() {
         deviceBrowser = "ie";
     }
     
-    alert("Browser: " + deviceBrowser + " | OS: " + deviceOS + " | " + (deviceDesktop ? "desktop" : "mobile"));
+    //alert("Browser: " + deviceBrowser + " | OS: " + deviceOS + " | " + (deviceDesktop ? "desktop" : "mobile"));
     
-    if (deviceDesktop) {
+    if (false && deviceDesktop) {
         document.getElementById("controls-container").style.display = "none";
         CONTROLS = false;
     }
