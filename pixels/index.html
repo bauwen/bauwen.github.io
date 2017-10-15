@@ -804,7 +804,7 @@ function getEnv() {
     else if (/Firefox/.test(ua)) {
         deviceBrowser = "firefox";
     }
-    else if (/AppleWebKit/.test(ua) && device.iOS) {
+    else if (/AppleWebKit/.test(ua) && deviceOS === "ios") {
         deviceBrowser = "mobilesafari";
     }
     else if (/MSIE (\d+\.\d+);/.test(ua)) {
