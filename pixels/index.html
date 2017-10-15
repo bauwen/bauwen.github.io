@@ -44,7 +44,7 @@
     }
     
     #conarrows {
-        background-color: rgba(255, 0, 0, 0.3);
+        background-color: rgba(255, 0, 0, 0);
         z-index: 2;
         position: absolute;
         left: 0px;
@@ -52,7 +52,7 @@
     }
     
     #conbuttons {
-        background-color: rgba(255, 255, 0, 0.3);
+        background-color: rgba(255, 255, 0, 0);
         z-index: 2;
         position: absolute;
         left: 0px;
@@ -60,7 +60,7 @@
     }
     
     #conextras {
-        background-color: rgba(50, 180, 200, 0.3);
+        background-color: rgba(50, 180, 200, 0);
         z-index: 2;
         position: absolute;
         left: 0px;
@@ -617,8 +617,9 @@ function renderControls() {
     
     var w = controls.width;
     var h = controls.height;
-    var cx = marginHor; //w / marginButtonHor;
-    var cy = h / marginButtonVer;
+    var cc = leftArrow.getCenter();
+    var cx = cc.x;//w / marginButtonHor;
+    var cy = cc.y;//h / marginButtonVer;
     
     ctx.strokeStyle = "white";
     ctx.lineWidth = 2;
