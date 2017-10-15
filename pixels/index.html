@@ -747,9 +747,6 @@ var deviceDesktop = false;
 var CONTROLS = true;
 
 function getEnv() {
-    deviceOS = "";
-    deviceBrowser = "";
-    deviceDesktop = false;
 
     var ua = navigator.userAgent;
 
@@ -812,12 +809,14 @@ function getEnv() {
         deviceBrowser = "ie";
     }
     
-    console.log("Browser: " + deviceBrowser + " | OS: " + deviceOS + " | " + (deviceDesktop ? "desktop" : "mobile"));
+    alert("Browser: " + deviceBrowser + " | OS: " + deviceOS + " | " + (deviceDesktop ? "desktop" : "mobile"));
     
+    /*
     if (deviceDesktop) {
         document.getElementById("controls-container").style.display = "none";
         CONTROLS = false;
     }
+    */
 }
 
 getEnv();
