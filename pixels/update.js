@@ -110,7 +110,7 @@ gameobjects["obj_player"] = {
         }
          
         if (moved) {
-            this.speed = keyboard[SPACE] ? 4 : 2;
+            this.speed = keyboard[SPACE] ? 2 : 1;
             
             if (this.rotation == prevdir && this.startup == 3) {
                 this.startup = 0;
