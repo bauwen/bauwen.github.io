@@ -60,7 +60,10 @@ var movement = {
     }
 };
 
-
+var trail = [];
+for (var i = 0; i < 64; i++) {
+    trail.push(undefined, undefined);
+}
 var gameobjects = {};
 
 gameobjects["obj_player"] = {
@@ -84,6 +87,14 @@ gameobjects["obj_player"] = {
         var cell = 16;
         var cx = Math.floor(this.x / cell) * cell;
         var cy = Math.floor(this.y / cell) * cell;
+        
+        for (var i = 0; i < trail.length - 2; i += 2) {
+            trail[i + 0] = trail[i + 2];
+            trail[i + 1] = trail[i + 3];
+        }
+        
+        trail[trail.length - 2] = this.x + 8;
+        trail[trail.length - 1] = this.y + 8;
         
         if (this.x != cx || this.y != cy) {
             return;
@@ -167,7 +178,15 @@ function update() {
     rectfill(10, 20, 20, 100);
     rectfill(180, 140, 30, 30);
     
-    setcolor(255, 128, 0);
+    
+    for (var i = 0; i < trail.length; i += 2) {
+        var tx = trail[i + 0];
+        var ty = trail[i + 1];
+        
+        if (tx !== undefined) {
+            drawPixel(tx, ty, [Math.floor(255 - i * 1.5), Math.floor(i * 1.5), 255, 255]);
+        }
+    }
     
     
     // trees
