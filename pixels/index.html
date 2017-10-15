@@ -115,7 +115,7 @@ varying vec4 vColor;
 varying float y;
 
 void main() {
-    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a * y);
+    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
 }
 </script>
 
@@ -602,6 +602,8 @@ var controlCtx = controls.getContext("2d");
 function renderControls() {
     var ctx = controlCtx;
     
+    ctx.globalAlpha = 0.2;
+    
     var w = controls.width;
     var h = controls.height;
     
@@ -635,8 +637,6 @@ function renderControls() {
 
 window.onresize = goResize;
 goResize();
-
-window.onload = loop;
 
 var CW_RATIO = 1;
 var CH_RATIO = 1;
@@ -833,6 +833,168 @@ function getEnv() {
 }
 
 getEnv();
+
+
+var sprites = [];
+
+var convcan = document.createElement("canvas");
+var convctx = convcan.getContext("2d");
+
+function Sprite(image) {
+    var w = image.naturalWidth;
+    var h = image.naturalHeight;
+    convcan.width = w;
+    convcan.height = h;
+    convctx.clearRect(0, 0, w, h);
+    convctx.drawImage(image, 0, 0);
+    
+    this.data = convctx.getImageData(0, 0, w, h).data;
+    this.width = w;
+    this.height = h;
+}
+
+function drawSprite(index, x, y, rot) {
+    if (wb <= x || hb <= y) return;
+    
+    var sprite = sprites[index];
+    var spr = sprite.data;
+    var w = sprite.width;
+    var h = sprite.height;
+    
+    if (x + w < 0 || y + h < 0) return;
+    
+    // mirror/flip horizontally and vertically should be easy too!
+    
+    if (!rot) {
+    
+        for (var j = 0; j < h; j++) {
+            for (var k = 0; k < w; k++) {
+            
+                var xx = x + k;
+                var yy = y + j;
+                if (xx < 0 || wb <= xx || yy < 0 || hb <= yy) continue;
+                
+                var i = (xx + yy * wb) * 4;
+                var s = (k + j * w) * 4;
+                
+                var alpha = spr[s + 3];
+                
+                if (alpha > 0) {
+                    gridbuffer[i + 0] = spr[s + 0];
+                    gridbuffer[i + 1] = spr[s + 1];
+                    gridbuffer[i + 2] = spr[s + 2];
+                    gridbuffer[i + 3] = 255;//spr[s + 3];
+                }
+            }
+        }
+    
+    }
+    else if (rot === 1) {
+        
+        for (var j = 0; j < w; j++) {
+            for (var k = 0; k < h; k++) {
+                
+                var xx = x + k;
+                var yy = y + j;
+                if (xx < 0 || wb <= xx || yy < 0 || hb <= yy) continue;
+                
+                var i = (xx + yy * wb) * 4;
+                var s = (w - 1 - j + k * w) * 4;
+                
+                var alpha = spr[s + 3];
+                
+                if (alpha > 0) {
+                    gridbuffer[i + 0] = spr[s + 0];
+                    gridbuffer[i + 1] = spr[s + 1];
+                    gridbuffer[i + 2] = spr[s + 2];
+                    gridbuffer[i + 3] = 255;//spr[s + 3];
+                }
+            }
+        }
+        
+    }
+    else if (rot === 2) {
+        
+        for (var j = 0; j < h; j++) {
+            for (var k = 0; k < w; k++) {
+                
+                var xx = x + k;
+                var yy = y + j;
+                if (xx < 0 || wb <= xx || yy < 0 || hb <= yy) continue;
+                
+                var i = (xx + yy * wb) * 4;
+                var s = (w - 1 - k + (h - 1 - j) * w) * 4;
+                
+                var alpha = spr[s + 3];
+                
+                if (alpha > 0) {
+                    gridbuffer[i + 0] = spr[s + 0];
+                    gridbuffer[i + 1] = spr[s + 1];
+                    gridbuffer[i + 2] = spr[s + 2];
+                    gridbuffer[i + 3] = 255;//spr[s + 3];
+                }
+            }
+        }
+        
+    }
+    else if (rot === 3) {
+        
+        for (var j = 0; j < w; j++) {
+            for (var k = 0; k < h; k++) {
+                
+                var xx = x + k;
+                var yy = y + j;
+                if (xx < 0 || wb <= xx || yy < 0 || hb <= yy) continue;
+                
+                var i = (xx + yy * wb) * 4;
+                var s = (j + (h - 1 - k) * w) * 4;
+                
+                var alpha = spr[s + 3];
+                
+                if (alpha > 0) {
+                    gridbuffer[i + 0] = spr[s + 0];
+                    gridbuffer[i + 1] = spr[s + 1];
+                    gridbuffer[i + 2] = spr[s + 2];
+                    gridbuffer[i + 3] = 255;//spr[s + 3];
+                }
+            }
+        }
+        
+    }
+}
+
+
+function loadAssets() {
+    var images = [
+        "images/img_man_power.png",
+        "images/img_man1.png",
+        "images/img_man2.png",
+        "images/img_man3.png",
+        "images/img_tree1.png",
+        "images/tile_grass.png",
+        "images/tile_stone.png",
+    ];
+    
+    function loadImage(index) {
+        if (index >= images.length) {
+            console.log("Loaded!");
+            setTimeout(loop, 1);
+        } 
+        
+        var image = new Image();
+        image.src = images[index];
+        image.onload = function () {
+            sprites.push(new Sprite(image));
+            setTimeout(loadImage, 1, index + 1);
+        };
+    }
+    
+    loadImage(0);
+}
+
+
+window.onload = loadAssets;
+
 </script>
 
 </body>
