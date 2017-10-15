@@ -198,4 +198,6 @@ function update() {
     //for (var i = 0; i < 1; i++) circleFill(x, y, s); //rectfill(x, y, s, s);
     
     gameobjects["obj_player"].onupdate();
+    
+    drawSprite(7, 16 * 9, 16 * 1);
 }

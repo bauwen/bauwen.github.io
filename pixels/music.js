@@ -5,7 +5,7 @@ var synth = new Tone.FMSynth().toMaster()
 var t = "8n";
 var s = t;
 
-for (var i = 0; i < 30; i++) {
+for (var i = 0; i < 15; i++) {
     synth.triggerAttackRelease('C4', '4n', s); s += " + " + t;
     synth.triggerAttackRelease('E4', '8n', s); s += " + " + t;
     synth.triggerAttackRelease('G4', '16n', s); s += " + " + t;
