@@ -18,7 +18,7 @@
     #display {
         margin: 0px;
         width: 576px;
-        height: 576px;
+        height: 480px;
         background-color: rgb(50, 50, 50);
         //image-rendering: -moz-crisp-edges;
         //image-rendering: pixelated;
@@ -77,7 +77,7 @@
 <body>
 
 <div id="container" style="margin: 0px">
-    <canvas id="display" width="576" height="576"></canvas>
+    <canvas id="display" width="576" height="480"></canvas>
 
     <!--<div id="concon">-->
     <div id="controls-container">
@@ -178,7 +178,7 @@ gl.enableVertexAttribArray(colorAttributeLocation);
 
 
 var wb = 192;//canvas.width;
-var hb = 192;//canvas.height;
+var hb = 160;//canvas.height;
 var gridsize = wb * hb;
 var gridbuffer = new Uint8Array(gridsize * 4);
 
