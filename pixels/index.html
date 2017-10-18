@@ -18,7 +18,7 @@
     #display {
         margin: 0px;
         width: 576px;
-        height: 480px;
+        height: 576px;
         background-color: rgb(50, 50, 50);
         //image-rendering: -moz-crisp-edges;
         //image-rendering: pixelated;
@@ -77,7 +77,7 @@
 <body>
 
 <div id="container" style="margin: 0px">
-    <canvas id="display" width="576" height="480"></canvas>
+    <canvas id="display" width="576" height="576"></canvas>
 
     <!--<div id="concon">-->
     <div id="controls-container">
@@ -89,18 +89,15 @@
 </div>
 
 <script id="vertex_shader" type="x-shader/x-vertex">
+precision lowp float;
+
 attribute vec2 aPosition;
 attribute vec4 aColor;
 
-uniform vec2 uResolution;
-
 varying vec4 vColor;
-varying float y;
 
 void main() {
-    vec2 acPosition = vec2(aPosition.x + 0.5, aPosition.y + 0.5);
-    vec2 clipSpace = (acPosition / vec2(192.0, 160.0) * 2.0 - 1.0) * vec2(1.0, -1.0);
-    y = (clipSpace.y + 1.0) / 2.0;
+    vec2 clipSpace = (aPosition * 2.0 - 1.0) * vec2(1.0, -1.0);
     gl_PointSize = 3.0;
     gl_Position = vec4(clipSpace, 0, 1);
     vColor = aColor;
@@ -108,10 +105,9 @@ void main() {
 </script>
 
 <script id="fragment_shader" type="x-shader/x-fragment">
-precision mediump float;
+precision lowp float;
 
 varying vec4 vColor;
-varying float y;
 
 void main() {
     gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
@@ -128,11 +124,25 @@ var CONTROLS = true;
 
 // Tips:
 //      Work with color pallettes, buffer only contains int representing color
-//      within vertex shader, switch-check this int to determine right color
+//      within vertex shader, switch-check this int to determine right color    (use uniforms for variable-palettes within shader)
 //
 //      x and y are CONSTANT within buffer! So use separate ARRAY_BUFFER for positions (that never change!)
 //
 //      These two tips reduce the dynamic-buffer size from 192*160*6 to 192*160*1 (only 1 int for color index)
+//
+//      => Vertex shader code:
+//
+//        ...
+//        attribute int color_index;
+//        uniform vec4 palette[65];
+//        ...
+//        void main() {
+//            vColor = palette[color_index];
+//            ...
+
+//      divide position ("/ vec2(192.0, 160.0)") outside shader, because that's actually inside a static buffer!
+//      (this means float instead of byte, though, so static buffer is 4 times bigger; but, also no division for each pixel!)
+//      (I have no idea what is the best, though. Maybe division inside shader and smaller buffer is more performant... no idea.)
 
 var container = document.getElementById("container");
 var conarrows = document.getElementById("conarrows");
@@ -144,7 +154,9 @@ var gl = canvas.getContext("webgl", {
     //alpha: false,
     premultipliedAlpha: false,
     antialias: false,
-    preserveDrawingBuffer: false
+    preserveDrawingBuffer: false,
+    stencil: false,
+    depth: false
 });
 
 var vertexShaderSource = document.getElementById("vertex_shader").innerHTML;
@@ -160,18 +172,13 @@ gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 var positionAttributeLocation = gl.getAttribLocation(program, "aPosition");
 var colorAttributeLocation = gl.getAttribLocation(program, "aColor");
-var resolutionUniformLocation = gl.getUniformLocation(program, "uResolution");
 
 gl.enableVertexAttribArray(positionAttributeLocation);
 gl.enableVertexAttribArray(colorAttributeLocation);
-gl.enableVertexAttribArray(resolutionUniformLocation);
-
-gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-
 
 
 var wb = 192;//canvas.width;
-var hb = 160;//canvas.height;
+var hb = 192;//canvas.height;
 var gridsize = wb * hb;
 var gridbuffer = new Uint8Array(gridsize * 4);
 
@@ -179,6 +186,7 @@ var gridbuffer = new Uint8Array(gridsize * 4);
 
 var vertexBufferPositions = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferPositions);
+/*
 gl.vertexAttribPointer(positionAttributeLocation, 2, gl.UNSIGNED_BYTE, false, 2 * 1, 0);
 var gridpositions = new Uint8Array(gridsize * 2);
 for (var i = 0; i < gridsize; i++) {
@@ -186,6 +194,15 @@ for (var i = 0; i < gridsize; i++) {
     var iy = Math.floor(i / wb);
     gridpositions[2 * i] = ix | 0;
     gridpositions[2 * i + 1] = iy | 0;
+}
+*/
+gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 2 * 4, 0);
+var gridpositions = new Float32Array(gridsize * 2);
+for (var i = 0; i < gridsize; i++) {
+    var ix = i % wb;
+    var iy = Math.floor(i / wb);
+    gridpositions[2 * i] = (ix + 0.5) / wb;
+    gridpositions[2 * i + 1] = (iy + 0.5) / hb;
 }
 gl.bufferData(gl.ARRAY_BUFFER, gridpositions, gl.STATIC_DRAW);
 
@@ -255,6 +272,8 @@ function clearbuffer() {
     for (var i = 3; i < len; i += 4) {
         gridbuffer[i] = 0;
     }
+    //*/
+    //gridbuffer.fill(0);
 }
 
 var x = 10;
@@ -277,12 +296,6 @@ function loop() {
     //console.log(pcount);
     
     requestAnimationFrame(loop);
-}
-
-function clear() {
-    for (var i = 0; i < pixels.length; i += 1) {
-        pixels[i] = 0 | 0;
-    }
 }
 
 function drawPixel(x, y, color) {

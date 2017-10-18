@@ -157,7 +157,7 @@ function update() {
     //for (var i = 0; i < 1; i++) circleFill(x, y, (x + y) / 10);
     
     for (var i = 0; i < 192/16; i++) {
-        for (var j = 0; j < 192/16; j++) {
+        for (var j = 0; j < 160/16; j++) {
             drawSprite(5, i * 16, j * 16);
         }
     }
@@ -166,7 +166,7 @@ function update() {
     
     if (keyboard[SPACE]) {
         setcolor(200, 200, 200);
-        rectfill(0, 0, 192, 192);
+        rectfill(0, 0, 192, 160);
     }
     
     if (!keyboard[ENTER]) {
