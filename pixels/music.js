@@ -145,7 +145,7 @@ function Chiptune() {
     
     chiptune.context = new AudioContext();
     
-    chiptune.tempo = 3;
+    chiptune.tempo = 10;
     chiptune.masterVolumeLevel = 1.0;
     
     chiptune.masterVolume = chiptune.context.createGain();
@@ -240,22 +240,13 @@ function Chiptune() {
         },
         
         play: function (test) {
-            
-            /*
-            var note = this.instrument.createNote(chiptune.masterVolume, 440);
-            
-            var offset = chiptune.context.currentTime;
-            
-            note.start(offset + 1);
-            note.stop(offset + 2);
-            */
-            
-            
             var volumeLevel = chiptune.masterVolumeLevel / 4 / (test ? 4 : 1);
             var volume = chiptune.context.createGain();
             
             volume.gain.value = volumeLevel;
             volume.connect(chiptune.masterVolume);
+            
+            console.log(volume.gain);
             
             
             var offset = chiptune.context.currentTime;
@@ -281,17 +272,40 @@ function Chiptune() {
                     }
                     
                     stopTime += 0.002;
-                    volume.gain.setValueAtTime(0.0, startTime);
+                    volume.gain.setValueAtTime(0, startTime);
                     volume.gain.linearRampToValueAtTime(volumeLevel, startTime + 0.002);
                     volume.gain.setValueAtTime(volumeLevel, stopTime - 0.002);
-                    volume.gain.linearRampToValueAtTime(0.0, stopTime);
+                    volume.gain.linearRampToValueAtTime(0, stopTime);
                 }
                 
                 if (frequency > 0) {
+                    //frequency *= 2;
                     var note = this.instrument.createNote(volume, frequency);
                     
+                    
+                    // vibratio effect  -- (todo: create Float32Array only once and reuse (if possible))
+                    // ...and many more effects possible: like slide up, slide down etc.!
+                    var s = frequency;
+                    var waveArray = new Float32Array(2); // important to have exact size
+                    waveArray[0] = s * 1;
+                    waveArray[1] = s * 0.8;
+                    //waveArray[2] = s * 1.1
+                    //waveArray[3] = s * 1;
+                    
+                    if (false && note.frequency) {
+                    
+                        note.frequency.setValueCurveAtTime(waveArray, startTime, stopTime - startTime);
+                    
+                    }
+                    
                     note.start(startTime);
-                    note.stop(stopTime);
+                    note.stop(stopTime); 
+                }
+                
+                if (i >= this.frequencies.length - 1 && !test) {
+                    note.onended = function () {
+                        console.log("Song has ended.");
+                    }
                 }
             }
         }
@@ -306,167 +320,517 @@ function Chiptune() {
 
 var tune = new Chiptune();
 
-var channel1 = new tune.Channel("sine");
+var channel1 = new tune.Channel('square');
 channel1.setNotes([
-    
-    "C5",
-    "D5",
-    "E5",
-    "C5",
-    "",
-    "E5",
-    "E5",
-    "D5",
-    "D5",
-    "C5",
-    "C5",
-    "C5",
-    "C5",
-    
-    "",
-    "",
-    
-    "B5",
-    "A5",
-    "E5",
-    "A5",
-    "",
-    "E5",
-    "G5",
-    "D5",
-    "G5",
-    "A5",
-    "A#5",
-    "A#5",
-    "A5",
-    
-    "",
-    
-    // repeat
-    
-    "C5",
-    "D5",
-    "E5",
-    "C5",
-    "",
-    "E5",
-    "E5",
-    "D5",
-    "D5",
-    "C5",
-    "C5",
-    "C5",
-    "C5",
-    
-    "",
-    "",
-    
-    "B5",
-    "A5",
-    "E5",
-    "A5",
-    "",
-    "E5",
-    "G5",
-    "D5",
-    "G5",
-    "A5",
-    "A#5",
-    "A#5",
-    "A5",
-    
-    ""
-    
+
+"Bb4","Bb4","Bb4","Bb4","Bb4","Bb4","Bb4","Bb4",
+"","","",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4","Bb4","Bb4",
+"Ab4",
+"Bb4","Bb4","Bb4","Bb4",
+"","","",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4","Bb4","Bb4",
+"Ab4",
+"Bb4","Bb4","Bb4","Bb4",
+"Bb4","Bb4","Bb4",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4",
+"Bb4","Bb4",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4","F4",
+"Bb4","Bb4","Bb4","Bb4",
+"F4","F4","F4","F4",
+"F4","F4","F4",
+"Bb4",
+"Bb4",
+"C5",
+"D5",
+"Eb5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"","",
+"F5","F5",
+"F5",
+"Gb5",
+"Ab5",
+"Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5",
+"",
+"Bb5",
+"Bb5",
+"Bb5",
+"Ab5",
+"Gb5",
+"Ab5","Ab5","Ab5",
+"Gb5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"F5","F5","F5","F5",
+"Eb5","Eb5",
+"Eb5",
+"F5",
+"Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5",
+"F5","F5",
+"Eb5","Eb5",
+"Db5","Db5",
+"Db5",
+"Eb5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"Eb5","Eb5",
+"Db5","Db5",
+"C5","C5",
+"C5",
+"D5",
+"E5","E5","E5","E5","E5","E5","E5","E5",
+"G5","G5","G5","G5",
+"F5","F5",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4","F4",
+"Bb4","Bb4","Bb4","Bb4",
+"F4","F4","F4","F4",
+"F4","F4","F4",
+"Bb4",
+"Bb4",
+"C5",
+"D5",
+"Eb5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"","",
+"F5","F5",
+"F5",
+"Gb5",
+"Ab5",
+"Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5","Bb5",
+"Db6","Db6","Db6","Db6",
+"C6","C6","C6","C6",
+"A5","A5","A5","A5","A5","A5","A5","A5",
+"F5","F5","F5","F5",
+"Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5",
+"","","","",
+"Bb5","Bb5","Bb5","Bb5",
+"A5","A5","A5","A5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"F5","F5","F5","F5",
+"Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5","Gb5",
+"","","","",
+"Bb5","Bb5","Bb5","Bb5",
+"A5","A5","A5","A5",
+"F5","F5","F5","F5","F5","F5","F5","F5",
+"D5","D5","D5","D5",
+"Eb5","Eb5","Eb5","Eb5","Eb5","Eb5","Eb5","Eb5",
+"","","","",
+"Gb5","Gb5","Gb5","Gb5",
+"F5","F5","F5","F5",
+"Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5",
+"Bb4","Bb4","Bb4","Bb4",
+"C5","C5",
+"C5",
+"D5",
+"E5","E5","E5","E5","E5","E5","E5","E5",
+"G5","G5","G5","G5",
+"F5","F5",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4",
+"F4",
+"F4","F4",
+"F4","F4",
+
+
 ]);
 
-var channel2 = new tune.Channel("noise");
+var channel2 = new tune.Channel('square');
 channel2.setNotes([
-    
-    "C5",
-    "D5",
-    "E5",
-    "C5",
-    "",
-    "E6",
-    "E6",
-    "D6",
-    "D6",
-    "C6",
-    "C6",
-    "C6",
-    "C6",
-    
-    "",
-    "",
-    
-    "",
-    "",
-    "",
-    "",
-    "",
-    "E5",
-    "G5",
-    "D5",
-    "G5",
-    "A5",
-    "",
-    "",
-    "",
-    
-    "",
-    
-    // repeat
-    
-    "C5",
-    "D5",
-    "E5",
-    "C5",
-    "",
-    "E6",
-    "E6",
-    "D6",
-    "D6",
-    "C6",
-    "C6",
-    "C6",
-    "C6",
-    
-    "",
-    "",
-    
-    "",
-    "",
-    "",
-    "",
-    "",
-    "E5",
-    "G5",
-    "D5",
-    "G5",
-    "A5",
-    "",
-    "",
-    "",
-    
-    "",
-    
+
+"D4","D4","D4","D4","D4","D4","D4","D4",
+"","","",
+"D4",
+"D4",
+"D4",
+"D4",
+"C4","C4","C4",
+"C4",
+"C4","C4","C4","C4",
+"","","",
+"C4",
+"C4",
+"C4",
+"C4",
+"Db4","Db4","Db4",
+"Db4",
+"Db4","Db4","Db4","Db4",
+"Db4","Db4","Db4",
+"Db4",
+"Db4",
+"Db4",
+"Db4",
+"Db4","Db4",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3","A3",
+"D4","D4","D4","D4",
+"D4",
+"D4",
+"C4",
+"D4","D4","D4",
+"D4",
+"D4",
+"Eb4",
+"F4",
+"G4",
+"Ab4","Ab4","Ab4",
+"Bb4",
+"Bb4",
+"C5",
+"D5",
+"Eb5",
+"F5","F5",
+"F5","F5",
+"Ab4",
+"Bb4",
+"C5",
+"Db5","Db5","Db5",
+"Gb4",
+"Gb4",
+"Ab4",
+"Bb4",
+"C5",
+"Db5","Db5",
+"Db5","Db5",
+"Db5",
+"C5",
+"Bb4",
+"Db5","Db5","Db5",
+"Ab4",
+"Ab4",
+"Ab4",
+"Gb4",
+"Ab4","Ab4","Ab4",
+"Ab4",
+"Ab4",
+"Gb4",
+"Ab4",
+"Gb4","Gb4",
+"",
+"Gb4",
+"F4",
+"Gb4","Gb4",
+"",
+"Gb4",
+"F4",
+"Bb4","Bb4","Bb4","Bb4",
+"Ab4","Ab4",
+"Gb4","Gb4",
+"F4","F4",
+"",
+"F4",
+"Eb4",
+"F4","F4",
+"",
+"F4",
+"Gb4",
+"Ab4","Ab4","Ab4","Ab4",
+"Gb4","Gb4",
+"F4","F4",
+"E4","E4","E4","E4",
+"E4","E4","E4",
+"F4",
+"G4","G4",
+"",
+"G4",
+"Ab4",
+"Bb4","Bb4",
+"C5","C5",
+"A4","A4",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3","A3",
+"D4","D4","D4","D4",
+"D4",
+"D4",
+"C4",
+"D4","D4","D4",
+"D4",
+"D4",
+"Eb4",
+"F4",
+"G4",
+"Ab4","Ab4","Ab4",
+"Bb4",
+"Bb4",
+"C5",
+"D5",
+"Eb5",
+"F5","F5",
+"F5","F5",
+"Ab4",
+"Bb4",
+"C5",
+"Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5","Db5",
+"E5","E5","E5","E5",
+"Eb5","Eb5","Eb5","Eb5",
+"C5","C5","C5","C5","C5","C5","C5","C5",
+"A4","A4","A4","A4",
+"B4","B4","B4","B4","B4","B4","B4","B4",
+"","","","",
+"Db5","Db5","Db5","Db5",
+"C5","C5","C5","C5",
+"A4","A4","A4","A4","A4","A4","A4","A4",
+"A4","A4","A4","A4",
+"B4","B4","B4","B4","B4","B4","B4","B4",
+"","","","",
+"Db5","Db5","Db5","Db5",
+"C5","C5","C5","C5",
+"A4","A4","A4","A4","A4","A4","A4","A4",
+"A4","A4","A4","A4",
+"Gb4","Gb4","Gb4","Gb4","Gb4","Gb4","Gb4","Gb4",
+"","","","",
+"B4","B4","B4","B4",
+"Bb4","Bb4","Bb4","Bb4",
+"F4","F4","F4","F4","F4","F4","F4","F4",
+"Db4","Db4","Db4","Db4",
+"E4","E4","E4","E4",
+"E4","E4","E4",
+"F4",
+"G4","G4",
+"",
+"G4",
+"Ab4",
+"Bb4","Bb4",
+"C5","C5",
+"A4","A4",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3",
+"A3",
+"A3","A3",
+"A3","A3",
+
+
 ]);
 
-channel1.play();
-channel2.play(true);
+var channel3 = new tune.Channel('sawtooth');
+channel3.setNotes([
 
-/*
-var track = new tune.Track();
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Bb2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Bb2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2",
+"Ab2",
+"Ab2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2",
+"Ab2",
+"Ab2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2",
+"Gb2",
+"Gb2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2",
+"Gb2",
+"Gb2",
+"Gb2","Gb2","Gb2","Gb2",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"G2","G2",
+"A2","A2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Ab2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2","Bb2","Bb2","Bb2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2",
+"Ab2",
+"Gb2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2","Ab2","Ab2","Ab2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2",
+"Gb2",
+"E2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2","Gb2","Gb2","Gb2",
+"Db3","Db3","Db3","Db3",
+"Db3",
+"Db3",
+"B2",
+"Db3","Db3","Db3","Db3",
+"Db3","Db3","Db3","Db3",
+"B2","B2","B2","B2",
+"B2",
+"B2",
+"Bb2",
+"B2","B2","B2","B2",
+"B2",
+"B2",
+"B2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Ab2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Bb2",
+"C3","C3","C3","C3",
+"C3",
+"C3",
+"Bb2",
+"C3","C3","C3","C3",
+"C3",
+"C3",
+"C3",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"G2","G2",
+"A2","A2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Ab2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2","Bb2","Bb2","Bb2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2",
+"Ab2",
+"Gb2",
+"Ab2","Ab2","Ab2","Ab2",
+"Ab2","Ab2","Ab2","Ab2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2",
+"Gb2",
+"E2",
+"Gb2","Gb2","Gb2","Gb2",
+"Gb2","Gb2","Gb2","Gb2",
+"F2","F2","F2","F2",
+"F2",
+"F2",
+"Eb2",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"E2",
+"Bb2",
+"Db3",
+"E3",
+"Bb3",
+"Db4",
+"E4","E4","E4","E4",
+"","","","",
+"F4","F4","F4","F4",
+"F2",
+"F2",
+"F2",
+"F2","F2","F2","F2",
+"","","","",
+"E2",
+"Bb2",
+"Db3",
+"E3",
+"Bb3",
+"Db4",
+"E4","E4","E4","E4",
+"","","","",
+"F4","F4","F4","F4",
+"F2",
+"F2",
+"F2",
+"F2","F2","F2","F2",
+"","","","",
+"B2","B2","B2","B2",
+"B2",
+"B2",
+"Bb2",
+"B2","B2","B2","B2",
+"B2",
+"B2",
+"B2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Ab2",
+"Bb2","Bb2","Bb2","Bb2",
+"Bb2",
+"Bb2",
+"Bb2",
+"C3","C3","C3","C3",
+"C3",
+"C3",
+"Bb2",
+"C3","C3","C3","C3",
+"C3",
+"C3",
+"C3",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"F2","F2","F2","F2",
+"G2","G2",
+"A2","A2",
 
-track.pushChannel(channel1);
-track.pushChannel(channel2, true);  // true -- loop channel playback within track
 
-setTimeout(function () {
-    track.play(true);  // true -- loop whole track playback
-}, 1000);
+]);
 
-requestAnimationFrame(function tuneloop() {
-    tune.update();  // used to check whether a channel is finished (and should start again if looping etc.)
-    requestAnimationFrame(tuneloop);
-});
-*/
+var started = false;
+window.setTimeout(function () {
+    if (!started) {
+    channel1.play();
+    channel2.play();
+    channel3.play();
+    started = true;
+    }
+}, 2000);
+
