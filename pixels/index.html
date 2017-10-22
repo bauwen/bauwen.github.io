@@ -89,7 +89,7 @@
 </div>
 
 <script id="vertex_shader" type="x-shader/x-vertex">
-precision lowp float;
+precision mediump float;
 
 attribute vec2 aPosition;
 attribute vec4 aColor;
@@ -97,10 +97,9 @@ attribute vec4 aColor;
 varying vec4 vColor;
 
 void main() {
-    vec2 clipSpace = (aPosition * 2.0 - 1.0) * vec2(1.0, -1.0);
-    gl_PointSize = 3.0;
-    gl_Position = vec4(clipSpace, 0, 1);
     vColor = aColor;
+    gl_PointSize = 3.0;
+    gl_Position = vec4(aPosition, 0, 1);
 }
 </script>
 
@@ -110,7 +109,7 @@ precision lowp float;
 varying vec4 vColor;
 
 void main() {
-    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
+    gl_FragColor = vColor;
 }
 </script>
 
@@ -121,6 +120,18 @@ var deviceOS = "";
 var deviceBrowser = "";
 var deviceDesktop = false;
 var CONTROLS = true;
+
+/*  TRICK TO DRAW GRID (pos is in absolute (192.0, 160.0) coordinates)
+
+    float eps = 1.0;
+    vec2 c = floor(pos / 16.0) * 16.0;
+    
+    if ((abs(c.x - pos.x) < eps && gl_PointCoord.x < 0.2) || (abs(c.y - pos.y) < eps && gl_PointCoord.y < 0.2)) {
+        gl_FragColor = vec4(0.4, 0.4, 0.4, 1);
+    } else {
+        gl_FragColor = vColor;
+    }
+*/
 
 // Tips:
 //      Work with color pallettes, buffer only contains int representing color
@@ -140,9 +151,10 @@ var CONTROLS = true;
 //            vColor = palette[color_index];
 //            ...
 
+//      (aPosition / vec2(192.0, 160.0) * 2.0 - 1.0) * vec2(1.0, -1.0);
 //      divide position ("/ vec2(192.0, 160.0)") outside shader, because that's actually inside a static buffer!
 //      (this means float instead of byte, though, so static buffer is 4 times bigger; but, also no division for each pixel!)
-//      (I have no idea what is the best, though. Maybe division inside shader and smaller buffer is more performant... no idea.)
+//      (I have no idea what is best, though. Maybe division inside shader and smaller buffer is more performant... no idea.)
 
 var container = document.getElementById("container");
 var conarrows = document.getElementById("conarrows");
@@ -201,8 +213,8 @@ var gridpositions = new Float32Array(gridsize * 2);
 for (var i = 0; i < gridsize; i++) {
     var ix = i % wb;
     var iy = Math.floor(i / wb);
-    gridpositions[2 * i] = (ix + 0.5) / wb;
-    gridpositions[2 * i + 1] = (iy + 0.5) / hb;
+    gridpositions[2 * i] = ((ix + 0.5) / wb * 2.0) - 1.0;
+    gridpositions[2 * i + 1] = 1.0 - ((iy + 0.5) / hb * 2.0);
 }
 gl.bufferData(gl.ARRAY_BUFFER, gridpositions, gl.STATIC_DRAW);
 
@@ -860,22 +872,35 @@ var convcan = document.createElement("canvas");
 var convctx = convcan.getContext("2d");
 
 function Sprite(image) {
-    var w = image.naturalWidth;
-    var h = image.naturalHeight;
-    convcan.width = w;
-    convcan.height = h;
-    convctx.clearRect(0, 0, w, h);
-    convctx.drawImage(image, 0, 0);
-    
-    this.data = convctx.getImageData(0, 0, w, h).data;
-    this.width = w;
-    this.height = h;
+    if (image.data) {
+        this.data = image.data;
+        this.width = image.width;
+        this.height = image.height;
+    } else {
+        var w = image.naturalWidth;
+        var h = image.naturalHeight;
+        convcan.width = w;
+        convcan.height = h;
+        convctx.clearRect(0, 0, w, h);
+        convctx.drawImage(image, 0, 0);
+        
+        this.data = convctx.getImageData(0, 0, w, h).data;
+        this.width = w;
+        this.height = h;
+    }
 }
 
 function drawSprite(index, x, y, rot) {
     if (wb <= x || hb <= y) return;
     
-    var sprite = sprites[index];
+    var sprite;
+    
+    if (typeof index === "object") {
+        sprite = index;
+    } else {
+        sprite = sprites[index];
+    }
+    
     var spr = sprite.data;
     var w = sprite.width;
     var h = sprite.height;
@@ -1010,6 +1035,8 @@ function loadAssets() {
     }
     
     loadImage(0);
+    
+    lettersToSprites();
 }
 
 
@@ -1017,7 +1044,6 @@ window.onload = loadAssets;
 
 </script>
 
-<script src="audio/Tone.min.js"></script>
 <script src="music.js"></script>
 
 </body>

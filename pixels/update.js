@@ -200,4 +200,69 @@ function update() {
     gameobjects["obj_player"].onupdate();
     
     drawSprite(7, 16 * 9, 16 * 1);
+    
+    drawSprite(LETTERS["a"], 16 * 1 + 0, 16 * 1);
+    drawSprite(LETTERS["b"], 16 * 1 + 5 + 1, 16 * 1);
+    drawSprite(LETTERS["b"], 16 * 1 + 10 + 2, 16 * 1);
+    drawSprite(LETTERS["a"], 16 * 1 + 15 + 3, 16 * 1);
+}
+
+
+var LETTERS = {
+    /*
+    "a": [
+        1, 1, 1,
+        1, 0, 1,
+        1, 1, 1,
+        1, 0, 1,
+        1, 0, 1
+    ],
+    
+    "b": [
+        1, 1, 1,
+        1, 0, 1,
+        1, 1, 0,
+        1, 0, 1,
+        1, 1, 1
+    ]
+    */
+    "a": [
+        0, 1, 1, 1, 0,
+        1, 1, 0, 0, 1,
+        1, 1, 0, 0, 1,
+        1, 1, 1, 1, 1,
+        1, 1, 0, 0, 1
+    ],
+    
+    "b": [
+        1, 1, 1, 1, 0,
+        1, 1, 0, 0, 1,
+        1, 1, 1, 1, 0,
+        1, 1, 0, 0, 1,
+        1, 1, 1, 1, 0
+    ]
+};
+
+function lettersToSprites() {
+    var w = 5;
+    var h = 5;
+    convcan.width = w;
+    convcan.height = h;
+    
+    for (var letter in LETTERS) {
+        convctx.clearRect(0, 0, w, h);
+        var data = convctx.getImageData(0, 0, w, h).data;
+        var grid = LETTERS[letter];
+        
+        for (var i = 0; i < grid.length; i++) {
+            var j = i * 4;
+            
+            data[j + 0] = 0;
+            data[j + 1] = 0;
+            data[j + 2] = 0;
+            data[j + 3] = grid[i] * 255;
+        }
+        
+        LETTERS[letter] = new Sprite({ data: data, width: w, height: h });
+    }
 }
