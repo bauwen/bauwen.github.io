@@ -187,7 +187,7 @@ var Tween;
                 buttonsReleased[i] = false;
             }
             
-            ctx.fillStyle = "rgb(70, 70, 70)";
+            ctx.fillStyle = "rgb(90, 90, 90)";
             ctx.textAlign = "left";
             ctx.font = "18px verdana";
             ctx.fillText("v0.2", 15, 30);

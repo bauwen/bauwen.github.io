@@ -147,7 +147,6 @@ addModule("shapes", function () {
         currentShapeColor = shapeColors[Math.floor(Math.random() * shapeColors.length)];
         
         if (timerCount === 3 || (timerCount > 3 && Math.random() < 0.5)) {
-        //if (Math.random() < 0.5) {
             if (Math.random() < 0.3) {
                 currentMatchType = currentShapeType;
                 currentMatchColor = currentShapeColor;
@@ -161,8 +160,7 @@ addModule("shapes", function () {
             }
         }
         
-        if (timerCount === 6 || (timerCount > 7 && Math.random() < 0.3)) {
-        //if (Math.random() < 0.3) {
+        if (timerCount === 7 || (timerCount > 7 && Math.random() < 0.3)) {
             if (Math.random() < 0.2) {
                 currentObjectColor = "";
                 currentOldShape = "";
@@ -283,6 +281,11 @@ addModule("shapes", function () {
     
     var restartButton = new Button();
     var menuButton = new Button();
+    
+    restartButton.width = 250;
+    restartButton.height = 60;
+    menuButton.width = restartButton.width;
+    menuButton.height = restartButton.height;
     
     onTimer();
     
