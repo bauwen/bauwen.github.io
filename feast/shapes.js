@@ -87,9 +87,20 @@ addModule("shapes", function () {
         
         var correct = false;
         
-        correct = (currentMatchType !== type || currentMatchColor !== currentShapeColor) &&
-                  (currentOldShape !== type && currentShapeType === type || 
-                   currentNewShape === type && currentShapeType === currentOldShape);
+        if (currentMatchType !== currentShapeType || currentMatchColor !== currentShapeColor) {
+            if (currentNewShape) {
+                if (currentOldShape) {
+                    correct = currentOldShape !== type && 
+                             (currentNewShape !== type || currentOldShape === currentShapeType || currentShapeType === type) &&
+                             (currentNewShape === type || currentShapeType === type);
+                }
+                else if (currentObjectColor) {
+                    correct = currentShapeType === type || currentNewShape === type && currentShapeColor === currentObjectColor;
+                }
+            } else {
+                correct = currentShapeType === type;
+            }
+        }
         
         fadeAlpha[type] = 0.4;
         fadeColor[type] = correct ? "lime" : "red";
@@ -108,9 +119,7 @@ addModule("shapes", function () {
             return;
         }
         
-        var correct = currentMatchColor === currentShapeColor && 
-                      (currentOldShape !== currentShapeType && currentMatchType === currentShapeType ||
-                       currentOldShape === currentShapeType && currentMatchType === currentNewShape);
+        var correct = currentMatchType === currentShapeType && currentMatchColor === currentShapeColor;
         
         matchFadeAlpha = 0.4;
         matchFadeColor = correct ? "lime" : "red";
@@ -125,7 +134,7 @@ addModule("shapes", function () {
     }
     
     function onTimer() {
-        timer = 60 * 3;
+        timer = timerInterval;
         timerCount += 1;
         
         var type;
@@ -137,8 +146,8 @@ addModule("shapes", function () {
         currentShapeType = type;
         currentShapeColor = shapeColors[Math.floor(Math.random() * shapeColors.length)];
         
-        //if (timerCount >= 3 && (timerCount === 3 || Math.random() < 0.5)) {
-        if (Math.random() < 0.5) {
+        if (timerCount === 3 || (timerCount > 3 && Math.random() < 0.5)) {
+        //if (Math.random() < 0.5) {
             if (Math.random() < 0.3) {
                 currentMatchType = currentShapeType;
                 currentMatchColor = currentShapeColor;
@@ -152,19 +161,26 @@ addModule("shapes", function () {
             }
         }
         
-        //if (timerCount >= 7 && (timerCount === 7 || Math.random() < 0.3)) {
-        if (Math.random() < 0.3) {
+        if (timerCount === 6 || (timerCount > 7 && Math.random() < 0.3)) {
+        //if (Math.random() < 0.3) {
             if (Math.random() < 0.2) {
+                currentObjectColor = "";
                 currentOldShape = "";
                 currentNewShape = "";
             } else {
-                currentOldShape = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+                currentNewShape = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
                 
-                do {
-                    type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-                } while (type === currentOldShape);
-                
-                currentNewShape = type;
+                if (Math.random() < 0.5) {
+                    currentObjectColor = shapeColors[Math.floor(Math.random() * shapeColors.length)];
+                    currentOldShape = "";
+                } else {
+                    do {
+                        type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+                    } while (type === currentNewShape);
+                    
+                    currentOldShape = type;
+                    currentObjectColor = "";
+                }
             }
         }
     }
@@ -187,20 +203,31 @@ addModule("shapes", function () {
         "lime",
         "cyan",
         "yellow",
-        "orange",
-        "fuchsia"
+        //"orange",
+        //"fuchsia"
     ];
     
     var currentShapeType = shapeTypes[0];
     var currentShapeColor = shapeColors[0];
     var currentMatchType = "";
     var currentMatchColor = "";
+    var currentObjectColor = "";
     var currentOldShape = "";
     var currentNewShape = "";
     
     var timer = 0;
     var timerCount = 0;
-    var totalCount = 30;
+    var timerInterval = 60 * 3;
+    var totalCount = 40;
+    
+    var colorName = {
+        "red": "red",
+        "lime": "green",
+        "cyan": "blue",
+        "yellow": "yellow",
+        "orange": "orange",
+        "fuchsia": "purple"
+    };
     
     var fillShape = {
         "triangle": fillTriangle,
@@ -278,7 +305,7 @@ addModule("shapes", function () {
             onTimer();
         }
         
-        if (timerCount > totalCount & timer < 60 * 2.7) {
+        if (timerCount > totalCount & timer < timerInterval - 20) {
             ROOM_STATE = 2;
             return;
         }
@@ -332,14 +359,19 @@ addModule("shapes", function () {
         
         var text = "";
         
-        if (currentOldShape && timerCount <= totalCount) {
-            text = currentOldShape.charAt(0).toUpperCase() + currentOldShape.slice(1) + "s are now " + currentNewShape + "s";
+        if (currentNewShape && timerCount <= totalCount) {
+            if (currentOldShape) {
+                text = "Classify " + currentOldShape + "s as " + currentNewShape + "s";
+            }
+            else if (currentObjectColor) {
+                text = "Classify " + colorName[currentObjectColor] + " objects as " + currentNewShape + "s";
+            }
         }
         
         xx = buttonMargin;
         yy = canvas.height / 2 + 20;
         
-        ctx.font = "bold 32px verdana";
+        ctx.font = "bold 30px verdana";
         ctx.textAlign = "left";
         ctx.fillStyle = "rgb(50, 50, 50)";
         ctx.fillText(text, xx + shx / 2, yy + shy / 2);
@@ -387,6 +419,11 @@ addModule("shapes", function () {
             matchTween.set(-10);
             onMatch();
         }
+        
+        if (keyboardPressed("Escape")) {
+            ROOM_STATE = 2;
+            return;
+        }
     }
     
     function updateStats() {
@@ -403,15 +440,17 @@ addModule("shapes", function () {
         ctx.fillStyle = "rgb(200, 200, 200)";
         ctx.fillText("GAME OVER", xx, yy - 10);
         
-        //xx = canvas.width / 2 + 40 + 50;
-        xx = canvas.width / 2 + 40 + 125;
+        //xx = canvas.width / 2 + 40 + 125;
+        xx = canvas.width / 7 + 125;
         yy = canvas.height / 1.5 - 120 + 210;
         
-        var p = Math.round(POINTS_CORRECT / totalCount * 100);
+        var cc = timerCount - 1;
+        
+        var p = cc === 0 ? "\\(°^°)/" : Math.round(POINTS_CORRECT / cc * 100) + "%";
         ctx.textAlign = "center";
         ctx.font = "bold 64px verdana";
         ctx.fillStyle = "yellow";
-        ctx.fillText(p + "%", xx, yy);
+        ctx.fillText(p, xx, yy);
         
         /*
         ctx.fillStyle = "rgb(120, 120, 120)";
@@ -419,7 +458,8 @@ addModule("shapes", function () {
         ctx.fillText("Best: " + "73%", xx + 5, yy + 40);
         */
         
-        xx = canvas.width / 2 + 40;
+        //xx = canvas.width / 2 + 40;
+        xx = canvas.width / 7;
         yy = canvas.height / 1.5 - 120 - 130;
         
         restartButton.x = xx;
@@ -432,19 +472,22 @@ addModule("shapes", function () {
         menuButton.text = "GO TO MENU";
         menuButton.draw();
         
-        xx = canvas.width / 7;
+        //xx = canvas.width / 7;
+        xx = canvas.width / 2 + 40;
         yy = canvas.height / 1.5 - 120 + 20;
         
         ctx.textAlign = "left";
         ctx.fillStyle = "rgb(200, 200, 200)";
-        ctx.font = "32px verdana";
-        ctx.fillText("Correct: ", xx, yy);
-        ctx.fillText("Wrong: ", xx, yy + 90);
-        ctx.fillText("Missed: ", xx, yy + 180);
-        
-        ctx.fillText(POINTS_CORRECT + "/" + totalCount, xx + 150, yy);
-        ctx.fillText(POINTS_WRONG + "/" + totalCount, xx + 150, yy + 90);
-        ctx.fillText(POINTS_TOOLATE + "/" + totalCount, xx + 150, yy + 180);
+        ctx.font = "bold 32px verdana";
+        ctx.fillStyle = "rgb(160, 230, 160)";
+        ctx.fillText("Correct: ", xx, yy - 20);
+        ctx.fillText(POINTS_CORRECT + "/" + cc, xx + 160, yy - 20);
+        ctx.fillStyle = "rgb(230, 160, 160)";
+        ctx.fillText("Wrong: ", xx, yy + 85);
+        ctx.fillText(POINTS_WRONG + "/" + cc, xx + 160, yy + 85);
+        ctx.fillStyle = "rgb(230, 160, 230)";
+        ctx.fillText("Missed: ", xx, yy + 190);
+        ctx.fillText(POINTS_TOOLATE + "/" + cc, xx + 160, yy + 190);
         
         if (mousePressed("Left")) {
             if (restartButton.isHovering()) {
@@ -455,13 +498,18 @@ addModule("shapes", function () {
                 POINTS_TOOLATE = 0;
                 currentMatchType = "";
                 currentMatchColor = "";
+                currentObjectColor = "";
                 currentOldShape = "";
                 currentNewShape = "";
                 onTimer();
             }
             else if (menuButton.isHovering()) {
-                // TODO
+                setModule("menu");
             }
+        }
+        
+        if (keyboardPressed("Escape")) {
+            setModule("menu");
         }
     }
     

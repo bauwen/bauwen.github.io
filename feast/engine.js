@@ -187,10 +187,16 @@ var Tween;
                 buttonsReleased[i] = false;
             }
             
+            ctx.fillStyle = "rgb(70, 70, 70)";
+            ctx.textAlign = "left";
+            ctx.font = "18px verdana";
+            ctx.fillText("v0.2", 15, 30);
+            
             requestAnimationFrame(loop);
         };
         
-        setModule("shapes");
+        canvas.style.backgroundColor = "rgb(60, 60, 60)";
+        setModule("menu");
         resizeHandler();
         loop();
     }
