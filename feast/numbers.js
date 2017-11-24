@@ -401,7 +401,7 @@ addModule("numbers", function () {
         xx = buttonMargin;
         yy = canvas.height / 2 + 20;
         
-        ctx.font = "bold 20px verdana";
+        ctx.font = "bold 24px verdana";
         ctx.textAlign = "left";
         ctx.fillStyle = "rgb(50, 50, 50)";
         ctx.fillText(text, xx + shx / 2, yy + shy / 2);
