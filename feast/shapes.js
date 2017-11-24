@@ -205,7 +205,7 @@ addModule("shapes", function () {
         //"fuchsia"
     ];
     
-    var currentShapeType = shapeTypes[0];
+    var currentShapeType = "";//shapeTypes[0];
     var currentShapeColor = shapeColors[0];
     var currentMatchType = "";
     var currentMatchColor = "";
@@ -215,7 +215,7 @@ addModule("shapes", function () {
     
     var timer = 0;
     var timerCount = 0;
-    var timerInterval = 60 * 3;
+    var timerInterval = 60 * 2.5;
     var totalCount = 40;
     
     var colorName = {
@@ -435,21 +435,21 @@ addModule("shapes", function () {
         var xx;
         var yy;
         
+        var cc = timerCount - 1;
+        var p = cc === 0 ? "\\(°^°)/" : Math.round(POINTS_CORRECT / cc * 100) + "%";
+        
         xx = canvas.width / 7;
         yy = canvas.height / 4;
         
         ctx.textAlign = "left";
         ctx.font = "bold 72px verdana";
         ctx.fillStyle = "rgb(200, 200, 200)";
-        ctx.fillText("GAME OVER", xx, yy - 10);
+        ctx.fillText(p === "100%" ? "YAY! 100%!" : "GAME OVER!", xx, yy - 10);
         
         //xx = canvas.width / 2 + 40 + 125;
         xx = canvas.width / 7 + 125;
         yy = canvas.height / 1.5 - 120 + 210;
-        
-        var cc = timerCount - 1;
-        
-        var p = cc === 0 ? "\\(°^°)/" : Math.round(POINTS_CORRECT / cc * 100) + "%";
+         
         ctx.textAlign = "center";
         ctx.font = "bold 64px verdana";
         ctx.fillStyle = "yellow";

@@ -29,9 +29,7 @@ addModule("menu", function () {
                 setModule("shapes");
             }
             else if (numbersButton.isHovering()) {
-                // TODO
-                //setModule("numbers");
-                alert("Daar moet ik nog aan beginnen :P");
+                setModule("numbers");
             }
         }
     };

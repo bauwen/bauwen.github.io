@@ -190,12 +190,12 @@ var Tween;
             ctx.fillStyle = "rgb(90, 90, 90)";
             ctx.textAlign = "left";
             ctx.font = "18px verdana";
-            ctx.fillText("v0.2", 15, 30);
+            ctx.fillText(VERSION, 15, 30);
             
             requestAnimationFrame(loop);
         };
         
-        canvas.style.backgroundColor = "rgb(60, 60, 60)";
+        canvas.style.background = "linear-gradient(rgb(50, 50, 54), rgb(65, 65, 65))";//"rgb(60, 60, 60)";
         setModule("menu");
         resizeHandler();
         loop();
