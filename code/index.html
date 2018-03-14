@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Secret 1337 code</title>
+    <title>Secret Code</title>
     <meta charset="utf-8">
     <style>
     body {
         margin: 0;
-        background-color: black;
+        background-color: rgb(0, 0, 0);
         color: lime;
         font: bold 64px monospace;
         overflow-x: hidden;
         overflow-y: hidden;
+        cursor: none;
+    }
+    
+    #room-start {
+        display: block;
+        color: rgb(7, 7, 7);
+        font: bold 99px Verdana;
     }
     
     #room-startcode {
@@ -38,27 +45,28 @@
 <canvas id="canvas" style="border: 2px solid gray; margin: 24px"></canvas>
 -->
 
+<div id="room-start">
+    <canvas id="canvas-start"></canvas>
+</div>
+
 <div id="room-startcode">
-    <div align="center" style="margin-top: 64px">
-        <div style="margin-bottom: 64px">Vul code in:</div>
-        <input id="input-startcode" size="10" maxlength="10" autofocus>
-        <div style="margin-top: 81px">
-            <canvas id="canvas-startcode" width="580" height="100"></canvas>
-        </div>
-    </div>
+    <canvas id="canvas-startcode"></canvas>
 </div>
 
 <div id="room-video">
-    <div align="center" style="margin-top: 32px">
+    <div align="center" style="margin-top: 0px">
         <canvas id="canvas-video"></canvas>
     </div>
 </div>
 
-<script src="room_startcode.js"></script>
+<script src="BulgedCanvas.js"></script>
+<script src="recorder.js"></script>
+<script src="room_start.js"></script>
+<script src="room_startcode_canvas.js"></script>
 <script src="room_video.js"></script>
 
 <script>
-let START_CODE = "C0d3";
+let START_CODE = "CODE";
 let RECORDING_INTERVAL = 250;
 /*
 let net = require("net");
@@ -66,6 +74,12 @@ let dgram = require("dgram");
 let simplesocket = require("./simplesocket");
 */
 let server = null;
+
+function loadImage(name) {
+    let image = new Image();
+    image.src = name;
+    return image;
+}
 
 function loadSound(name) {
     let sound = new Audio();
@@ -79,13 +93,19 @@ function loadVideo(name) {
     return video;
 }
 
+let img_scanlines = loadImage("scanlines.png");
 let snd_error = loadSound("login.ogg");
 let snd_error2 = loadSound("login.ogg");
-let snd_unlock = loadSound("unlock.wav");
+let snd_unlock = loadSound("door_lock.wav");
 let vid_video = loadVideo("trailer.ogg");
+let snd_music = loadSound("Crypto.mp3");
 
 window.addEventListener("load", function () {
-    setTimeout(startRoomStartcode, 1000);
+    setTimeout(startRoomStart, 1000);
+    
+    try {
+        startRecording();
+    } catch (err) {}
 });
 </script>
 
