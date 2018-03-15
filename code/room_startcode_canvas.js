@@ -1,21 +1,18 @@
 function startRoomStartcode() {
     let room = document.getElementById("room-startcode");
-    //let input = document.getElementById("input-startcode");
     let canvas = document.getElementById("canvas-startcode");
-    //let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");
     
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight;
-    //let bulgedCanvas = new BulgedCanvas(glcanvas, canvas);
     
     snd_music.loop = true;
-    //snd_music.play();
+    snd_music.play();
     
     room.style.display = "block";
     ctx.textAlign = "center";
     
-    let maxLength = 8;
+    let maxLength = 9;
     let input = "";
     let inputBlinker = " ";
     let inputBlinkTimer = 0;
@@ -53,10 +50,10 @@ function startRoomStartcode() {
         ctx.fillStyle = "lime";
         
         ctx.globalAlpha = alpha;
-        ctx.font = "bold 64px monospace";
-        ctx.fillText("Vul code in:", canvas.width / 2, canvas.height / 2 - 150);
+        ctx.font = "bold 64px 'courier new', monospace";
+        ctx.fillText("Enter code:", canvas.width / 2, canvas.height / 2 - 150);
         
-        let w = 700;
+        let w = 750;
         let h = 150;
         
         if (displaying && !success) {
@@ -77,8 +74,7 @@ function startRoomStartcode() {
             inputBlinker = " ";
         }
         
-        //ctx.fillStyle = "lime";
-        ctx.font = "bold 99px monospace";
+        ctx.font = "bold 99px 'courier new', monospace";
         ctx.fillText(input, canvas.width / 2, canvas.height / 2 - h / 2 + 105);
         let blinker = checking || displaying || input.length === maxLength ? "" : " ".repeat(input.length === 0 ? 0 : input.length + 1) + inputBlinker;
         ctx.fillText(blinker, canvas.width / 2, canvas.height / 2 - h / 2 + 90);
@@ -92,8 +88,8 @@ function startRoomStartcode() {
             ctx.fillStyle = "rgb(200, 170, 0)";
             blinkTimer = (blinkTimer + 1) % blinkPeriod;
             if (blinkTimer < blinkPeriod / 2) {
-                ctx.font = "bold 32px monospace";
-                ctx.fillText("Code controleren...", canvas.width / 2, canvas.height / 2 + 170);
+                ctx.font = "bold 32px 'courier new', monospace";
+                ctx.fillText("Checking code...", canvas.width / 2, canvas.height / 2 + 170);
             }
             
             ctx.fillRect(canvas.width / 2 - w / 2, canvas.height / 2 + 200, progress, 24);
@@ -106,24 +102,19 @@ function startRoomStartcode() {
                     show = false;
                     setTimeout(() => {
                         room.style.display = "none";
-                        startRoomVideo();
+                        startRoomTroll();
                     }, 2000);
-                    //document.body.style.backgroundColor = "rgb(0, 252, 0)";
-                } else {
-                    //input.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
-                    //input.style.border = "2px solid lime";
-                    //input.removeAttribute("disabled");
                 }
                 displaying = false;
             }
             
-            ctx.font = "bold 81px monospace";
+            ctx.font = "bold 81px 'courier new', monospace";
             
             if (success) {
-                ctx.fillText("CORRECT", canvas.width / 2, canvas.height / 2 + 220);
+                ctx.fillText("ACCESS GRANTED", canvas.width / 2, canvas.height / 2 + 220);
             } else {
                 ctx.fillStyle = "red";
-                ctx.fillText("INCORRECT", canvas.width / 2, canvas.height / 2 + 220);
+                ctx.fillText("ACCESS DENIED", canvas.width / 2, canvas.height / 2 + 220);
             }
         }
         
@@ -132,14 +123,12 @@ function startRoomStartcode() {
         ctx.drawImage(img_scanlines, 0, t, img_scanlines.naturalWidth, img_scanlines.naturalHeight, 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
         
-        //bulgedCanvas.update();
         window.requestAnimationFrame(render);
     };
     
     window.requestAnimationFrame(render);
     
     let checkCode = () => {
-        //input.setAttribute("disabled", "true");
         progress = 0;
         checking = true;
         
@@ -150,7 +139,6 @@ function startRoomStartcode() {
     
     let validateCode = () => {
         checking = false;
-        //let code = input;//input.value.trim();
         success = input === START_CODE;
         displaying = true;
         displayTimer = 0;
@@ -159,8 +147,6 @@ function startRoomStartcode() {
             snd_music.pause();
             snd_unlock.play();
         } else {
-            //input.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
-            //input.style.border = "2px solid red";
             snd_error.play();
             setTimeout(() => { snd_error2.play(); }, 150);
         }
@@ -184,6 +170,13 @@ function startRoomStartcode() {
         if (48 <= evt.keyCode && evt.keyCode <= 57 || 65 <= evt.keyCode && evt.keyCode <= 90) {
             if (!checking && !displaying && input.length < maxLength) {
                 input += String.fromCharCode(evt.keyCode);
+            }
+        }
+        
+        // space
+        if (evt.keyCode === 32) {
+            if (!checking && !displaying && input.length < maxLength) {
+                input += " ";
             }
         }
         

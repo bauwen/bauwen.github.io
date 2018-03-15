@@ -1,79 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Secret Code</title>
+    <title>Very Secret Code</title>
     <meta charset="utf-8">
     <style>
     body {
         margin: 0;
         background-color: rgb(0, 0, 0);
         color: lime;
-        font: bold 64px monospace;
+        font: bold 64px 'courier new', monospace;
         overflow-x: hidden;
         overflow-y: hidden;
         cursor: none;
-    }
-    
-    #room-start {
-        display: block;
-        color: rgb(7, 7, 7);
-        font: bold 99px Verdana;
     }
     
     #room-startcode {
         display: none;
     }
     
-    #input-startcode {
-        padding: 12px 16px;
-        background-color: rgba(0, 255, 0, 0.1);
-        border: 2px solid lime;
-        border-radius: 4px;
-        font: bold 99px monospace;
-        color: lime;
-        text-align: center;
-    }
-    
-    #room-video {
+    #room-troll {
         display: none;
     }
     </style>
 </head>
 <body>
 
-<!--
-<canvas id="canvas" style="border: 2px solid gray; margin: 24px"></canvas>
--->
-
-<div id="room-start">
-    <canvas id="canvas-start"></canvas>
-</div>
-
 <div id="room-startcode">
     <canvas id="canvas-startcode"></canvas>
 </div>
 
-<div id="room-video">
-    <div align="center" style="margin-top: 0px">
-        <canvas id="canvas-video"></canvas>
-    </div>
+<div id="room-troll">
+    <canvas id="canvas-troll"></canvas>
 </div>
 
-<script src="BulgedCanvas.js"></script>
-<script src="recorder.js"></script>
-<script src="room_start.js"></script>
 <script src="room_startcode_canvas.js"></script>
-<script src="room_video.js"></script>
+<script src="room_troll.js"></script>
 
 <script>
-let START_CODE = "CODE";
-let RECORDING_INTERVAL = 250;
-/*
-let net = require("net");
-let dgram = require("dgram");
-let simplesocket = require("./simplesocket");
-*/
-let server = null;
+let START_CODE = "CODE";  // You're not supposed to see this! ;)
 
 function loadImage(name) {
     let image = new Image();
@@ -93,6 +57,7 @@ function loadVideo(name) {
     return video;
 }
 
+let img_trollface = loadImage("trollface.png");
 let img_scanlines = loadImage("scanlines.png");
 let snd_error = loadSound("login.ogg");
 let snd_error2 = loadSound("login.ogg");
@@ -101,12 +66,40 @@ let vid_video = loadVideo("trailer.ogg");
 let snd_music = loadSound("Crypto.mp3");
 
 window.addEventListener("load", function () {
-    setTimeout(startRoomStart, 1000);
+    setTimeout(startRoomStartcode, 2000);
     
     try {
         startRecording();
     } catch (err) {}
 });
+
+let ac = new AudioContext();
+let source;
+let gain = ac.createGain();
+let analyser = ac.createAnalyser();
+gain.gain.value = 1;
+analyser.connect(ac.destination);
+gain.connect(analyser);
+
+let webapi = true;
+
+let request = new XMLHttpRequest();
+request.onload = function () {
+    if (request.readyState === 4 && request.status === 200) {
+        ac.decodeAudioData(request.response, function (buffer) {
+            source = ac.createBufferSource();
+            source.buffer = buffer;
+            source.connect(gain);
+        });
+    }
+};
+request.onerror = function () {
+    webapi = false;
+    source = loadSound("trollmusic.mp3");
+};
+request.responseType = 'arraybuffer';
+request.open('GET', 'trollmusic.mp3', true);
+request.send(null);
 </script>
 
 </body>
