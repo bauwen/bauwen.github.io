@@ -263,7 +263,7 @@ function Game(width, height) {
         var h = Math.floor(window.innerHeight);
         var c = self.canvas;
         
-        c.width = Math.max(480, w);
+        c.width = Math.max(400, w);
         c.height = Math.max(580, h);
         
         var r = w / h;
