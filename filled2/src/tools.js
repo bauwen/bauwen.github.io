@@ -47,8 +47,8 @@ WIDTH = HEIGHT;
 HEIGHT = tmp;
 //*/
 
-SURFACE.width = WIDTH * CELL + 10;
-SURFACE.height = HEIGHT * CELL + 10;
+SURFACE.width = WIDTH * CELL + CELL / 2;
+SURFACE.height = HEIGHT * CELL + CELL / 2;
 
 function loadDrawings() {
     var size = 48;
@@ -404,6 +404,11 @@ function loadLevels() {
         */
         //***
         
+        for (var i = 0; i < bridges.length; i++) {
+            bridges[i].x -= x1;
+            bridges[i].y -= y1;
+        }
+        
         var levelgrid = {
             get: function (x, y) {
                 return croppedGrid[y][x];//list[x + y * WIDTH];
@@ -434,8 +439,6 @@ function getLevelImage(level) {
     var width = level.width;
     var height = level.height;
     
-    
-    
     for (var i = 0; i < width; i++) {
         for (var j = 0; j < height; j++) {
             var obj = level.get(i, j);
@@ -445,9 +448,11 @@ function getLevelImage(level) {
             var y = dy + j * CELL;
             var s = 0;
             
-            if (type !== "nothing") {
+            if (type !== "nothing" && type !== "wall") {
+                ctx.fillStyle = "rgb(70, 75, 70)";
+                ctx.fillRect(x + 2, y + 2, CELL + 5, CELL + 5);
                 ctx.fillStyle = COLLAYER;
-                ctx.fillRect(x + 2, y + 2, CELL + 4, CELL + 4);
+                ctx.fillRect(x, y, CELL, CELL);
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = COLGRID;
                 ctx.strokeRect(x, y, CELL, CELL);
@@ -493,14 +498,14 @@ function getLevelImage(level) {
                     s = 2;
                     
                     ctx.fillStyle = COLWALL;
-                    ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
+                    //ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
                     
                     var wallG = ctx.createLinearGradient(x + s, y + s, x+s+CELL - 2 * s, y+s+CELL - 2 * s);
                     wallG.addColorStop(0, "white");
                     wallG.addColorStop(1, "black");
                     ctx.fillStyle = wallG;
                     ctx.globalAlpha = 0.1;
-                    ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
+                    //ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
                     ctx.globalAlpha = 1;
                     
                     break;
@@ -524,9 +529,9 @@ function getLevelImage(level) {
                     break;
                     
                 case "tunnel":
-                    s = 3;
+                    s = 4;
                     
-                    ctx.lineWidth = 6;
+                    ctx.lineWidth = 8;
                     ctx.strokeStyle = COLTUNNELS[obj.id];
                     ctx.strokeRect(x + s + 3, y + s + 3, CELL - 2 * s - 6, CELL - 2 * s - 6);
                     

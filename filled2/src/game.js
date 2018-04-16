@@ -106,7 +106,7 @@ game.addObject("obj_controller", {
                 this.level.number = this.number;
                 
                 if (this.restartAngle > 0) {
-                    this.direction = 90;
+                    this.direction = 270;
                 } else {
                     this.direction = ((this.goingBack ? 180 : 0) + this.dirlist[this.number - (this.goingBack ? 0 : 1)]) % 360;
                 }
@@ -159,14 +159,14 @@ game.addObject("obj_controller", {
         }
         
         ctx.globalAlpha = 0.6;
-        ctx.textAlign = "right";//"center";
+        ctx.textAlign = "center";//"center";
         ctx.fillStyle = "white";
-        ctx.font = "44px gamefont, sans-serif";
+        ctx.font = "42px gamefont, sans-serif";
         
         if (this.number < LEVELS.length - 1) {
-            //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width / 5, ctx.canvas.height - 32);
+            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width / 2, ctx.canvas.height - 32);
             //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 30, 50 + 70);
-            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 100, 58);
+            //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 100, 58);
         }
         
         var prevHover = false;
@@ -291,6 +291,35 @@ game.addObject("obj_controller", {
     }
 });
 
+game.addObject("obj_dust", {
+    create: function () {
+        this.x = Math.floor(Math.random() * ctx.canvas.width);
+        this.y = Math.floor(Math.random() * ctx.canvas.height);
+        this.speed = 0.001 + Math.random() * 0.2;
+        this.direction = Math.random() * 2 * Math.PI;
+        this.lifetime = 60 * 10 + Math.floor(Math.random() * 60 * 10);
+        this.life = this.lifetime;
+    },
+    
+    update: function () {
+        this.life -= 1;
+        if (this.life < 0) {
+            game.destroyInstance(this);
+            return;
+        }
+        
+        this.x += Math.cos(this.direction) * this.speed;
+        this.y -= Math.sin(this.direction) * this.speed;
+        
+        var olt = this.lifetime / 2;
+        var alpha = 1 - Math.abs(this.life - olt) / olt;
+        ctx.globalAlpha = Math.max(0, Math.min(alpha / 4, 1));
+        ctx.fillStyle = "rgb(70, 105, 70)";
+        ctx.fillRect(Math.floor(this.x), Math.floor(this.y), 6, 6);
+        ctx.globalAlpha = 1;
+    }
+});
+
 game.addObject("obj_level", {
     create: function () {
         this.number = -1;
@@ -375,7 +404,7 @@ game.addObject("obj_level", {
             while (t.tunnel) {
                 t = self.trails.pop();
                 teleported = true;
-                //self.clicked = false;
+                self.clicked = false;//
             }
             
             self.px = t.x;
@@ -427,6 +456,10 @@ game.addObject("obj_level", {
             this.image = IMAGES[this.number];
             this.px = this.level.startX;
             this.py = this.level.startY;
+        }
+        
+        if (Math.random() < 0.1 && game.getInstanceCount("obj_dust") < 20) {
+            game.createInstance("obj_dust", 0, 0, 10000);
         }
         
         if (!CONTROLLER.sliding && !this.done) {
@@ -580,7 +613,7 @@ game.addObject("obj_level", {
                 
                 this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
                 this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
-                //this.clicked = false;
+                this.clicked = false;//
                 break;
         
             case "target":
@@ -615,12 +648,12 @@ game.addObject("obj_level", {
         s = 8;
         if (this.finished) {
             if (this.doneFade > 0) {
-                this.doneFade -= 0.03;
+                this.doneFade -= 0.025;
             } else {
                 this.done = true;
             }
             s = 2;
-            var v = Math.floor(205 - (1 - this.doneFade) * 105);
+            var v = Math.floor(205 - (1 - this.doneFade) * 100);
             color = "rgb(" + (v - 5) + "," + v + "," + (v - 5) + ")";
         }
         
@@ -739,7 +772,7 @@ game.addObject("obj_level", {
         }
         
         if (!this.finished) {
-            s = 6 - this.ptween.get()// + this.glow;
+            s = 6 - this.ptween.get() + this.glow;
         } else {
             s = 2;
         }
@@ -761,9 +794,17 @@ game.addObject("obj_level", {
         if (this.number === LEVELS.length - 1) {
             ctx.fillStyle = "white";
             ctx.globalAlpha = 0.6;
+            
+            var limitWidth = 500;
             ctx.font = "64px gamefont, sans-serif";
+            if (ctx.canvas.width < limitWidth) {
+                ctx.font = "32px gamefont, sans-serif";
+            }
             ctx.fillText("Congratulations!", this.x, this.y - 80);
             ctx.font = "48px gamefont, sans-serif";
+            if (ctx.canvas.width < limitWidth) {
+                ctx.font = "24px gamefont, sans-serif";
+            }
             ctx.fillText("Thank you for playing!", this.x, this.y + 105);
             ctx.globalAlpha = 1;
         }

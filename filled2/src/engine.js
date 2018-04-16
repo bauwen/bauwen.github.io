@@ -3,7 +3,7 @@ var COLGRID = "rgb(90, 95, 90)";
 var COLPLAYER = "rgb(200, 200, 60)";
 var COLTRAIL = "rgb(80, 160, 80)";
 var COLWALL = "rgb(100, 105, 100)"//COLGRID;
-var COLTARGET = "rgb(80, 160, 80)";
+var COLTARGET = "rgb(60, 170, 60)";//"rgb(80, 160, 80)";
 var COLBRIDGE = "rgb(160, 60, 160)";
 var COLTUNNELS = [
     "rgb(60, 100, 180)",
@@ -12,7 +12,7 @@ var COLTUNNELS = [
     "rgb(120, 180, 40)",
     "rgb(80, 180, 180)"
 ];
-var COLLAYER = "rgb(60, 65, 60)"//"rgb(60, 120, 160)";
+var COLLAYER = "rgb(65, 70, 65)"//"rgb(60, 120, 160)";
 
 /*
 var COLBACK = "rgb(200, 200, 100)";//"rgb(40, 100, 140)";//"rgb(49, 54, 49)";
@@ -178,6 +178,9 @@ function Game(width, height) {
         self.mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
         self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
         
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
+        
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
             self.buttonsPressed[button] = true;
@@ -201,6 +204,9 @@ function Game(width, height) {
         
         self.mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
         self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
+        
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
     };
     
     var touchStartHandler = function (event) {
@@ -220,6 +226,9 @@ function Game(width, height) {
         
         self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
         self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
+        
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
         
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
@@ -248,6 +257,9 @@ function Game(width, height) {
         
         self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
         self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
+        
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
     };
     
     window.addEventListener("mousedown", mouseDownHandler, false);
