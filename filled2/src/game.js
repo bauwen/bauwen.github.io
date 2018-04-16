@@ -12,12 +12,12 @@ game.addObject("obj_controller", {
         this.sliding = false;
         this.direction = 0;
         this.number = 0;
-        
+        /*
         if (game.getLocalStorage("giflevel")) {
             this.number = parseInt(game.getLocalStorage("giflevel"));
             this.number = Math.max(0, Math.min(this.number, LEVELS.length - 1));
         }
-        
+        */
         this.prev = null;
         this.level = game.createInstance("obj_level", ctx.canvas.width / 2, ctx.canvas.height / 2);
         this.level.number = this.number;
