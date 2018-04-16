@@ -9,10 +9,9 @@ function unlockAllLevels() {
 parent.unlockAllLevels = unlockAllLevels;
 
 function checkCorrectSite() {
-    return true;/*
     var hostname = parent.location.hostname;
     
-    return (hostname === "" || hostname.indexOf("coolmath-games.com") >= 0);*/
+    return (hostname === "" || hostname.indexOf("coolmath-games.com") >= 0);
 }
 
 function cmgStart() {
@@ -39,7 +38,7 @@ var LEVELGRIDS = [];
 var SURFACE = document.createElement("canvas");
 var SURFACECTX = SURFACE.getContext("2d");
 
-
+/*
 var tmp = WIDTH;
 WIDTH = HEIGHT;
 HEIGHT = tmp;
@@ -210,6 +209,24 @@ function loadDrawings() {
 }
 
 function loadLevels() {
+    var floodfill = function (list, x, y, visited) {
+        if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {
+            return true;
+        }
+        
+        var index = x + y * WIDTH;
+        if (list.charAt(index) !== "o" || visited.indexOf(index) >= 0) {
+            return false;
+        }
+        visited.push(index);
+        
+        var r = floodfill(list, x + 1, y, visited);
+        var l = floodfill(list, x - 1, y, visited);
+        var d = floodfill(list, x, y + 1, visited);
+        var u = floodfill(list, x, y - 1, visited);
+        return r || l || d || u;
+    };
+        
     var loadLevel = function (n) {
         var level = LEVELS[n];
         var list = [];
@@ -218,25 +235,27 @@ function loadLevels() {
         var playerY = -1;
         var bridges = [];
         
+        /*
         //** rotate grid 90 degrees
         if (HEIGHT > WIDTH) {
-        var str = [];
-        for (var i = 0; i < level.length; i++) str.push("");
-        for (var i = 0; i < HEIGHT; i++) {
-            for (var j = 0; j < WIDTH; j++) {
-                str[j + (HEIGHT - 1 - i) * WIDTH] = level.charAt(i + j * HEIGHT);
+            var str = [];
+            for (var i = 0; i < level.length; i++) str.push("");
+            for (var i = 0; i < HEIGHT; i++) {
+                for (var j = 0; j < WIDTH; j++) {
+                    str[j + (HEIGHT - 1 - i) * WIDTH] = level.charAt(i + j * HEIGHT);
+                }
             }
-        }
-        level = str.join("");
+            level = str.join("");
         }
         //**
+        */
         
         for (var i = 0; i < level.length; i++) {
             var c = level.charAt(i);
             switch (c) {
                 case "o":
                     list.push({
-                        type: "nothing"
+                        type: "wall"//"nothing"
                     });
                     break;
                     
@@ -247,12 +266,14 @@ function loadLevels() {
                     tiles += 1;
                     break;
                     
-                case "#":
+                /*
+                case "#":  // TODO: not in use
                     list.push({
                         type: "wall"
                     });
                     break;
-                    
+                */
+                
                 case "@":
                     list.push({
                         type: "player"
@@ -317,12 +338,77 @@ function loadLevels() {
             }
         }
         
+        for (var i = 0; i < WIDTH * HEIGHT; i++) {
+            if (list[i].type === "wall" && floodfill(level, i % WIDTH, Math.floor(i / WIDTH), [])) {
+                list[i].type = "nothing";
+            }
+        }
+                
+        var x1 = WIDTH;
+        var y1 = HEIGHT;
+        var x2 = -1;
+        var y2 = -1;
+        
+        for (var y = 0; y < HEIGHT; y++) {
+            for (var x = 0; x < WIDTH; x++) {
+                if (list[x + y * WIDTH].type === "nothing") {
+                    continue;
+                }
+                if (x < x1) x1 = x;
+                if (x2 < x) x2 = x;
+                if (y < y1) y1 = y;
+                if (y2 < y) y2 = y;
+            }
+        }
+        
+        var croppedGrid = [];
+        for (var y = y1; y <= y2; y++) {
+            var croppedRow = [];
+            for (var x = x1; x <= x2; x++) {
+                var obj = list[x + y * WIDTH];
+                if (obj.type === "tunnel") {
+                    obj.other.x -= x1;
+                    obj.other.y -= y1;
+                }
+                croppedRow.push(obj);
+            }
+            croppedGrid.push(croppedRow);
+        }
+        
+        var width = x2 - x1 + 1;
+        var height = y2 - y1 + 1;
+        //***
+        /*
+        var table = [];
+        for (var y = 0; y < height; y++) {
+            var str = "";
+            for (var x = 0; x < width; x++) {
+                var g = croppedGrid[y][x];
+                switch (g.type) {
+                    case "nothing": str += "o"; break;
+                    case "wall": str += "#"; break;
+                    case "tile": str += "."; break;
+                    case "player": str += "@"; break;
+                    case "target": str += "x"; break;
+                    case "bridge": str += "%"; break;
+                    case "tunnel": str += g.id + 1; break;
+                }
+            }
+            table.push(str);
+        }
+        console.log(width, height);
+        console.log(table.join("\n"));
+        */
+        //***
+        
         var levelgrid = {
             get: function (x, y) {
-                return list[x + y * WIDTH];
+                return croppedGrid[y][x];//list[x + y * WIDTH];
             },
-            startX: playerX,
-            startY: playerY,
+            width: width,
+            height: height,
+            startX: playerX - x1,
+            startY: playerY - y1,
             tiles: tiles,
             bridges: bridges
         };
@@ -342,9 +428,13 @@ function getLevelImage(level) {
     
     var dx = 5;
     var dy = 5;
+    var width = level.width;
+    var height = level.height;
     
-    for (var i = 0; i < WIDTH; i++) {
-        for (var j = 0; j < HEIGHT; j++) {
+    
+    
+    for (var i = 0; i < width; i++) {
+        for (var j = 0; j < height; j++) {
             var obj = level.get(i, j);
             var type = obj.type;
             
@@ -401,6 +491,14 @@ function getLevelImage(level) {
                     
                     ctx.fillStyle = COLWALL;
                     ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
+                    
+                    var wallG = ctx.createLinearGradient(x + s, y + s, x+s+CELL - 2 * s, y+s+CELL - 2 * s);
+                    wallG.addColorStop(0, "white");
+                    wallG.addColorStop(1, "black");
+                    ctx.fillStyle = wallG;
+                    ctx.globalAlpha = 0.1;
+                    ctx.fillRect(x + s, y + s, CELL - 2 * s, CELL - 2 * s);
+                    ctx.globalAlpha = 1;
                     
                     break;
                     

@@ -32,8 +32,8 @@ var COLTUNNELS = [
 var COLLAYER = "rgb(180, 180, 80)";//"rgb(60, 120, 160)";
 */
 
-var WIDTH = 16;
-var HEIGHT = 9;
+var WIDTH = 8;//16;
+var HEIGHT = 10;//9;
 var CELL = 40;
 var CONTROLLER = null;
 
@@ -263,7 +263,7 @@ function Game(width, height) {
         var h = Math.floor(window.innerHeight);
         var c = self.canvas;
         
-        c.width = Math.max(400, w);
+        c.width = Math.max(320, w);
         c.height = Math.max(580, h);
         
         var r = w / h;

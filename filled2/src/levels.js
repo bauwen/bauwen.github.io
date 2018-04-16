@@ -1,15 +1,167 @@
 // 7x12
 
 var LEVELS = [
-/*
-    "ooooo.oooooo" +
-    "ooooo@oooooo" +
-    "ooooo.oooooo" +
-    "ooooo.oooooo" +
-    "ooooo.oooooo" +
-    "oooooxoooooo" +
-    "ooooo.oooooo",
-  */  
+
+    // 1-5 =======================
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oo@..xoo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo",
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "ooo..ooo" +
+    "oo@..xoo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo",
+    
+    "oooooooo" +
+    "oooooooo" +
+    "o....@oo" +
+    "o.o..xoo" +
+    "o.....oo" +
+    "o.....oo" +
+    "o.o...oo" +
+    "o.....oo" +
+    "oooooooo" +
+    "oooooooo",
+    
+    "oooooooo" +
+    "oo@...oo" +
+    "o...o.oo" +
+    "o.o...oo" +
+    "o..x..oo" +
+    "o.....oo" +
+    "o.....oo" +
+    "o...oooo" +
+    "o...oooo" +
+    "oooooooo",
+    
+    "o.....oo" +
+    "o.....oo" +
+    "oxoo.ooo" +
+    "o..o..oo" +
+    "o..oo.oo" +
+    "o.....oo" +
+    "o.oo..oo" +
+    "o.o@..oo" +
+    "o.ooo.oo" +
+    "o.....oo",
+    
+    
+    // 6-10 ======================
+    
+    ".......o" +
+    ".oo....o" +
+    ".ox.o..o" +
+    ".oooo..o" +
+    "....@..o" +
+    "..oo...o" +
+    "...o...o" +
+    ".o.....o" +
+    ".......o" +
+    "o..oo..o",
+    
+    ".......o" +
+    ".o.....o" +
+    "...o...o" +
+    "..oo.o.o" +
+    ".....o.o" +
+    ".......o" +
+    "..oo...o" +
+    "...ox..o" +
+    ".o.....o" +
+    ".....@.o",
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oo...ooo" +
+    "oo1x.ooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oo..1ooo" +
+    "oo@..ooo" +
+    "oooooooo",
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo",
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo",
+    
+    
+    // 11-15 =====================
+    
+    // 16-20 =====================
+    
+    // 21-25 =====================
+    
+    // 26-30 =====================
+    
+    // 31-35 =====================
+    
+    // 36-40 =====================
+    
+    
+    
+    
+    //%
+    "ox.oo..o" +
+    "...oo..o" +
+    "...o...o" +
+    "...o...o" +
+    "..oo...o" +
+    "....%.@o" +
+    "..oo...o" +
+    "...o...o" +
+    "...oo..o" +
+    "o..oo..o",
+    
+    
+    
+    
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo" +
+    "oooooooo",
+];
+
+var PLACEHOLDER = [
+    
     // NONE
     "oooooooooooooooo" +
     "oooooooooooooooo" +

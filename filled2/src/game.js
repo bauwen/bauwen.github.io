@@ -131,12 +131,12 @@ game.addObject("obj_controller", {
         var musicHover = IsMouseInBox(25, 20, 48, 48);
         z = musicHover ? 6 : 0;
         ctx.globalAlpha = musicHover ? 1 : 0.6;
-        ctx.drawImage(DRAWINGS[MUSIC ? "spr_music_on" : "spr_music_off"], 25 - z / 2, 20 - z / 2 + 68, 48 + z, 48 + z);
+        ctx.drawImage(DRAWINGS[MUSIC ? "spr_music_on" : "spr_music_off"], 25 - z / 2, 20 - z / 2, 48 + z, 48 + z);
         
         var soundHover = IsMouseInBox(25 + 48 + 20, 20, 48, 48);
         z = soundHover ? 6 : 0;
         ctx.globalAlpha = soundHover ? 1 : 0.6;
-        ctx.drawImage(DRAWINGS[SOUND ? "spr_sound_on" : "spr_sound_off"], 25 + /*48 + 20*/ - z / 2, 20 - z / 2, 48 + z, 48 + z);
+        ctx.drawImage(DRAWINGS[SOUND ? "spr_sound_on" : "spr_sound_off"], 25 + 48 + 20 - z / 2, 20 - z / 2, 48 + z, 48 + z);
         
         var restartHover = false;
         
@@ -161,11 +161,12 @@ game.addObject("obj_controller", {
         ctx.globalAlpha = 0.6;
         ctx.textAlign = "right";//"center";
         ctx.fillStyle = "white";
-        ctx.font = "36px gamefont, sans-serif";
+        ctx.font = "44px gamefont, sans-serif";
         
         if (this.number < LEVELS.length - 1) {
             //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width / 5, ctx.canvas.height - 32);
-            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 30, 50 + 70);
+            //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 30, 50 + 70);
+            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 100, 58);
         }
         
         var prevHover = false;
@@ -324,7 +325,7 @@ game.addObject("obj_level", {
             var x = ox + dx;
             var y = oy + dy;
             
-            if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {
+            if (x < 0 || this.level.width <= x || y < 0 || this.level.height <= y) {
                 return false;
             }
             
@@ -382,8 +383,8 @@ game.addObject("obj_level", {
             self.pdir = t.prevdir;
             
             if (teleported && self.clicked) {
-                var ox = Math.floor(ctx.canvas.width / 2) - WIDTH * CELL / 2;
-                var oy = Math.floor(ctx.canvas.height / 2) - HEIGHT * CELL / 2;
+                var ox = Math.floor(ctx.canvas.width / 2) - this.level.width * CELL / 2;
+                var oy = Math.floor(ctx.canvas.height / 2) - this.level.height * CELL / 2 + CELL / 2;
                 self.clickX = game.mouseX - (ox + self.px * CELL + CELL / 2);
                 self.clickY = game.mouseY - (oy + self.py * CELL + CELL / 2); 
             }
@@ -433,8 +434,8 @@ game.addObject("obj_level", {
             this.y = Math.floor(ctx.canvas.height / 2);
         }
         
-        var ox = this.x - WIDTH * CELL / 2;
-        var oy = this.y - HEIGHT * CELL / 2 - CELL / 2;
+        var ox = this.x - this.level.width * CELL / 2;
+        var oy = this.y - this.level.height * CELL / 2 - CELL / 2 + CELL / 2;
         
         if (this.hasControl) {
             if (game.mousePressed("Left")) {
@@ -565,7 +566,7 @@ game.addObject("obj_level", {
                 this.moved = true;
             }
         }
-        
+
         var obj = this.level.get(this.px, this.py);
         switch (obj.type) {
             case "tunnel":
