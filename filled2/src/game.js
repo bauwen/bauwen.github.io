@@ -15,12 +15,12 @@ game.addObject("obj_controller", {
         this.sliding = false;
         this.direction = 0;
         this.number = 0;
-        
+        /*
         if (game.getLocalStorage("giflevel")) {
             this.number = parseInt(game.getLocalStorage("giflevel"));
             this.number = Math.max(0, Math.min(this.number, LEVELS.length - 1));
         }
-        
+        */
         kongApi.submitStat("Level", this.number);
         if (this.number >= LEVELS.length - 1) {
             kongApi.submitStat("Completion", 1);
@@ -873,7 +873,7 @@ function startLoading() {
         },
         
         music: {
-            "mus_back": "src/music/mus_back.mp3"
+            "mus_back": "src/music/mus_back.ogg"
         },
         
         fonts: {

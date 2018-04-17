@@ -216,7 +216,7 @@ function Game(width, height) {
         }
         
         if (MUSIC && !LOADING && (this.music["mus_back"].paused || this.music["mus_back"].currentTime === 0)) {
-            game.playMusic("mus_back", true);
+            this.playMusic("mus_back", true);
         }
         
         var rect = self.canvas.getBoundingClientRect();
