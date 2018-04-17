@@ -39,6 +39,7 @@ var CONTROLLER = null;
 
 var MUSIC = true;
 var SOUND = true;
+var MOBILELOADED = false;
 
 var deviceOS = "";
 var browserSafari = false;
@@ -238,8 +239,11 @@ function Game(width, height) {
             touchDetected = true;
         }
         
-        if (MUSIC && !LOADING && (self.music["mus_back"].paused || self.music["mus_back"].currentTime === 0)) {
-            self.playMusic("mus_back", true);
+        if (MUSIC && !LOADING && !MOBILELOADED) {
+            MOBILELOADED = true;
+            self.music["mus_back"].play();
+            self.music["mus_back"].pause();
+            window.setTimeout(function () { self.playMusic("mus_back", true); }, 200);
         }
         
         var rect = self.canvas.getBoundingClientRect();
