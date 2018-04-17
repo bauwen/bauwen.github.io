@@ -484,6 +484,7 @@ game.addObject("obj_level", {
         var oy = this.y - this.level.height * CELL / 2 - CELL / 2 + CELL / 2;
         
         if (this.hasControl) {
+            /*
             if (game.mousePressed("Left")) {
                 if (IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
                 //if (IsMouseInBox(0, 80, ctx.canvas.width, ctx.canvas.height - 160)) {
@@ -511,6 +512,34 @@ game.addObject("obj_level", {
                         if (SOUND) game.playSound("snd_undo");
                         
                         this.clicked = true;
+                    }
+                }
+            }
+            */
+            
+            if (game.mousePressed("Left")) {
+                if (IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
+                    this.clicked = true;
+                    this.clickX = 0;//game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = 0;//game.mouseY - (oy + this.py * CELL + CELL / 2);
+                } else {
+                    for (var i = 0; i < this.trails.length; i++) {
+                        var t = this.trails[i];
+                        
+                        if (IsMouseInBox(ox + t.x * CELL, oy + t.y * CELL, CELL, CELL) && !t.tunnel) {
+                            var u = this.trails.pop();
+                            while (u !== t) {
+                                u = this.trails.pop();
+                            }
+                            
+                            this.px = t.x;
+                            this.py = t.y;
+                            this.pdir = t.prevdir;
+                            
+                            if (SOUND) game.playSound("snd_undo");
+                            
+                            this.clicked = true;
+                        }
                     }
                 }
             }

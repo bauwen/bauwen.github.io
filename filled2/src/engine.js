@@ -81,6 +81,29 @@ function Game(width, height) {
         this.hasLocalStorage = false;
     }
     
+    this.objects = {};
+    this.instances = [];
+    this.instanceGroups = {};
+    this.destroyedInstances = [];
+    this.changedOrder = false;
+    
+    this.scenes = {};
+    this.nextScene = null;
+    this.scene = {
+        name: "",
+        width: this.ctx.canvas.width,
+        height: this.ctx.canvas.height,
+        enter: function () {},
+        leave: function () {}
+    };
+    
+    this.viewX = 0;
+    this.viewY = 0;
+
+    this.images = {};
+    this.sounds = {};
+    this.music = {};
+    
     this.keysDown = {};
     this.keysPressed = {};
     this.keysReleased = {};
@@ -214,11 +237,11 @@ function Game(width, height) {
             window.removeEventListener("mousemove", mouseMoveHandler, false);
             touchDetected = true;
         }
-        /*
-        if (MUSIC && !LOADING && (this.music["mus_back"].paused || this.music["mus_back"].currentTime === 0)) {
-            this.playMusic("mus_back", true);
+        
+        if (MUSIC && !LOADING && (self.music["mus_back"].paused || self.music["mus_back"].currentTime === 0)) {
+            self.playMusic("mus_back", true);
         }
-        */
+        
         var rect = self.canvas.getBoundingClientRect();
         var button = 0;
         var touch = event.touches[0];
@@ -301,29 +324,6 @@ function Game(width, height) {
     
     window.addEventListener("resize", resizeHandler);
     resizeHandler();
-    
-    this.objects = {};
-    this.instances = [];
-    this.instanceGroups = {};
-    this.destroyedInstances = [];
-    this.changedOrder = false;
-    
-    this.scenes = {};
-    this.nextScene = null;
-    this.scene = {
-        name: "",
-        width: this.ctx.canvas.width,
-        height: this.ctx.canvas.height,
-        enter: function () {},
-        leave: function () {}
-    };
-    
-    this.viewX = 0;
-    this.viewY = 0;
-
-    this.images = {};
-    this.sounds = {};
-    this.music = {};
 }
 
 Game.prototype = {
