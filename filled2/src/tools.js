@@ -1,38 +1,10 @@
-function unlockAllLevels() {
-    for (var i = 0; i <= 40; i++) {
-        CONTROLLER.unlockedLevels[i] = true;
-    }
-    
-    game.setLocalStorage("giflevel", 40);
-}
-
-parent.unlockAllLevels = unlockAllLevels;
-
 function checkCorrectSite() {
     /*
     var hostname = parent.location.hostname;
     
-    return (hostname === "" || hostname.indexOf("coolmath-games.com") >= 0);
+    return (hostname === "" || hostname.indexOf("kongregate.com") >= 0);
     */
     return true;
-}
-
-function cmgStart() {
-    if (parent.cmgGameEvent) {
-        parent.cmgGameEvent("start");
-    }
-}
-
-function cmgStartLevel(n) {
-    if (parent.cmgGameEvent) {
-        parent.cmgGameEvent("start", "" + n);
-    }
-}
-
-function cmgReplay(n) {
-    if (parent.cmgGameEvent) {
-        parent.cmgGameEvent("replay", "" + n);
-    }
 }
 
 var DRAWINGS = {};
@@ -75,19 +47,20 @@ function loadDrawings() {
         var s = 10;
         var cx = size / 2 - 3;
         var cy = size / 2;
+        var dx = 2;
         
         ctx.beginPath();
-        ctx.moveTo(cx - s / 2, cy);
-        ctx.lineTo(cx + s, cy - s + 1);
-        ctx.lineTo(cx + s, cy + s - 1);
+        ctx.moveTo(cx - s / 2 + 3 - dx, cy);
+        ctx.lineTo(cx + s - dx, cy - s + 1);
+        ctx.lineTo(cx + s - dx, cy + s - 1);
         ctx.closePath();
         ctx.fill();
         
-        ctx.fillRect(cx - s + 5, cy - s / 2, s + 5, s);
+        ctx.fillRect(cx - s + 5 + 3 - dx, cy - s / 2, s + 5 - 3, s);
         
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2 - 4, 0, 2 * Math.PI);
+        ctx.arc(size / 2, size / 2, size / 2 - 4 + 2, 0, 2 * Math.PI);
         ctx.stroke();
     };
     
@@ -125,7 +98,7 @@ function loadDrawings() {
         
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2 - 4, 0, 2 * Math.PI);
+        ctx.arc(size / 2, size / 2, size / 2 - 4 + 2, 0, 2 * Math.PI);
         ctx.stroke();
     };
     
@@ -133,7 +106,7 @@ function loadDrawings() {
     DRAWINGS["spr_sound_off"] = getDrawing(function (ctx) {
         spr_sound(ctx);
         
-        var r = size / 2 - 10;
+        var r = size / 2 - 10 + 2;
         
         ctx.lineWidth = 4;
         ctx.beginPath();
@@ -146,7 +119,7 @@ function loadDrawings() {
     DRAWINGS["spr_music_off"] = getDrawing(function (ctx) {
         spr_music(ctx);
         
-        var r = size / 2 - 10;
+        var r = size / 2 - 10 + 2;
         
         ctx.lineWidth = 4;
         ctx.beginPath();
@@ -159,7 +132,7 @@ function loadDrawings() {
         ctx.fillStyle = "white";
         ctx.strokeStyle = "white";
         
-        var r = 14;
+        var r = 14 + 1;
         var s = 8;
         var cx = size / 2;
         var cy = size / 2;

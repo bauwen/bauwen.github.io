@@ -40,8 +40,6 @@ var CONTROLLER = null;
 var MUSIC = true;
 var SOUND = true;
 
-var banner;
-
 var deviceOS = "";
 var browserSafari = false;
 var deviceMobile = false;
@@ -215,6 +213,10 @@ function Game(width, height) {
             window.removeEventListener("mouseup", mouseUpHandler, false);
             window.removeEventListener("mousemove", mouseMoveHandler, false);
             touchDetected = true;
+        }
+        
+        if (MUSIC && !LOADING && (this.music["mus_back"].paused || this.music["mus_back"].currentTime === 0)) {
+            game.playMusic("mus_back", true);
         }
         
         var rect = self.canvas.getBoundingClientRect();

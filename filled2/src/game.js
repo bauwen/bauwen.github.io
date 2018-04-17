@@ -1,6 +1,9 @@
 var game = new Game(640, 640);
 var ctx = game.ctx;
 
+var LOADING = true;
+var kongApi;
+
 game.canvas.style.backgroundColor = COLBACK;
 
 game.addObject("obj_controller", {
@@ -12,12 +15,19 @@ game.addObject("obj_controller", {
         this.sliding = false;
         this.direction = 0;
         this.number = 0;
-        /*
+        
         if (game.getLocalStorage("giflevel")) {
             this.number = parseInt(game.getLocalStorage("giflevel"));
             this.number = Math.max(0, Math.min(this.number, LEVELS.length - 1));
         }
-        */
+        
+        kongApi.submitStat("Level", this.number);
+        if (this.number >= LEVELS.length - 1) {
+            kongApi.submitStat("Completion", 1);
+        } else {
+            kongApi.submitStat("Completion", 0);
+        }
+        
         this.prev = null;
         this.level = game.createInstance("obj_level", ctx.canvas.width / 2, ctx.canvas.height / 2);
         this.level.number = this.number;
@@ -52,8 +62,6 @@ game.addObject("obj_controller", {
                 self.level.y = Math.floor(ctx.canvas.height / 2);
                 self.sliding = false;
             }
-            
-            cmgReplay(self.number + 2);
         };
     },
     
@@ -106,7 +114,7 @@ game.addObject("obj_controller", {
                 this.level.number = this.number;
                 
                 if (this.restartAngle > 0) {
-                    this.direction = 270;
+                    this.direction = 90;
                 } else {
                     this.direction = ((this.goingBack ? 180 : 0) + this.dirlist[this.number - (this.goingBack ? 0 : 1)]) % 360;
                 }
@@ -118,6 +126,11 @@ game.addObject("obj_controller", {
                 if (!this.unlockedLevels[this.number]) {
                     this.unlockedLevels[this.number] = true;
                     game.setLocalStorage("giflevel", this.number);
+                    
+                    kongApi.submitStat("Level", this.number);
+                    if (this.number >= LEVELS.length - 1) {
+                        kongApi.submitStat("Completion", 1);
+                    }
                 }
                 
                 if (SOUND) game.playSound("snd_swipe");
@@ -130,12 +143,12 @@ game.addObject("obj_controller", {
         
         var musicHover = IsMouseInBox(25, 20, 48, 48);
         z = musicHover ? 6 : 0;
-        ctx.globalAlpha = musicHover ? 1 : 0.6;
+        ctx.globalAlpha = musicHover ? 1 : 0.3;
         ctx.drawImage(DRAWINGS[MUSIC ? "spr_music_on" : "spr_music_off"], 25 - z / 2, 20 - z / 2, 48 + z, 48 + z);
         
         var soundHover = IsMouseInBox(25 + 48 + 20, 20, 48, 48);
         z = soundHover ? 6 : 0;
-        ctx.globalAlpha = soundHover ? 1 : 0.6;
+        ctx.globalAlpha = soundHover ? 1 : 0.3;
         ctx.drawImage(DRAWINGS[SOUND ? "spr_sound_on" : "spr_sound_off"], 25 + 48 + 20 - z / 2, 20 - z / 2, 48 + z, 48 + z);
         
         var restartHover = false;
@@ -149,22 +162,22 @@ game.addObject("obj_controller", {
         if (this.number < LEVELS.length - 1) {
             restartHover = IsMouseInBox(ctx.canvas.width - 25 - 48, 20, 48, 48);
             z = restartHover ? 6 : 0;
-            ctx.globalAlpha = restartHover ? 1 : 0.6;
+            ctx.globalAlpha = restartHover ? 1 : 0.3;
             
             ctx.save();
-            ctx.translate(ctx.canvas.width - 25 - 48 + 24, 20 + 24);
+            ctx.translate(ctx.canvas.width - 25 - 48 + 24, 20 + 24 + 2);
             ctx.rotate(-this.restartAngle);
             ctx.drawImage(DRAWINGS["spr_restart"], -24 - z / 2, -24 - z / 2, 48 + z, 48 + z);
             ctx.restore();
         }
         
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.4;
         ctx.textAlign = "center";//"center";
         ctx.fillStyle = "white";
         ctx.font = "42px gamefont, sans-serif";
         
         if (this.number < LEVELS.length - 1) {
-            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width / 2, ctx.canvas.height - 32);
+            ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width / 2, ctx.canvas.height - 32 + 5);
             //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 30, 50 + 70);
             //ctx.fillText((this.number < 9 ? "0" : "") + (this.number + 1), ctx.canvas.width - 100, 58);
         }
@@ -174,8 +187,8 @@ game.addObject("obj_controller", {
         if (this.number > 0 && this.unlockedLevels[this.number - 1]) {
             prevHover = IsMouseInBox(20, ctx.canvas.height - 70, 48, 48);
             z = prevHover ? 6 : 0;
-            ctx.globalAlpha = prevHover ? 1 : 0.6;
-            ctx.drawImage(DRAWINGS["spr_prev"], 20 - z / 2, ctx.canvas.height - 70 - z / 2, z + 48, z + 48);
+            ctx.globalAlpha = prevHover ? 1 : 0.2;
+            ctx.drawImage(DRAWINGS["spr_prev"], 20 - z / 2, ctx.canvas.height - 70 - z / 2 + 5, z + 48, z + 48);
         }
         
         var nextHover = false;
@@ -183,8 +196,8 @@ game.addObject("obj_controller", {
         if (this.number < LEVELS.length - 1 && this.unlockedLevels[this.number + 1]) {
             nextHover = IsMouseInBox(ctx.canvas.width - 48 - 20, ctx.canvas.height - 70, 48, 48);
             z = nextHover ? 6 : 0;
-            ctx.globalAlpha = nextHover ? 1 : 0.6;
-            ctx.drawImage(DRAWINGS["spr_next"], ctx.canvas.width - 48 - 20 - z / 2, ctx.canvas.height - 70 - z / 2, z + 48, z + 48);
+            ctx.globalAlpha = nextHover ? 1 : 0.2;
+            ctx.drawImage(DRAWINGS["spr_next"], ctx.canvas.width - 48 - 20 - z / 2, ctx.canvas.height - 70 - z / 2 + 5, z + 48, z + 48);
         }
         
         ctx.globalAlpha = 1;
@@ -475,8 +488,8 @@ game.addObject("obj_level", {
                 if (IsMouseInBox(ox + this.px * CELL, oy + this.py * CELL, CELL, CELL)) {
                 //if (IsMouseInBox(0, 80, ctx.canvas.width, ctx.canvas.height - 160)) {
                     this.clicked = true;
-                    this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
-                    this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
+                    this.clickX = 0;//game.mouseX - (ox + this.px * CELL + CELL / 2);
+                    this.clickY = 0;//game.mouseY - (oy + this.py * CELL + CELL / 2);
                 }
             }
             
@@ -844,17 +857,13 @@ window.addEventListener("load", function () {
         SOUND = game.getLocalStorage("sounds") === "on" ? true : false;
     }
     
-    banner = new Image();
-    banner.src = "src/banner.png";
-    banner.onload = function () {
+    loadKongregateApi(function (api) {
+        kongApi = api;
         window.setTimeout(startLoading, 2);
-    };
+    });
 });
     
 function startLoading() {
-    var bw = banner.naturalWidth;
-    var bh = banner.naturalHeight;
-    
     game.loadAssets({
         sounds: {
             "snd_undo": "src/sounds/snd_undo.wav",
@@ -873,24 +882,24 @@ function startLoading() {
     }, {
         progress: function (p) {
             var h = Math.max(330, window.innerHeight - 100);
-            var w = bw * h / bh;
+            var w = game.canvasctx.canvas.width / 2;// * h / bh;
             
             var ctx = game.canvasctx;
             var lw = w;//400;
             var lh = 20;
             var s = 4;
-            var hh = 30 + lh + 10;
+            var hh = 30 + lh + 10 + 50;
             
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.lineWidth = 3;
             
-            ctx.strokeStyle = "rgb(180, 180, 50)";
+            ctx.strokeStyle = "rgb(120, 120, 100)";//"rgb(180, 180, 50)";
             ctx.strokeRect(ctx.canvas.width / 2 - lw / 2, ctx.canvas.height - hh, lw, lh);
             
-            ctx.fillStyle = "rgb(180, 70, 20)";
+            ctx.fillStyle = "rgb(120, 100, 80)";//"rgb(180, 70, 20)";
             ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - hh + s, (lw - 2 * s) * p, lh - 2 * s);
             
-            ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
+            //ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
         },
         
         finish: function () {
@@ -901,6 +910,7 @@ function startLoading() {
                 game.playMusic("mus_back", true);
             }
             
+            LOADING = false;
             game.run();
             game.enterScene("scn_levels");
         }
