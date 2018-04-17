@@ -238,14 +238,14 @@ function Game(width, height) {
             window.removeEventListener("mousemove", mouseMoveHandler, false);
             touchDetected = true;
         }
-        
+        /*
         if (MUSIC && !LOADING && !MOBILELOADED) {
             MOBILELOADED = true;
             self.music["mus_back"].play();
             self.music["mus_back"].pause();
             window.setTimeout(function () { self.playMusic("mus_back", true); }, 200);
         }
-        
+        */
         var rect = self.canvas.getBoundingClientRect();
         var button = 0;
         var touch = event.touches[0];

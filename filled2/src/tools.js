@@ -563,5 +563,5 @@ function detectEnv() {
     }
     
     deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
-    if (deviceOS) console.log(deviceOS + " detected");
+    //if (deviceOS) console.log(deviceOS + " detected");
 }

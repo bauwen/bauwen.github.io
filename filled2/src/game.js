@@ -141,15 +141,21 @@ game.addObject("obj_controller", {
         
         ctx.globalAlpha = 0.6;
         
-        var musicHover = IsMouseInBox(25, 20, 48, 48);
-        z = musicHover ? 6 : 0;
-        ctx.globalAlpha = musicHover ? 1 : 0.3;
-        ctx.drawImage(DRAWINGS[MUSIC ? "spr_music_on" : "spr_music_off"], 25 - z / 2, 20 - z / 2, 48 + z, 48 + z);
+        var musicHover = false;
+        if (!deviceMobile) {
+            musicHover = IsMouseInBox(25, 20, 48, 48);
+            z = musicHover ? 6 : 0;
+            ctx.globalAlpha = musicHover ? 1 : 0.3;
+            ctx.drawImage(DRAWINGS[MUSIC ? "spr_music_on" : "spr_music_off"], 25 - z / 2, 20 - z / 2, 48 + z, 48 + z);
+        }
         
-        var soundHover = IsMouseInBox(25 + 48 + 20, 20, 48, 48);
-        z = soundHover ? 6 : 0;
-        ctx.globalAlpha = soundHover ? 1 : 0.3;
-        ctx.drawImage(DRAWINGS[SOUND ? "spr_sound_on" : "spr_sound_off"], 25 + 48 + 20 - z / 2, 20 - z / 2, 48 + z, 48 + z);
+        var soundHover = false;
+        if (!deviceMobile) {
+            soundHover = IsMouseInBox(25 + 48 + 20, 20, 48, 48);
+            z = soundHover ? 6 : 0;
+            ctx.globalAlpha = soundHover ? 1 : 0.3;
+            ctx.drawImage(DRAWINGS[SOUND ? "spr_sound_on" : "spr_sound_off"], 25 + 48 + 20 - z / 2, 20 - z / 2, 48 + z, 48 + z);
+        }
         
         var restartHover = false;
         
