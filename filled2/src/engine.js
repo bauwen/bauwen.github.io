@@ -1,5 +1,5 @@
 var COLBACK = "rgb(49, 54, 49)";
-var COLGRID = "rgb(90, 95, 90)";
+var COLGRID = "rgb(100, 105, 100)";//"rgb(90, 95, 90)";
 var COLPLAYER = "rgb(200, 200, 60)";
 var COLTRAIL = "rgb(80, 160, 80)";
 var COLWALL = "rgb(100, 105, 100)"//COLGRID;
@@ -520,7 +520,7 @@ Game.prototype = {
         var progress = body.progress || function (p) {};
         var finish = body.finish || function () {};
         var channelCount = 4;
-        var fontTimeout = 2;
+        var fontTimeout = 200;
         
         if (assets.images) {
             for (var name in assets.images) {
@@ -598,7 +598,7 @@ Game.prototype = {
                     };
                     count += 1;
                     progress(count / total);
-                    window.setTimeout(loadSound, 1, index + 2);
+                    window.setTimeout(loadSound, 100, index + 2);
                     return;
                 }
                 
@@ -622,12 +622,12 @@ Game.prototype = {
             if (deviceMobile) {
                 count += 1;
                 progress(count / total);
-                window.setTimeout(finish, 20);
+                window.setTimeout(finish, 1000);
                 return;
             }
             
             if (index >= musicAssets.length) {
-                window.setTimeout(finish, 20);
+                window.setTimeout(finish, 1000);
                 return;
             }
             

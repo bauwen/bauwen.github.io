@@ -1,6 +1,7 @@
 var game = new Game(640, 640);
 var ctx = game.ctx;
 
+var DUST = true;
 var LOADING = true;
 var kongApi;
 
@@ -15,12 +16,12 @@ game.addObject("obj_controller", {
         this.sliding = false;
         this.direction = 0;
         this.number = 0;
-        /*
+        
         if (game.getLocalStorage("giflevel")) {
             this.number = parseInt(game.getLocalStorage("giflevel"));
             this.number = Math.max(0, Math.min(this.number, LEVELS.length - 1));
         }
-        */
+        
         kongApi.submitStat("Level", this.number);
         if (this.number >= LEVELS.length - 1) {
             kongApi.submitStat("Completion", 1);
@@ -433,8 +434,8 @@ game.addObject("obj_level", {
             if (teleported && self.clicked) {
                 var ox = Math.floor(ctx.canvas.width / 2) - this.level.width * CELL / 2;
                 var oy = Math.floor(ctx.canvas.height / 2) - this.level.height * CELL / 2 + CELL / 2;
-                self.clickX = game.mouseX - (ox + self.px * CELL + CELL / 2);
-                self.clickY = game.mouseY - (oy + self.py * CELL + CELL / 2); 
+                self.clickX = 0;//game.mouseX - (ox + self.px * CELL + CELL / 2);
+                self.clickY = 0;//game.mouseY - (oy + self.py * CELL + CELL / 2);
             }
             
             if (SOUND) game.playSound("snd_undo");
@@ -478,7 +479,7 @@ game.addObject("obj_level", {
         }
         
         if (Math.random() < 0.1 && game.getInstanceCount("obj_dust") < 20) {
-            game.createInstance("obj_dust", 0, 0, 10000);
+            if (DUST) game.createInstance("obj_dust", 0, 0, 10000);
         }
         
         if (!CONTROLLER.sliding && !this.done) {
@@ -659,8 +660,8 @@ game.addObject("obj_level", {
                     obj = this.level.get(this.px, this.py);
                 }
                 
-                this.clickX = game.mouseX - (ox + this.px * CELL + CELL / 2);
-                this.clickY = game.mouseY - (oy + this.py * CELL + CELL / 2);
+                this.clickX = 0;//game.mouseX - (ox + this.px * CELL + CELL / 2);
+                this.clickY = 0;//game.mouseY - (oy + this.py * CELL + CELL / 2);
                 this.clicked = false;//
                 break;
         
@@ -908,7 +909,7 @@ function startLoading() {
         },
         
         music: {
-            "mus_back": "src/music/mus_back.ogg"
+            "mus_back": "src/music/mus_back.mp3"
         },
         
         fonts: {
@@ -927,6 +928,11 @@ function startLoading() {
             
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.lineWidth = 3;
+            
+            ctx.fillStyle = "rgb(100, 105, 100)";
+            ctx.font = "20px gamefont, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Can you solve all 30 levels?", ctx.canvas.width / 2, ctx.canvas.height - hh + s - 30);
             
             ctx.strokeStyle = "rgb(120, 120, 100)";//"rgb(180, 180, 50)";
             ctx.strokeRect(ctx.canvas.width / 2 - lw / 2, ctx.canvas.height - hh, lw, lh);
