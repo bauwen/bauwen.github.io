@@ -1,9 +1,15 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+canvas.addEventListener("click", function () {
+    canvas.focus();
+});
+canvas.focus();
+
 /*
 TODOs:
-- clean up code (remove debug stuff)
+- alle levels uitspelen als test
+
 - add web portal APIs
 */
 
@@ -434,15 +440,18 @@ function startLevel(n) {
 function leaveGame() {
     switch (LEVEL) {
         case 1:
-            if (highscore1 < DISTANCE) { highscore1 = DISTANCE; }
+            if (highscore1 < DISTANCE) { highscore1 = DISTANCE; if (completed) { highscore1 += 1; } }
             break;
         case 2:
-            if (highscore2 < DISTANCE) { highscore2 = DISTANCE; }
+            if (highscore2 < DISTANCE) { highscore2 = DISTANCE; if (completed) { highscore2 += 1; } }
             break;
         case 3:
-            if (highscore3 < DISTANCE) { highscore3 = DISTANCE; }
+            if (highscore3 < DISTANCE) { highscore3 = DISTANCE; if (completed) { highscore3 += 1; } }
             break;
     }
+    
+    // send highscores here via APIs
+    
     setLocalStorage("highscore1", highscore1);
     setLocalStorage("highscore2", highscore2);
     setLocalStorage("highscore3", highscore3);
@@ -1066,7 +1075,7 @@ function nextIteration() {
                 setNextColor("player", 110, 80, 155);
                 setNextColor("back", 220, 160, 160);
                 setNextColor("wall", 120, 120, 120);
-                setNextColor("spike", 60, 60, 60);
+                setNextColor("spike", 80, 80, 80);
                 break;
             /*
             case 4:
@@ -1155,7 +1164,7 @@ function nextIteration() {
                 runningSpeed = 1.6;
                 colorSpeed = 10;
                 
-                setNextColor("player", 155, 155, 155);
+                setNextColor("player", 170, 170, 170);
                 setNextColor("back", 100, 100, 100);
                 setNextColor("wall", 50, 50, 50);
                 setNextColor("spike", 200, 200, 200);
@@ -1190,7 +1199,6 @@ function nextIteration() {
                 break;
                 
             case 3:
-                // TODO: VERSCHUIVINGEN
                 hueShift = true;
                 backgroundEffect = 3;
                 
