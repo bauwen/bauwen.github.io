@@ -14,11 +14,12 @@
         }
         
         .container {
-            padding: 24px;
-            width: 304px;
+            padding: 18px;
+            width: 264px;
             background-color: hsl(210, 100%, 47%);
             border-radius: 4px;
             text-align: left;
+            box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2);
         }
         
         .title {
@@ -29,14 +30,14 @@
         }
         
         input {
-            width: 280px;
+            width: 240px;
             padding: 4px 8px;
             font: 22px asap, sans-serif;
         }
         
         .output {
             font: 32px asap, sans-serif;
-            color: hsl(210, 20%, 47%);
+            color: hsl(210, 20%, 37%);
             margin-top: 24px;
         }
         
@@ -67,7 +68,7 @@
             <div class="inner">Celsius to Fahrenheit</div>
             <img class="icon" title="Swap units" src="swap.png"></img>
         </div>
-        <input id="input" type="text" placeholder="°C">
+        <input id="input" type="text" placeholder="°C" autofocus>
     </div>
     <div id="output" class="output">°F = °C * 9/5 + 32</div>
     
