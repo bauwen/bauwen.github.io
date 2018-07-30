@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Conversions</title>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <style>
+        body {
+            background-color: hsl(220, 100%, 87%);
+            padding-top: 16px;
+        }
+        
+        .container {
+            padding: 24px;
+            width: 304px;
+            background-color: hsl(210, 100%, 47%);
+            border-radius: 4px;
+            text-align: left;
+        }
+        
+        .title {
+            color: rgb(230, 230, 230);
+            margin-bottom: 16px;
+            font: 22px asap, sans-serif;
+            /*font-size: calc(0.8999rem + 0.4000vw);*/
+        }
+        
+        input {
+            width: 280px;
+            padding: 4px 8px;
+            font: 22px asap, sans-serif;
+        }
+        
+        .output {
+            font: 32px asap, sans-serif;
+            color: hsl(210, 20%, 47%);
+            margin-top: 24px;
+        }
+        
+        .inner {
+            display: inline-block;
+            border: 0px solid lime;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .icon {
+            display: inline-block;
+            float: right;
+            cursor: pointer;
+        }
+        
+        .ad {
+            margin-top: 64px;
+        }
+    </style>
+</head>
+<body>
+
+<div align="center">
+
+    <div class="container">
+        <div class="title">
+            <div class="inner">Celsius to Fahrenheit</div>
+            <img class="icon" title="Swap units" src="swap.png"></img>
+        </div>
+        <input id="input" type="text" placeholder="°C">
+    </div>
+    <div id="output" class="output">°F = °C * 9/5 + 32</div>
+    
+    <div class="ad">
+        <img src="https://lh6.ggpht.com/TiYbh-9wRxPZfwZ2X34rQNTBdPinjB9nXYS2g65bhyO0-P2HH7d74un0H-he16AmbLoxnw6X=w200"></img>
+    </div>
+    
+</div>
+
+    
+<script>
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+$('input').addEventListener('input', function () {
+    var celsius = parseFloat(this.value);
+    if (isNaN(celsius)) {
+        $('output').innerHTML = "°F = °C * 9/5 + 32";
+        return;
+    }
+    
+    var fahrenheit = celsius * 9/5 + 32;
+    fahrenheit = Math.floor(fahrenheit * 1000) / 1000;
+    $('output').innerHTML = celsius + ' °C = ' + fahrenheit + ' °F';
+});
+
+</script>
+
+</body>
+</html>
