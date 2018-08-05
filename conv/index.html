@@ -139,7 +139,7 @@ ctx.fillText("Please allow camera access.", canvas.width/2, canvas.height/2 + 10
 
 navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: { facingMode: "user" },
+    video: { facingMode: { exact: "user" } },
 })
 .then((stream) => {
     video.srcObject = stream;
@@ -159,6 +159,6 @@ function renderFrame() {
 }
 
 </script>
-
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 </body>
 </html>
