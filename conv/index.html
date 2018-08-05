@@ -139,7 +139,7 @@ ctx.fillText("Please allow camera access.", canvas.width/2, canvas.height/2 + 10
 
 navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: true,
+    video: { facingMode: "user" },
 })
 .then((stream) => {
     video.srcObject = stream;
