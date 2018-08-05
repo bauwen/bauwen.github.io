@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Test Webcam Online</title>
+    <title>Conversions</title>
     
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -58,7 +58,7 @@
         
         .ad {
             margin-top: 10vh;
-            display: none;
+            display: block;
         }
         
         .footer {
@@ -66,34 +66,18 @@
             left: 0;
             bottom: 0;
             width: 100%;
-            background-color: rgb(100, 180, 240);/*hsl(220, 100%, 67%);*/
+            background-color: hsl(220, 100%, 67%);
             color: white;
             text-align: center;
             padding: 12px;
-            font: 14px asap, sans-serif;
         }
         
         .outer {
             position: absolute;
             top: 50%;
-            margin-top: -210px;
+            margin-top: -260px;
             left: 0;
             width: 100%;
-        }
-        
-        .button1 {
-            margin-top: 24px;
-            padding: 12px 18px;
-            border-radius: 4px;
-            background: hsl(220, 100%, 67%);
-            outline: none;
-            font: 16px asap, sans-serif;
-            color: white;
-        }
-        
-        canvas {
-            background-color: black;
-            border: 1px solid black;
         }
     </style>
 </head>
@@ -104,12 +88,12 @@
 <div class="outer">
     <div class="container">
         <div class="title">
-            <div class="inner">Test your webcam</div>
+            <div class="inner">Celsius to Fahrenheit</div>
+            <img class="icon" title="Swap units" src="swap.png"></img>
         </div>
-        <canvas id="canvas" width="260" height="200"></canvas>
+        <input id="input" type="text" placeholder="°C" autofocus>
     </div>
-    <button class="button1">Take Picture</button>&nbsp;&nbsp;&nbsp;
-    <button class="button1">Record Video</button>
+    <div id="output" class="output">°F = °C × 9/5 + 32</div>
     
     <div class="ad">
         <img src="https://lh6.ggpht.com/TiYbh-9wRxPZfwZ2X34rQNTBdPinjB9nXYS2g65bhyO0-P2HH7d74un0H-he16AmbLoxnw6X=w200"></img>
@@ -117,9 +101,10 @@
 
 </div>
 
-<div class="footer">About | Privacy Policy | Contact</div>
+    <div class="footer">Privacy Policy | About</div>
   
 </div>
+
     
 <script>
 
@@ -127,36 +112,17 @@ function $(id) {
     return document.getElementById(id);
 }
 
-var video = document.createElement("video");
-video.autoplay = true;
-var canvas = $("canvas");
-var ctx = canvas.getContext("2d");
-
-ctx.fillStyle = "white";
-ctx.font = "16px asap, sans-serif";
-ctx.textAlign = "center";
-ctx.fillText("Please allow camera access.", canvas.width/2, canvas.height/2 + 10);
-
-navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: true,
-})
-.then((stream) => {
-    video.srcObject = stream;
-    requestAnimationFrame(renderFrame);
-})
-.catch(function (err) {
-
+$('input').addEventListener('input', function () {
+    var celsius = parseFloat(this.value);
+    if (isNaN(celsius)) {
+        $('output').innerHTML = "°F = °C * 9/5 + 32";
+        return;
+    }
+    
+    var fahrenheit = celsius * 9/5 + 32;
+    fahrenheit = Math.floor(fahrenheit * 1000) / 1000;
+    $('output').innerHTML = celsius + ' °C = ' + fahrenheit + ' °F';
 });
-
-function renderFrame() {
-    // TODO: make canvas dimensions video's ratio
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-    
-    requestAnimationFrame(renderFrame);
-}
 
 </script>
 
