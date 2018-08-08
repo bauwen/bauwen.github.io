@@ -15,29 +15,72 @@
         
         .container {
             padding: 18px;
-            width: 264px;
+            width: 364px;
             background-color: hsl(210, 100%, 47%);
             border-radius: 4px;
             text-align: left;
-            box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.3);
         }
         
         .title {
-            color: rgb(230, 230, 230);
+            color: rgb(250, 250, 250);
             margin-bottom: 16px;
-            font: 22px asap, sans-serif;
+            font: 30px asap, sans-serif;
             /*font-size: calc(0.8999rem + 0.4000vw);*/
         }
         
         input {
-            width: 240px;
+            width: 300px;
             padding: 4px 8px;
-            font: 22px asap, sans-serif;
+            font: 32px asap, sans-serif;
+            display: inline-block;
+        }
+        
+        .unit {
+            color: rgb(250, 250, 250);
+            font: 32px asap, sans-serif;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);/*hsl(220, 100%, 67%);*/
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font: 16px asap, sans-serif;
+        }
+        
+        @media screen and (max-width: 500px) {
+            .container {
+                width: 264px;
+            }
+            
+            .title {
+                font-size: 22px;
+            }
+            
+            input {
+                width: 210px;
+                font-size: 22px;
+            }
+            
+            .unit {
+                font-size: 22px;
+            }
+            
+            .footer {
+                font-size: 14px;
+            }
         }
         
         .output {
             font: 32px asap, sans-serif;
-            color: hsl(210, 20%, 37%);
+            color: hsl(210, 20%, 27%);
             margin-top: 24px;
         }
         
@@ -61,21 +104,12 @@
             display: block;
         }
         
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: hsl(220, 100%, 67%);
-            color: white;
-            text-align: center;
-            padding: 12px;
-        }
+        
         
         .outer {
             position: absolute;
             top: 50%;
-            margin-top: -260px;
+            margin-top: -250px;
             left: 0;
             width: 100%;
         }
@@ -92,8 +126,9 @@
             <img class="icon" title="Swap units" src="swap.png"></img>
         </div>
         <input id="input" type="text" placeholder="°C" autofocus>
+        <div class="unit">°C</div>
     </div>
-    <div id="output" class="output">°F = °C × 9/5 + 32</div>
+    <div id="output" class="output">°F = °C × 9 ÷ 5 + 32</div>
     
     <div class="ad">
         <img src="https://lh6.ggpht.com/TiYbh-9wRxPZfwZ2X34rQNTBdPinjB9nXYS2g65bhyO0-P2HH7d74un0H-he16AmbLoxnw6X=w200"></img>
@@ -101,7 +136,7 @@
 
 </div>
 
-    <div class="footer">Privacy Policy | About</div>
+    <div class="footer">© 2018 webutils.org | About</div>
   
 </div>
 
@@ -115,7 +150,7 @@ function $(id) {
 $('input').addEventListener('input', function () {
     var celsius = parseFloat(this.value);
     if (isNaN(celsius)) {
-        $('output').innerHTML = "°F = °C * 9/5 + 32";
+        $('output').innerHTML = "°F = °C × 9 ÷ 5 + 32";
         return;
     }
     

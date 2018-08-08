@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Test Webcam Online</title>
+    <title>Grayscale Image</title>
     
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -11,33 +11,54 @@
         body {
             background-color: rgb(220, 230, 170);/*hsl(220, 100%, 87%);*/
             padding-top: 32px;
+            color: rgb(250, 250, 250);
         }
         
         .container {
             padding: 18px;
-            width: 264px;
+            width: 424px;
             background-color: hsl(210, 100%, 47%);
             border-radius: 4px;
             text-align: left;
-            box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.3);
         }
         
         .title {
-            color: rgb(230, 230, 230);
+            color: rgb(250, 250, 250);
             margin-bottom: 16px;
-            font: 22px asap, sans-serif;
+            font: 30px asap, sans-serif;
             /*font-size: calc(0.8999rem + 0.4000vw);*/
         }
         
         input {
-            width: 240px;
+            width: 300px;
             padding: 4px 8px;
-            font: 22px asap, sans-serif;
+            font: 32px asap, sans-serif;
+            display: inline-block;
+        }
+        
+        .unit {
+            color: rgb(250, 250, 250);
+            font: 32px asap, sans-serif;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);/*hsl(220, 100%, 67%);*/
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font: 16px asap, sans-serif;
         }
         
         .output {
             font: 32px asap, sans-serif;
-            color: hsl(210, 20%, 37%);
+            color: hsl(210, 20%, 27%);
             margin-top: 24px;
         }
         
@@ -61,24 +82,18 @@
             display: none;
         }
         
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: rgb(100, 180, 240);/*hsl(220, 100%, 67%);*/
-            color: white;
-            text-align: center;
-            padding: 12px;
-            font: 14px asap, sans-serif;
-        }
-        
-        .outer {
+        #outer {
             position: absolute;
             top: 50%;
-            margin-top: -210px;
+            margin-top: -290px;
             left: 0;
             width: 100%;
+        }
+        
+        #frame {
+            border: 2px dashed rgba(250, 250, 250, 0.7);
+            width: 420px;
+            height: 320px;
         }
         
         .button1 {
@@ -86,14 +101,81 @@
             padding: 12px 18px;
             border-radius: 4px;
             background: hsl(220, 100%, 67%);
-            outline: none;
-            font: 16px asap, sans-serif;
+            border-style: outset;
+            font: 18px asap, sans-serif;
             color: white;
+            border-width: 2px;
+            
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .button1:active {
+            border-style: inset;
         }
         
-        canvas {
-            background-color: black;
-            border: 1px solid black;
+        .button1-disabled {
+            margin-top: 24px;
+            padding: 12px 18px;
+            border-radius: 4px;
+            background-color: rgb(180, 180, 180);
+            border-style: outset;
+            font: 18px asap, sans-serif;
+            color: white;
+            border-width: 2px;
+            
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        @media screen and (max-width: 500px) {
+            .container {
+                width: 264px;
+            }
+            
+            .title {
+                font-size: 22px;
+            }
+            
+            input {
+                width: 210px;
+                font-size: 22px;
+            }
+            
+            .unit {
+                font-size: 22px;
+            }
+            
+            .footer {
+                font-size: 14px;
+            }
+            
+            .button1 {
+                font-size: 16px;
+            }
+            
+            .button1-disabled {
+                font-size: 16px;
+            }
+            
+            #frame {
+                width: 240px;
+            }
+        }
+        
+        .footlink {
+            text-decoration: none;
+            color: rgb(250, 250, 250);
+        }
+        
+        .footlink:hover {
+            color: rgb(250, 50, 50);
         }
     </style>
 </head>
@@ -101,15 +183,20 @@
 
 <div align="center">
 
-<div class="outer">
+<div id="outer">
     <div class="container">
         <div class="title">
-            <div class="inner">Test your webcam</div>
+            <div class="inner">Grayscale Image</div>
         </div>
-        <canvas id="canvas" width="260" height="200"></canvas>
+        <div class="frame" align="center">
+            <canvas id="frame" width="840" height="640"></canvas>
+        </div>
     </div>
-    <button class="button1">Take Picture</button>&nbsp;&nbsp;&nbsp;
-    <button class="button1">Record Video</button>
+    <div style="margin-top: 48px">
+        <label class="button1" for="input-image">Choose Image...<input id="input-image" type="file" accept=".png, .jpg, .bmp" style="display: none"></label>
+        &nbsp;&nbsp;&nbsp;
+        <label id="download-button" class="button1-disabled" for="download">Download<a id="download" href="#" style="display: none" download="untitled.png"></a></label>
+    </div>
     
     <div class="ad">
         <img src="https://lh6.ggpht.com/TiYbh-9wRxPZfwZ2X34rQNTBdPinjB9nXYS2g65bhyO0-P2HH7d74un0H-he16AmbLoxnw6X=w200"></img>
@@ -117,9 +204,10 @@
 
 </div>
 
-<div class="footer">About | Privacy Policy | Contact</div>
+    <div class="footer">© 2018 example.com &nbsp;|&nbsp; <a href="#" class="footlink">About</a></div>
   
 </div>
+
     
 <script>
 
@@ -127,36 +215,156 @@ function $(id) {
     return document.getElementById(id);
 }
 
-var video = document.createElement("video");
-video.autoplay = true;
-var canvas = $("canvas");
+var canvas = document.getElementById("frame");
 var ctx = canvas.getContext("2d");
 
-ctx.fillStyle = "white";
-ctx.font = "16px asap, sans-serif";
+ctx.font = "64px asap, sans-serif";
 ctx.textAlign = "center";
-ctx.fillText("Please allow camera access.", canvas.width/2, canvas.height/2 + 10);
+ctx.fillStyle = "rgb(230, 230, 230)";
+ctx.fillText("drop image here", canvas.width/2, canvas.height/2 + 10);
 
-navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: { facingMode: "user" },
-})
-.then((stream) => {
-    video.srcObject = stream;
-    requestAnimationFrame(renderFrame);
-})
-.catch(function (err) {
-
+$("frame").addEventListener("dragover", function (evt) {
+    evt.preventDefault();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(250, 250, 250, 0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgb(230, 230, 230)";
+    ctx.fillText("drop image here", canvas.width/2, canvas.height/2 + 10);
 });
 
-function renderFrame() {
-    // TODO: make canvas dimensions video's ratio
-    
+$("frame").addEventListener("dragleave", function (evt) {
+    evt.preventDefault();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgb(230, 230, 230)";
+    ctx.fillText("drop image here", canvas.width/2, canvas.height/2 + 10);
+});
+
+var image = new Image();
+var imageData = null;
+var name = "";
+var extension = "";
+var type = "";
+
+var maxWidth = 0;
+var maxHeight = 0;
+
+window.addEventListener("drop", function (evt) {
+    evt.preventDefault();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    requestAnimationFrame(renderFrame);
+    loadImage(evt.dataTransfer.files);
+});
+
+$("input-image").addEventListener("change", function (evt) {
+    loadImage(evt.target.files);
+});
+
+image.addEventListener("load", function () {
+    canvas.width = image.width;
+    canvas.height = image.height;
+    
+    fitImage();
+    
+    ctx.drawImage(image, 0, 0);
+    var src = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var dst = convertImageGrayscale(src);
+    ctx.putImageData(dst, 0, 0);
+    
+    $("frame").style.border = "2px solid rgba(250, 250, 250, 0.7)";
+    $("download-button").setAttribute("class", "button1");
+});
+
+function loadImage(files) {
+    if (files.length === 0) {
+        return;
+    }
+    
+    var file = files[0];
+    type = file.type;
+    
+    if (type !== "image/png" && type !== "image/jpeg" && type !== "image/bmp") {
+        return;
+    }
+    
+    var index = file.name.lastIndexOf(".");
+    name = file.name.slice(0, index);
+    extension = file.name.slice(index);
+    
+    var reader = new FileReader();
+    reader.addEventListener("load", function (evt) {
+        image.src = evt.target.result;
+    });   
+    reader.readAsDataURL(file);
 }
+
+function convertImageGrayscale(src) {
+    var dst = ctx.createImageData(src.width, src.height);
+    
+    for (var i = 0; i < dst.data.length; i += 4) {
+        var r = src.data[i + 0];
+        var g = src.data[i + 1];
+        var b = src.data[i + 2];
+        var a = src.data[i + 3];
+        var value = (r + g + b) / 3;
+        dst.data[i + 0] = value;
+        dst.data[i + 1] = value;
+        dst.data[i + 2] = value;
+        dst.data[i + 3] = a;
+    }
+    
+    return dst;
+}
+
+$("download-button").addEventListener("click", function () {
+    if (this.getAttribute("class") === "button1-disabled") {
+        return;
+    }
+    
+    $("download").click();
+});
+
+$("download").addEventListener("click", function () {
+    this.href = canvas.toDataURL(type);
+    this.download = name + "_grayscale" + extension;
+});
+
+function fitImage() {
+    var w = maxWidth;
+    var h = maxHeight;
+    var sw = canvas.width;
+    var sh = canvas.height;
+    
+    var r = w / h;
+    var sr = sw / sh;
+    
+    if (r > sr) {
+        sw *= h / sh;
+        sh = h;
+    } else {
+        sh *= w / sw;
+        sw = w;
+    }
+    
+    canvas.style.width = sw + "px";
+    canvas.style.height = sh + "px";
+}
+
+function resizeHandler() {
+    if (window.innerWidth < 500) {
+        maxWidth = 260;
+        maxHeight = 198;
+        fitImage();
+        $("outer").style["margin-top"] = "-210px";
+    } else {
+        maxWidth = 420;
+        maxHeight = 320;
+        fitImage();
+        $("outer").style["margin-top"] = "-290px";
+    }
+}
+
+window.addEventListener("resize", resizeHandler);
+window.addEventListener("load", resizeHandler);
 
 </script>
 
