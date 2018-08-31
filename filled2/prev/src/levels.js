@@ -313,9 +313,9 @@ var LEVELS = [
     "oo4....o" +
     "oo.1...o" +
     "oo..%5oo" +
-    "o.%.%.oo" +
-    "o@.354oo" +
-    "oo..oxoo",
+    "oo..%.oo" +
+    "ooo354oo" +
+    "oo@.oxoo",
     
     "%%...%%o" +
     "%.o1o.%o" +

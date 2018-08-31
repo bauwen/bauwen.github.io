@@ -63,8 +63,6 @@ game.addObject("obj_controller", {
                 self.level.y = Math.floor(ctx.canvas.height / 2);
                 self.sliding = false;
             }
-            
-            cmgReplay(self.number + 2);
         };
     },
     
@@ -533,7 +531,6 @@ game.addObject("obj_level", {
                     this.clickY = 0;//game.mouseY - (oy + this.py * CELL + CELL / 2);
                 } else {
                     for (var i = 0; i < this.trails.length; i++) {
-                    //for (var i = this.trails.length - 1; i >= 0; i--) {
                         var t = this.trails[i];
                         
                         if (IsMouseInBox(ox + t.x * CELL, oy + t.y * CELL, CELL, CELL) && !t.tunnel) {
@@ -549,7 +546,6 @@ game.addObject("obj_level", {
                             if (SOUND) game.playSound("snd_undo");
                             
                             this.clicked = true;
-                            //break;
                         }
                     }
                 }
@@ -884,8 +880,6 @@ game.addScene("scn_levels", {
     }
 });
 
-var banner;
-
 window.addEventListener("load", function () {
     if (!checkCorrectSite()) {
         return;
@@ -901,13 +895,7 @@ window.addEventListener("load", function () {
     
     loadKongregateApi(function (api) {
         kongApi = api;
-        
-        banner = new Image();
-        banner.src = "src/banner.png";
-        banner.onload = function () {
-            window.setTimeout(startLoading, 2);
-        };
-        //window.setTimeout(startLoading, 2);
+        window.setTimeout(startLoading, 2);
     });
 });
     
@@ -929,14 +917,14 @@ function startLoading() {
         }
     }, {
         progress: function (p) {
-            var h = 280;//Math.max(330, window.innerHeight - 100);
+            var h = Math.max(330, window.innerHeight - 100);
             var w = game.canvasctx.canvas.width / 2;// * h / bh;
             
             var ctx = game.canvasctx;
             var lw = w;//400;
             var lh = 20;
             var s = 4;
-            var hh = 30 + lh + 10 + 50 - 50;
+            var hh = 30 + lh + 10 + 50;
             
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.lineWidth = 3;
@@ -952,12 +940,7 @@ function startLoading() {
             ctx.fillStyle = "rgb(120, 100, 80)";//"rgb(180, 70, 20)";
             ctx.fillRect(ctx.canvas.width / 2 - lw / 2 + s, ctx.canvas.height - hh + s, (lw - 2 * s) * p, lh - 2 * s);
             
-            var bw = banner.naturalWidth;
-            var bh = banner.naturalHeight;
-            h = Math.max(540, window.innerHeight - 200);
-            w = bw * h / bh;
-            
-            ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30 - 20, w, h);
+            //ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30, w, h);
         },
         
         finish: function () {

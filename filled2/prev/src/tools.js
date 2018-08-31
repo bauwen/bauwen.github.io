@@ -1,3 +1,12 @@
+function checkCorrectSite() {
+    /*
+    var hostname = parent.location.hostname;
+    
+    return (hostname === "" || hostname.indexOf("kongregate.com") >= 0);
+    */
+    return true;
+}
+
 var DRAWINGS = {};
 var IMAGES = [];
 var LEVELGRIDS = [];
@@ -554,5 +563,5 @@ function detectEnv() {
     }
     
     deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
-    if (deviceOS) console.log(deviceOS + " detected");
+    //if (deviceOS) console.log(deviceOS + " detected");
 }

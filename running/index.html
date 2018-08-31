@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Get It Filled 2</title>
+    <title>Running Round</title>
     <meta charset="utf-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <meta name="apple-web-app-capable" content="yes">
@@ -13,23 +13,35 @@
             background-color: black;
             overflow-x: hidden;
             overflow-y: hidden;
+            background-color: rgb(40, 40, 40);
         }
         
         canvas {
             outline: none;
             background-color: transparent;
+            border: 0px solid gray;
         }
     </style>
 </head>
 <body>
 
+<div id="top-div" align="center">
+    <canvas id="canvas" width="720" height="540" tabindex="1"></canvas>
+</div>
+
 <script src="src/cmg.js"></script>
-<script src="src/engine.js"></script>
-<script src="src/Tween.js"></script>
-<script src="src/tools.js"></script>
+<script src="src/input.js"></script>
+
+<script src="src/objects.js"></script>
+<script src="src/obj_wall.js"></script>
+<script src="src/obj_player.js"></script>
+
 <script src="src/levels.js"></script>
-<script src="src/game.js"></script>
-<script src="src/kongapi.js"></script>
+<script src="src/platforms.js"></script>
+
+<script src="src/main.js"></script>
+<script src="src/transform.js"></script>
+
 
 </body>
 </html>
