@@ -425,8 +425,10 @@ function startMenu() {
 }
 
 function startLevel(n) {
-    gameMusic["mus_menu"].pause();
-    gameMusic["mus_menu"].currentTime = 0;
+    if (!deviceMobile) {
+        gameMusic["mus_menu"].pause();
+        gameMusic["mus_menu"].currentTime = 0;
+    }
     flashFade = 2;
     
     MENU = false;
