@@ -362,7 +362,7 @@ function loadAssets(assets, body) {
     }
     
     function loadMusic(index) {
-        if (deviceMobile && false) {  // try to load music on mobile too
+        if (deviceMobile) {
             count += 1;
             progress(count / total);
             window.setTimeout(finish, 1000);
