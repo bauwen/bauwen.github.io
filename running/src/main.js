@@ -86,18 +86,20 @@ function initLoading() {
                 highscore3 = h3;
             }
             
-            //gameMusic["mus_lvl1"].play();
-            gameMusic["mus_menu"].volume = 0.6;
-            gameMusic["mus_lvl1"].volume = 0.6;
-            gameMusic["mus_lvl2"].volume = 0.6;
-            gameMusic["mus_lvl3"].volume = 0.6;
-            setTimeout(loop, 1);
-            
-            if (MUSIC) {
-                gameMusic["mus_menu"].loop = true;
-                gameMusic["mus_menu"].play();
+            if (!deviceMobile) {
+                //gameMusic["mus_lvl1"].play();
+                gameMusic["mus_menu"].volume = 0.6;
+                gameMusic["mus_lvl1"].volume = 0.6;
+                gameMusic["mus_lvl2"].volume = 0.6;
+                gameMusic["mus_lvl3"].volume = 0.6;
+                
+                if (MUSIC) {
+                    gameMusic["mus_menu"].loop = true;
+                    gameMusic["mus_menu"].play();
+                }
             }
             
+            setTimeout(loop, 1);
             startMenu();
         }
     });
@@ -384,11 +386,13 @@ function loopMenu() {
                 MUSIC = !MUSIC;
                 setLocalStorage("music", MUSIC ? "on" : "off");
                 
-                if (MUSIC) {
-                    gameMusic["mus_menu"].loop = true;
-                    gameMusic["mus_menu"].play();
-                } else {
-                    gameMusic["mus_menu"].pause();
+                if (!deviceMobile) {
+                    if (MUSIC) {
+                        gameMusic["mus_menu"].loop = true;
+                        gameMusic["mus_menu"].play();
+                    } else {
+                        gameMusic["mus_menu"].pause();
+                    }
                 }
                 break;
                 
@@ -444,7 +448,7 @@ function startLevel(n) {
     running = false;
     setTimeout(function () {
         running = true;
-        if (MUSIC) gameMusic["mus_lvl" + n].play();
+        if (MUSIC && !deviceMobile) gameMusic["mus_lvl" + n].play();
     }, 500);
 
     var player = createInstance("obj_player", canvas.width / 2, 50, -1);
@@ -471,7 +475,7 @@ function leaveGame() {
     startMenu();
     
     setTimeout(function () {
-        if (MUSIC && MENU) {
+        if (MUSIC && MENU && !deviceMobile) {
             gameMusic["mus_menu"].loop = true;
             gameMusic["mus_menu"].play();
         }

@@ -426,6 +426,10 @@ function playSound(name) {
 }
 
 function stopMusic() {
+    if (deviceMobile) {
+        return;
+    }
+    
     var music;
     music = gameMusic["mus_lvl1"];
     music.pause();
