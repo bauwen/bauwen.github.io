@@ -1,5 +1,43 @@
 // HTML5 Game Engine
 
+var banner;
+var deviceOS = "";
+var browserSafari = false;
+var deviceMobile = false;
+var WIDTH_RATIO = 1;
+var HEIGHT_RATIO = 1;
+
+function detectEnv() {
+    var ua = navigator.userAgent;
+    
+    if (/Android/.test(ua)) {
+        deviceOS = "android";
+    }
+    else if (/iP[ao]d|iPhone/i.test(ua)) {
+        deviceOS = "ios";
+    }
+    else if (/Windows Phone/i.test(ua) || /IEMobile/i.test(ua)) {
+        deviceOS = "windowsphone";
+    }
+    else if (/Linux/.test(ua)) {
+        deviceOS = "linux";
+    }
+    else if (/Mac OS/.test(ua)) {
+        deviceOS = "macos";
+    }
+    else if (/Windows/.test(ua)) {
+        deviceOS = "windows";
+    }
+    
+    if (/Safari/.test(ua) && !(/Chrome\/(\d+)/.test(ua)) && (deviceOS === "ios" || deviceOS === "macos")) {
+        console.log("safari detected");
+        browserSafari = true;
+    }
+    
+    deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
+    if (deviceOS) console.log(deviceOS + " detected");
+}
+
 function Game(canvas, useViews) {
     var self = this;
     
@@ -32,8 +70,58 @@ function Game(canvas, useViews) {
     this.keysPressed = {};
     this.keysReleased = {};
     
+    var translateKeyCode = function (code) {
+        var s = code + "";
+        
+        switch (s) {
+            case "8": return "Backspace";
+            case "9": return "Tab";
+            case "13": return "Enter";
+            case "16": return "Shift";
+            case "17": return "Control";
+            case "18": return "Alt";
+            case "27": return "Escape";
+            case "32": return " ";
+            case "37": return "ArrowLeft";
+            case "38": return "ArrowUp";
+            case "39": return "ArrowRight";
+            case "40": return "ArrowDown";
+            // ... digits ...
+            case "65": return "ArrowLeft"; //return "a";
+            case "66": return "b";
+            case "67": return "c";
+            case "68": return "ArrowRight"; //return "d";
+            case "69": return "e";
+            case "70": return "f";
+            case "71": return "g";
+            case "72": return "h";
+            case "73": return "i";
+            case "74": return "j";
+            case "75": return "k";
+            case "76": return "l";
+            case "77": return "m";
+            case "78": return "n";
+            case "79": return "o";
+            case "80": return "p";
+            case "81": return "ArrowLeft"; //return "q";
+            case "82": return "r";
+            case "83": return "ArrowDown"; //return "s";
+            case "84": return "t";
+            case "85": return "u";
+            case "86": return "v";
+            case "87": return "ArrowUp"; //return "w";
+            case "88": return "x";
+            case "89": return "y";
+            case "90": return "ArrowUp"; //return "z";
+        }
+        
+        return s;
+    };
+    
+    detectEnv();
+    
     window.addEventListener("keydown", function (event) {
-        var key = event.key;
+        var key = translateKeyCode(event.which || event.keyCode || event.key);
         
         event.preventDefault();
         
@@ -44,7 +132,7 @@ function Game(canvas, useViews) {
     });
     
     window.addEventListener("keyup", function (event) {
-        var key = event.key;
+        var key = translateKeyCode(event.which || event.keyCode || event.key);
         
         event.preventDefault();
         
@@ -54,6 +142,36 @@ function Game(canvas, useViews) {
         }
     });
     
+    var resizeHandler = function () {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var c = canvas; 
+        var sw = c.width;
+        var sh = c.height;
+        
+        var r = w / h;
+        var sr = sw / sh;
+        
+        if (r > sr) {
+            sw *= h / sh;
+            sh = h;
+        } else {
+            sh *= w / sw;
+            sw = w;
+        }
+        
+        WIDTH_RATIO = c.width / sw;
+        HEIGHT_RATIO = c.height / sh;
+        
+        c.style.width = Math.floor(sw) + "px";
+        c.style.height = Math.floor(sh) + "px";
+        var topdiv = document.getElementById("top-div");
+        topdiv.style.marginTop = Math.floor((h - sh) / 2) + "px";
+    };
+    
+    window.addEventListener("resize", resizeHandler);
+    window.addEventListener("load", resizeHandler);
+    
     this.buttonNames = ["Left", "Middle", "Right"];
     this.buttonIndices = {"Left": 0, "Middle": 1, "Right": 2};
     this.buttonsDown = [false, false, false];
@@ -62,22 +180,24 @@ function Game(canvas, useViews) {
     this.mouseX = 0;
     this.mouseY = 0;
     
-    canvas.addEventListener("mousedown", function (event) {
+    var touchDetected = false;
+    
+    var mouseDownHandler = function (event) {
         var rect = canvas.getBoundingClientRect();
         var button = event.button;
         
         event.preventDefault();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
+        self.mouseX = Math.floor((event.pageX - window.scrollX - rect.left) * WIDTH_RATIO);
+        self.mouseY = Math.floor((event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO);
         
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
             self.buttonsPressed[button] = true;
         }
-    });
+    };
     
-    window.addEventListener("mouseup", function (event) {
+    var mouseUpHandler = function (event) {
         var rect = canvas.getBoundingClientRect();
         var button = event.button;
         
@@ -87,14 +207,69 @@ function Game(canvas, useViews) {
             self.buttonsDown[button] = false;
             self.buttonsReleased[button] = true;
         }
-    });
+    };
     
-    window.addEventListener("mousemove", function (event) {
+    var mouseMoveHandler = function (event) {
         var rect = canvas.getBoundingClientRect();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
-    });
+        self.mouseX = Math.floor((event.pageX - window.scrollX - rect.left) * WIDTH_RATIO);
+        self.mouseY = Math.floor((event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO);
+    };
+    
+    var touchStartHandler = function (event) {
+        if (!touchDetected) {
+            window.removeEventListener("mousedown", mouseDownHandler, false);
+            window.removeEventListener("mouseup", mouseUpHandler, false);
+            window.removeEventListener("mousemove", mouseMoveHandler, false);
+            touchDetected = true;
+        }
+        
+        var rect = self.canvas.getBoundingClientRect();
+        var button = 0;
+        var touch = event.touches[0];
+        
+        event.stopPropagation();
+        event.preventDefault();
+        
+        self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
+        
+        if (!self.buttonsDown[button]) {
+            self.buttonsDown[button] = true;
+            self.buttonsPressed[button] = true;
+        }
+    };
+    
+    var touchEndHandler = function (event) {
+        var rect = self.canvas.getBoundingClientRect();
+        var button = 0;
+        
+        if (self.buttonsDown[button]) {
+            self.buttonsDown[button] = false;
+            self.buttonsReleased[button] = true;
+        }
+    };
+    
+    var touchCancelHandler = touchEndHandler;
+    
+    var touchMoveHandler = function (event) {
+        var rect = self.canvas.getBoundingClientRect();
+        var touch = event.touches[0];
+        
+        event.stopPropagation();
+        event.preventDefault();
+        
+        self.mouseX = (touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
+        self.mouseY = (touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
+    };
+    
+    window.addEventListener("mousedown", mouseDownHandler, false);
+    window.addEventListener("mouseup", mouseUpHandler, false);
+    window.addEventListener("mousemove", mouseMoveHandler, false);
+    window.addEventListener("touchstart", touchStartHandler, false);
+    window.addEventListener("touchend", touchEndHandler, false);
+    window.addEventListener("touchcancel", touchCancelHandler, false);
+    window.addEventListener("touchmove", touchMoveHandler, false);
     
     this.objects = {};
     this.instances = [];
@@ -427,14 +602,26 @@ Game.prototype = {
                 channel.src = soundAssets[index + 1];
                 channel.onloadeddata = function () {
                     channels.push(channel);
-                    loadChannel(i + 1);
+                    //loadChannel(i + 1);
                 };
+                channel.preload = "auto";
+                
+                setTimeout(function () {
+                    loadChannel(i + 1);
+                }, 300);
             }
             
             loadChannel(0);
         }
         
         function loadMusic(index) {
+            if (deviceMobile) {
+                count += 1;
+                progress(count / total);
+                window.setTimeout(finish, 2000);
+                return;
+            }
+            
             if (index >= musicAssets.length) {
                 window.setTimeout(finish, 500);
                 return;
@@ -480,6 +667,11 @@ Game.prototype = {
     
     playSound: function (name) {
         var sound = this.sounds[name];
+        
+        if (!sound || sound.channels.length === 0) {
+            return;
+        }
+        
         var channel = sound.channels[sound.currentChannel];
         
         sound.currentChannel = (sound.currentChannel + 1) % sound.channels.length;
@@ -490,6 +682,10 @@ Game.prototype = {
     setSoundVolume: function (name, volume) {
         var sound = this.sounds[name]; 
         
+        if (!sound) {
+            return;
+        }
+        
         for (var i = 0; i < sound.channels.length; i++) {
             sound.channels[i].volume = volume;
         }
@@ -498,23 +694,51 @@ Game.prototype = {
     playMusic: function (name, loop) {
         var music = this.music[name];
         
+        if (!music) {
+            return;
+        }
+        
         music.loop = loop || false;
         music.play();
     },
     
     pauseMusic: function (name) {
-        this.music[name].pause();
+        var music = this.music[name];
+        
+        if (!music) {
+            return;
+        }
+        
+        music.pause();
     },
     
     setMusicTime: function (name, time) {
-        this.music[name].currentTime = time;
+        var music = this.music[name];
+        
+        if (!music) {
+            return;
+        }
+        
+        music.currentTime = time;
     },
     
     setMusicVolume: function (name, volume) { 
-        this.music[name].volume = volume;
+        var music = this.music[name];
+        
+        if (!music) {
+            return;
+        }
+        
+        music.volume = volume;
     },
     
     setMusicMuted: function (name, muted) {
-        this.music[name].muted = muted;
+        var music = this.music[name];
+        
+        if (!music) {
+            return;
+        }
+        
+        music.muted = muted;
     }
 };

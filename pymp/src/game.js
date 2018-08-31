@@ -247,6 +247,7 @@ game.addObject("obj_foreground", {
             game.ctx.fillText(triangleCount, tsx, tsy - 1);
             //*/
             
+            game.ctx.font = "bold 81px fnt_menufont, sans-serif";
             game.ctx.fillStyle = getColor(coincol);
             game.ctx.fillText(triangleCount, tsx, tsy);
             
@@ -742,15 +743,23 @@ game.addObject("obj_controller", {
     update: function () {
         
         if (!gameLoaded) {
+            var bw = banner.naturalWidth;
+            var bh = banner.naturalHeight;
+            
+            var h = 420;//Math.max(330, window.innerHeight - 100);
+            var w = bw * h / bh;
+            
+            ctx.drawImage(banner, (WIDTH - w) / 2, (HEIGHT - h) / 2 - 30 + 50, w, h);
+            
             var loadw = 400;
             ctx.strokeStyle = "black";
             ctx.fillStyle = "gray";
             //ctx.globalAlpha = 0.5;
-            ctx.strokeRect(WIDTH / 2 - loadw / 2, HEIGHT / 5, loadw, 30);
-            ctx.fillRect(WIDTH / 2 - loadw / 2 + 5, HEIGHT / 5 + 5, gameLoadProgress * (loadw - 10), 30 - 10);
+            ctx.strokeRect(WIDTH / 2 - loadw / 2, HEIGHT / 5 - 50, loadw, 20);
+            ctx.fillRect(WIDTH / 2 - loadw / 2 + 5, HEIGHT / 5 + 5 - 50, gameLoadProgress * (loadw - 10), 20 - 10);
             //ctx.globalAlpha = 1;
-            ctx.fillText("Game by Diamonax.", WIDTH / 2, 180 + 30 - 1);
-            ctx.fillText("Look at this awesome loading bar!", WIDTH / 2, 90);
+            //ctx.fillText("Game by Diamonax.", WIDTH / 2, 180 + 30 - 1);
+            //ctx.fillText("Look at this awesome loading bar!", WIDTH / 2, 90);
         }
         
         if (errorSize > 0.1) {
@@ -1422,6 +1431,18 @@ game.addScene("scn_play", {
 });
 
 window.addEventListener("load", function () {
+    if (!checkCorrectSite()) {
+        return;
+    }
+    
+    banner = new Image();
+    banner.src = "src/banner.png";
+    banner.onload = function () {
+        window.setTimeout(startLoading, 2);
+    };
+});
+    
+function startLoading() {
     APILoader(function (api) {
         window.api = api;
         
@@ -1546,4 +1567,4 @@ window.addEventListener("load", function () {
             }
         });
     });
-});
+}

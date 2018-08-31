@@ -5,10 +5,7 @@ function APILoader(callback) {
     
     if (window.kongregateAPI) {
         kongregateAPI.loadAPI(function () {
-            var kongregate = kongregateAPI.getAPI();
-            api.submitStat = function (stat, value) {
-                kongregate.stats.submit(stat, value);
-            };
+            api.submitStat = kongregateAPI.getAPI().stats.submit();
             callback(api);
         });
         return;
