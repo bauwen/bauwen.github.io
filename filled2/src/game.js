@@ -954,7 +954,7 @@ function startLoading() {
             
             var bw = banner.naturalWidth;
             var bh = banner.naturalHeight;
-            h = Math.max(540, window.innerHeight - 200);
+            h = Math.max(330, window.innerHeight - 230);
             w = bw * h / bh;
             
             ctx.drawImage(banner, (ctx.canvas.width - w) / 2, (ctx.canvas.height - h) / 2 - 30 - 20, w, h);
