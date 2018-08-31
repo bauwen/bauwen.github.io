@@ -48,21 +48,25 @@ var diskColor = { r: 250, g: 50, b: 50 };
 var MUSIC = true;
 var musicClicked = false;
 var musicLoaded = false;
-var music = new Audio();
-music.src = "src/music.mp3";
-music.oncanplaythrough = function () {
-    if (music.paused || music.currentTime === 0) {
-        musicLoaded = true;
-        music.loop = true;
-        //music.play();
-        
-        if (MUSIC) {
-            music.volume = 1;
-        } else {
-            music.volume = 0;
+var music;
+
+if (!deviceMobile) {
+    music = new Audio();
+    music.src = "src/music.mp3";
+    music.oncanplaythrough = function () {
+        if (music.paused || music.currentTime === 0) {
+            musicLoaded = true;
+            music.loop = true;
+            //music.play();
+            
+            if (MUSIC) {
+                music.volume = 1;
+            } else {
+                music.volume = 0;
+            }
         }
-    }
-};
+    };
+}
 
 window.addEventListener("mousedown", function (event) {
     if (musicLoaded && !musicClicked) {
@@ -103,6 +107,28 @@ window.addEventListener("load", function () {
     
     loadKongregateApi(function (api) {
         kongApi = api;
+        
+        banner = new Image();
+        banner.src = "src/banner.png";
+        banner.onload = function () {
+            window.setTimeout(startLoading, 2);
+        };
+    });
+});
+
+function startLoading() {
+    ctx.fillStyle = "rgb(40, 40, 40)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    var bw = banner.naturalWidth;
+    var bh = banner.naturalHeight;
+    
+    var h = 480;//Math.max(330, window.innerHeight - 100);
+    var w = bw * h / bh;
+    
+    ctx.drawImage(banner, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    
+    setTimeout(function () {
         loadGameState();
         submitStats();
         window.requestAnimationFrame(gameloop);
@@ -112,8 +138,8 @@ window.addEventListener("load", function () {
         } else {
             gotoRoomMenu();
         }
-    });
-});
+    }, 3000);
+}
 
 window.addEventListener("resize", resizeHandler);
 

@@ -19,6 +19,44 @@ try {
     hasLocalStorage = false;
 }
 
+var banner;
+var deviceOS = "";
+var browserSafari = false;
+var deviceMobile = false;
+
+function detectEnv() {
+    var ua = navigator.userAgent;
+    
+    if (/Android/.test(ua)) {
+        deviceOS = "android";
+    }
+    else if (/iP[ao]d|iPhone/i.test(ua)) {
+        deviceOS = "ios";
+    }
+    else if (/Windows Phone/i.test(ua) || /IEMobile/i.test(ua)) {
+        deviceOS = "windowsphone";
+    }
+    else if (/Linux/.test(ua)) {
+        deviceOS = "linux";
+    }
+    else if (/Mac OS/.test(ua)) {
+        deviceOS = "macos";
+    }
+    else if (/Windows/.test(ua)) {
+        deviceOS = "windows";
+    }
+    
+    if (/Safari/.test(ua) && !(/Chrome\/(\d+)/.test(ua)) && (deviceOS === "ios" || deviceOS === "macos")) {
+        console.log("safari detected");
+        browserSafari = true;
+    }
+    
+    deviceMobile = deviceOS === "ios" || deviceOS === "android" || deviceOS === "windowsphone";
+    if (deviceOS) console.log(deviceOS + " detected");
+}
+
+detectEnv();
+
 function getLocalStorage(name) {
     if (!hasLocalStorage) {
         return undefined;
@@ -43,7 +81,9 @@ function setLocalStorage(name, value) {
     localStorage.removeItem(name);
 }
 
-canvas.addEventListener("mousedown", function (event) {
+var touchDetected = false;
+
+var mouseDownHandler = function (event) {
     var rect = canvas.getBoundingClientRect();
     var button = event.button;
     
@@ -56,9 +96,9 @@ canvas.addEventListener("mousedown", function (event) {
         mouseDown = true;
         mousePressed = true;
     }
-});
+}
 
-window.addEventListener("mouseup", function (event) {
+var mouseUpHandler = function (event) {
     var rect = canvas.getBoundingClientRect();
     var button = event.button;
     
@@ -68,14 +108,69 @@ window.addEventListener("mouseup", function (event) {
         mouseDown = false;
         mouseReleased = true;
     }
-});
+}
 
-window.addEventListener("mousemove", function (event) {
+var mouseMoveHandler = function (event) {
     var rect = canvas.getBoundingClientRect();
     
     mouseX = Math.floor((event.pageX - window.scrollX - rect.left) * WIDTH_RATIO);
     mouseY = Math.floor((event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO);
-});
+}
+
+var touchStartHandler = function (event) {
+    if (!touchDetected) {
+        window.removeEventListener("mousedown", mouseDownHandler, false);
+        window.removeEventListener("mouseup", mouseUpHandler, false);
+        window.removeEventListener("mousemove", mouseMoveHandler, false);
+        touchDetected = true;
+    }
+    
+    var rect = canvas.getBoundingClientRect();
+    var button = 0;
+    var touch = event.touches[0];
+    
+    event.stopPropagation();
+    event.preventDefault();
+    
+    mouseX = Math.floor((touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO);
+    mouseY = Math.floor((touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO);
+    
+    if (button === 0 && !mouseDown) {
+        mouseDown = true;
+        mousePressed = true;
+    }
+};
+
+var touchEndHandler = function (event) {
+    var rect = canvas.getBoundingClientRect();
+    var button = 0;
+    
+    if (button === 0 && mouseDown) {
+        mouseDown = false;
+        mouseReleased = true;
+    }
+};
+
+var touchCancelHandler = touchEndHandler;
+
+var touchMoveHandler = function (event) {
+    var rect = canvas.getBoundingClientRect();
+    var touch = event.touches[0];
+    
+    event.stopPropagation();
+    event.preventDefault();
+    
+    mouseX = Math.floor((touch.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO);
+    mouseY = Math.floor((touch.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO);
+};
+
+window.addEventListener("mousedown", mouseDownHandler, false);
+window.addEventListener("mouseup", mouseUpHandler, false);
+window.addEventListener("mousemove", mouseMoveHandler, false);
+window.addEventListener("touchstart", touchStartHandler, false);
+window.addEventListener("touchend", touchEndHandler, false);
+window.addEventListener("touchcancel", touchCancelHandler, false);
+window.addEventListener("touchmove", touchMoveHandler, false);
 
 function updateInput() {
     mousePressed = false;
