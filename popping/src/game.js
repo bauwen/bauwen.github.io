@@ -126,7 +126,7 @@ function startLoading() {
     var h = 480;//Math.max(330, window.innerHeight - 100);
     var w = bw * h / bh;
     
-    ctx.drawImage(banner, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    //ctx.drawImage(banner, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
     
     setTimeout(function () {
         loadGameState();

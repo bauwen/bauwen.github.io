@@ -749,7 +749,7 @@ game.addObject("obj_controller", {
             var h = 420;//Math.max(330, window.innerHeight - 100);
             var w = bw * h / bh;
             
-            ctx.drawImage(banner, (WIDTH - w) / 2, (HEIGHT - h) / 2 - 30 + 50, w, h);
+            //ctx.drawImage(banner, (WIDTH - w) / 2, (HEIGHT - h) / 2 - 30 + 50, w, h);
             
             var loadw = 400;
             ctx.strokeStyle = "black";
