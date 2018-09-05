@@ -367,15 +367,18 @@ function loopMenu() {
     if (pressed) {
         switch (bselect) {
             case 0:
+                cmgStartLevel(1);
                 startLevel(1);
                 break;
                 
             case 1:
+                cmgStartLevel(2);
                 startLevel(2);
                 break;
                 
             case 2:
                 if (isLevel3Unlocked()) {
+                    cmgStartLevel(3);
                     startLevel(3);
                 } else {
                     lvl3Size = 12;

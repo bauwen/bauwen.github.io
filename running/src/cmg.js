@@ -9,7 +9,28 @@ parent.unlockAllLevels = unlockAllLevels;
 
 function checkCorrectSite() {return true;
     var hostname = parent.location.hostname;
-    return (hostname === "" || hostname.indexOf("coolmath-games.com") >= 0);
+    var names = [
+        "https://www.coolmath-games.com",
+        "www.coolmath-games.com",
+        "edit.coolmath-games.com",
+        "www.stage.coolmath-games.com",
+        "edit-stage.coolmath-games.com",
+        "dev.coolmath-games.com",
+        "m.coolmath-games.com",
+        "https://www.coolmathgames.com",
+        "www.coolmathgames.com",
+        "edit.coolmathgames.com",
+        "www.stage.coolmathgames.com",
+        "edit-stage.coolmathgames.com",
+        "dev.coolmathgames.com",
+        "m.coolmathgames.com"
+    ];
+    for (var i = 0; i < names.length; i++) {
+        if (hostname.indexOf(names[i]) >= 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function cmgStart() {
