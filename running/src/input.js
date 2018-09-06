@@ -397,9 +397,8 @@ function loadAssets(assets, body) {
                 count += 1;
                 progress(count / total);    
                 window.setTimeout(loadMusic, 1, index + 2);
-            }, 500);
+            }, 1000);
         } else {
-            audio.play();
             audio.onloadeddata = function () {
                 gameMusic[musicAssets[index]] = audio;
                 count += 1;
