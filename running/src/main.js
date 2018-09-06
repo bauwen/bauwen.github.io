@@ -1241,12 +1241,22 @@ function setNextColor(name, red, green, blue) {
     COLORS[name][2] = blue;
 }
 
+function Sign(x) {
+    if (x < 0) {
+        return -1;
+    } else if (x > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 function updateColor(name) {
     var l = COLORS[name];
     var spd = colorSpeed;
-    l[3] += Math.sign(l[0] - l[3]) * spd;
-    l[4] += Math.sign(l[1] - l[4]) * spd;
-    l[5] += Math.sign(l[2] - l[5]) * spd;
+    l[3] += Sign(l[0] - l[3]) * spd;
+    l[4] += Sign(l[1] - l[4]) * spd;
+    l[5] += Sign(l[2] - l[5]) * spd;
     
     l[3] = Math.max(0, Math.min(l[3], 255));
     l[4] = Math.max(0, Math.min(l[4], 255));
