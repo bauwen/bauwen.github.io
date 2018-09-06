@@ -583,6 +583,13 @@ Game.prototype = {
         }
         
         function loadSound(index) {
+            if (deviceMobile || browserSafari) {
+                count += soundAssets.length / 2;
+                progress(count / total);
+                window.setTimeout(function () { loadMusic(0); }, 1000);
+                return;
+            }
+            
             if (index >= soundAssets.length) {
                 loadMusic(0);
                 return;
@@ -619,8 +626,8 @@ Game.prototype = {
         }
         
         function loadMusic(index) {
-            if (deviceMobile) {
-                count += 1;
+            if (deviceMobile || browserSafari) {
+                count += musicAssets.length / 2;
                 progress(count / total);
                 window.setTimeout(finish, 1000);
                 return;

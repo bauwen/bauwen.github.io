@@ -326,6 +326,13 @@ function loadAssets(assets, body) {
     }
     
     function loadSound(index) {
+        if (deviceMobile) {
+            count += soundAssets.length / 2;
+            progress(count / total);
+            window.setTimeout(function () { loadMusic(0); }, 1000);
+            return;
+        }
+        
         if (index >= soundAssets.length) {
             loadMusic(0);
             return;
@@ -363,7 +370,7 @@ function loadAssets(assets, body) {
     
     function loadMusic(index) {
         if (deviceMobile) {
-            count += 1;
+            count += musicAssets.length / 2;
             progress(count / total);
             window.setTimeout(finish, 1000);
             return;

@@ -145,7 +145,7 @@ game.addObject("obj_controller", {
         ctx.globalAlpha = 0.6;
         
         var musicHover = false;
-        if (!deviceMobile) {
+        if (!deviceMobile && !browserSafari) {
             musicHover = IsMouseInBox(25, 20, 48, 48);
             z = musicHover ? 6 : 0;
             ctx.globalAlpha = musicHover ? 1 : 0.3;
@@ -153,7 +153,7 @@ game.addObject("obj_controller", {
         }
         
         var soundHover = false;
-        if (!deviceMobile) {
+        if (!deviceMobile && !browserSafari) {
             soundHover = IsMouseInBox(25 + 48 + 20, 20, 48, 48);
             z = soundHover ? 6 : 0;
             ctx.globalAlpha = soundHover ? 1 : 0.3;
