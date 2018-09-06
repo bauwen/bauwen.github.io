@@ -220,9 +220,15 @@ var browserSafari = false;
 var deviceMobile = false;
 var WIDTH_RATIO = 1;
 var HEIGHT_RATIO = 1;
+var internetExplorer = false;
 
 function detectEnv() {
     var ua = navigator.userAgent;
+    
+    if (!!document.documentMode) {
+        internetExplorer = true;
+        console.log("internet explorer detected");
+    }
     
     if (/Android/.test(ua)) {
         deviceOS = "android";
@@ -385,12 +391,21 @@ function loadAssets(assets, body) {
         
         var audio = new Audio();
         audio.src = musicAssets[index + 1];
-        audio.onloadeddata = function () {
-            gameMusic[musicAssets[index]] = audio;
-            count += 1;
-            progress(count / total);    
-            window.setTimeout(loadMusic, 1, index + 2);
-        };
+        if (internetExplorer) {
+            setTimeout(function () {
+                gameMusic[musicAssets[index]] = audio;
+                count += 1;
+                progress(count / total);    
+                window.setTimeout(loadMusic, 1, index + 2);
+            }, 500);
+        } else {
+            audio.onloadeddata = function () {
+                gameMusic[musicAssets[index]] = audio;
+                count += 1;
+                progress(count / total);    
+                window.setTimeout(loadMusic, 1, index + 2);
+            };
+        }
         audio.preload = "auto";
     }
     
