@@ -64,12 +64,17 @@ function Game(width, height) {
     this.ctx.canvas.width = this.canvas.width;
     this.ctx.canvas.height = this.canvas.height;
     
-    var container = document.createElement("div");
+    /*var container = document.createElement("div");
     container.setAttribute("align", "center");
     container.style.marginTop = "0px";
     container.appendChild(this.canvas);
     
+    container.style["-webkit-tap-highlight-color"] = "rgba(0, 0, 0, 0)";
+    container.style["touch-action"] = "none";
+    
     document.body.appendChild(container);
+    */
+    document.body.appendChild(this.canvas);
     
     var WIDTH_RATIO = 0;
     var HEIGHT_RATIO = 0;
@@ -223,6 +228,8 @@ function Game(width, height) {
     
     var mouseMoveHandler = function (event) {
         var rect = self.canvas.getBoundingClientRect();
+        
+        event.preventDefault();
         
         self.mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
         self.mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;

@@ -1,6 +1,6 @@
 function unlockAllLevels() {
-    highscore1 = 300;
-    highscore2 = 300;
+    highscore1 = Math.max(highscore1, 300);
+    highscore2 = Math.max(highscore2, 300);
     setLocalStorage("highscore1", highscore1);
     setLocalStorage("highscore2", highscore2);
 }
@@ -9,6 +9,7 @@ parent.unlockAllLevels = unlockAllLevels;
 
 function checkCorrectSite() {return true;
     var hostname = parent.location.hostname;
+    if (hostname === "") return true;
     var names = [
         "https://www.coolmath-games.com",
         "www.coolmath-games.com",

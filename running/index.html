@@ -20,12 +20,14 @@
             outline: none;
             background-color: transparent;
             border: 0px solid gray;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            touch-action: none;
         }
     </style>
 </head>
 <body>
 
-<div id="top-div" align="center">
+<div id="top-div" align="center" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); touch-action: none">
     <canvas id="canvas" width="720" height="540" tabindex="1"></canvas>
 </div>
 

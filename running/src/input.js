@@ -118,6 +118,8 @@ var mouseUpHandler = function (event) {
 var mouseMoveHandler = function (event) {
     var rect = canvas.getBoundingClientRect();
     
+    event.preventDefault();
+    
     mouseX = (event.pageX - window.pageXOffset - rect.left) * WIDTH_RATIO;
     mouseY = (event.pageY - window.pageYOffset - rect.top) * HEIGHT_RATIO;
     

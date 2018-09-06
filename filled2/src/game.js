@@ -888,6 +888,7 @@ var banner;
 
 window.addEventListener("load", function () {
     if (!checkCorrectSite()) {
+        console.log("invalid domain");
         return;
     }
     

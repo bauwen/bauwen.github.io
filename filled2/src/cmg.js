@@ -10,6 +10,7 @@ parent.unlockAllLevels = unlockAllLevels;
 
 function checkCorrectSite() {return true;
     var hostname = parent.location.hostname;
+    if (hostname === "") return true;
     var names = [
         "https://www.coolmath-games.com",
         "www.coolmath-games.com",

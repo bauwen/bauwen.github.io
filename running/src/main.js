@@ -8,6 +8,7 @@ canvas.focus();
 
 function init() {
     if (!checkCorrectSite()) {
+        console.log("invalid domain");
         return;
     }
     
