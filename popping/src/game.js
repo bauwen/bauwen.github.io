@@ -138,7 +138,7 @@ function startLoading() {
         } else {
             gotoRoomMenu();
         }
-    }, 3000);
+    }, 300);
 }
 
 window.addEventListener("resize", resizeHandler);
