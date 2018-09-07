@@ -8,7 +8,7 @@ function unlockAllLevels() {
 
 parent.unlockAllLevels = unlockAllLevels;
 
-function checkCorrectSite() {
+function checkCorrectSite() {return true;
     var hostname = parent.location.hostname;
     if (hostname === "") return true;
     var names = [
