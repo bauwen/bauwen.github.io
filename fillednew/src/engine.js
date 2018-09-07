@@ -747,7 +747,7 @@ Game.prototype = {
     playMusic: function (name, loop) {
         var music = this.music[name];
         
-        if (!music) {
+        if (!music || music.readyState < 4) {
             return;
         }
         
@@ -758,7 +758,7 @@ Game.prototype = {
     pauseMusic: function (name) {
         var music = this.music[name];
         
-        if (!music) {
+        if (!music || music.readyState < 4) {
             return;
         }
         
@@ -768,7 +768,7 @@ Game.prototype = {
     setMusicTime: function (name, time) {
         var music = this.music[name];
         
-        if (!music) {
+        if (!music || music.readyState < 4) {
             return;
         }
         
@@ -778,7 +778,7 @@ Game.prototype = {
     setMusicVolume: function (name, volume) {
         var music = this.music[name];
         
-        if (!music) {
+        if (!music || music.readyState < 4) {
             return;
         }
         

@@ -475,14 +475,20 @@ function stopMusic() {
     
     var music;
     music = gameMusic["mus_lvl1"];
-    music.pause();
-    music.currentTime = 0;
+    if (music.readyState === 4) {
+        music.pause();
+        music.currentTime = 0;
+    }
     music = gameMusic["mus_lvl2"];
-    music.pause();
-    music.currentTime = 0;
+    if (music.readyState === 4) {
+        music.pause();
+        music.currentTime = 0;
+    }
     music = gameMusic["mus_lvl3"];
-    music.pause();
-    music.currentTime = 0;
+    if (music.readyState === 4) {
+        music.pause();
+        music.currentTime = 0;
+    }
 }
 
 window.addEventListener("resize", resizeHandler);
