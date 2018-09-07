@@ -44,6 +44,8 @@ var MOBILELOADED = false;
 var deviceOS = "";
 var browserSafari = false;
 var deviceMobile = false;
+var internetExplorer = false;
+var msEdge = false;
 
 function Game(width, height) {
     var self = this;
@@ -650,12 +652,21 @@ Game.prototype = {
             
             var audio = new Audio();
             audio.src = musicAssets[index + 1];
-            audio.onloadeddata = function () {
-                self.music[musicAssets[index]] = audio;
-                count += 1;
-                progress(count / total);    
-                window.setTimeout(loadMusic, 1, index + 2);
-            };
+            if (internetExplorer || msEdge) {
+                setTimeout(function () {
+                    self.music[musicAssets[index]] = audio;
+                    count += 1;
+                    progress(count / total);    
+                    window.setTimeout(loadMusic, 1, index + 2);
+                }, 1000);
+            } else {
+                audio.onloadeddata = function () {
+                    self.music[musicAssets[index]] = audio;
+                    count += 1;
+                    progress(count / total);    
+                    window.setTimeout(loadMusic, 1, index + 2);
+                };
+            }
             audio.preload = "auto";
         }
         

@@ -529,6 +529,16 @@ function IsMouseInBox(x, y, w, h) {
 function detectEnv() {
     var ua = navigator.userAgent;
     
+    if (!!document.documentMode) {
+        internetExplorer = true;
+        console.log("internet explorer detected");
+    }
+    
+    if (!internetExplorer && !!window.StyleMedia) {
+        msEdge = true;
+        console.log("microsoft edge detected");
+    }
+    
     if (/Android/.test(ua)) {
         deviceOS = "android";
     }
