@@ -183,13 +183,23 @@ var touchMoveHandler = function (event) {
     mouseY = Math.floor(mouseY);
 };
 
-window.addEventListener("mousedown", mouseDownHandler, false);
-window.addEventListener("mouseup", mouseUpHandler, false);
-window.addEventListener("mousemove", mouseMoveHandler, false);
+window.addEventListener("mousedown", mouseDownHandler, { passive: false });
+window.addEventListener("mouseup", mouseUpHandler, { passive: false });
+window.addEventListener("mousemove", mouseMoveHandler, { passive: false });
 window.addEventListener("touchstart", touchStartHandler, { passive: false });
 window.addEventListener("touchend", touchEndHandler, { passive: false });
 window.addEventListener("touchcancel", touchCancelHandler, { passive: false });
 window.addEventListener("touchmove", touchMoveHandler, { passive: false });
+
+var preventHandler = function (event) { event.preventDefault(); };
+
+canvas.addEventListener("mousedown", preventHandler, { passive: false });
+canvas.addEventListener("mouseup", preventHandler, { passive: false });
+canvas.addEventListener("mousemove", preventHandler, { passive: false });
+canvas.addEventListener("touchstart", preventHandler, { passive: false });
+canvas.addEventListener("touchend", preventHandler, { passive: false });
+canvas.addEventListener("touchcancel", preventHandler, { passive: false });
+canvas.addEventListener("touchmove", preventHandler, { passive: false });
 
 var resizeHandler = function () {
     var w = window.innerWidth;

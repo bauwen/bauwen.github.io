@@ -303,13 +303,23 @@ function Game(width, height) {
         self.mouseY = Math.floor(self.mouseY);
     };
     
-    window.addEventListener("mousedown", mouseDownHandler, false);
-    window.addEventListener("mouseup", mouseUpHandler, false);
-    window.addEventListener("mousemove", mouseMoveHandler, false);
+    window.addEventListener("mousedown", mouseDownHandler, { passive: false });
+    window.addEventListener("mouseup", mouseUpHandler, { passive: false });
+    window.addEventListener("mousemove", mouseMoveHandler, { passive: false });
     window.addEventListener("touchstart", touchStartHandler, { passive: false });
     window.addEventListener("touchend", touchEndHandler, { passive: false });
     window.addEventListener("touchcancel", touchCancelHandler, { passive: false });
     window.addEventListener("touchmove", touchMoveHandler, { passive: false });
+    
+    var preventHandler = function (event) { event.preventDefault(); };
+
+    self.canvas.addEventListener("mousedown", preventHandler, { passive: false });
+    self.canvas.addEventListener("mouseup", preventHandler, { passive: false });
+    self.canvas.addEventListener("mousemove", preventHandler, { passive: false });
+    self.canvas.addEventListener("touchstart", preventHandler, { passive: false });
+    self.canvas.addEventListener("touchend", preventHandler, { passive: false });
+    self.canvas.addEventListener("touchcancel", preventHandler, { passive: false });
+    self.canvas.addEventListener("touchmove", preventHandler, { passive: false });
     
     var resizeHandler = function () {
         var w = Math.floor(window.innerWidth);
