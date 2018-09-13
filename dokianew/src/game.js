@@ -608,12 +608,12 @@ function startCurrentMusic() {
     if (!MUSIC || worldnumber <= 0) return;
     var name = "mus_world" + worldnumber;
     
-    try {
+    //try {
         game.playMusic(name, true);
-        startedPlaying = true;
-    } catch (err) {
+        //startedPlaying = true;
+    //} catch (err) {
         // nothing
-    }
+    //}
 }
 
 function saveCounters() {

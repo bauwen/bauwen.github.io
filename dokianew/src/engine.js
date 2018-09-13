@@ -670,6 +670,10 @@ Game.prototype = {
         music.currentTime = 0;
         music.loop = loop || false;
         music.play();
+        
+        if (!music.paused || music.currentTime > 0) {
+            startedPlaying = true;
+        }
     },
     
     pauseMusic: function (name) {
