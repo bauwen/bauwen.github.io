@@ -570,7 +570,7 @@ Game.prototype = {
                 
                 setTimeout(function () {
                     loadChannel(i + 1);
-                }, 3);
+                }, 70);
             }
             
             loadChannel(0);

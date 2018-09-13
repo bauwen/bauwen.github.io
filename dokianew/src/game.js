@@ -334,7 +334,7 @@ game.addObject("obj_end", {
                 game.createInstance("obj_firework", fx, fy);
             }
         }
-        /*
+        
         if (game.keyboardPressed("o")) {
             stopAllMusic();
             startCurrentMusic();
@@ -347,7 +347,6 @@ game.addObject("obj_end", {
         if (game.keyboardPressed("s")) {
             toggleSound();
         }
-        */
     }
 });
 
@@ -355,7 +354,7 @@ game.addScene("scn_end", {
     enter: function () {
         var w = ctx.canvas.width;
         var h = ctx.canvas.height;
-        console.log(w, h);
+        //console.log(w, h);
         game.scene.width = w;
         game.scene.height = h;
         game.ctx.canvas.width = w;
