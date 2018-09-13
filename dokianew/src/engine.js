@@ -6,6 +6,10 @@ var deviceMobile = false;
 var internetExplorer = false;
 var msEdge = false;
 
+function clamp(a, b, v) {
+    return Math.max(a, Math.min(v, b));
+}
+
 function Game(canvas, useViews) {
     var self = this;
     
@@ -207,6 +211,8 @@ Game.prototype = {
     },
     
     run: function () {
+        CELL = 40;
+        
         if (this.useViews) {
             if (this.views.length > 0) {
                 /*
@@ -252,8 +258,24 @@ Game.prototype = {
                     zzy /= RATIO;
                 }
                 
-                this.canvasctx.drawImage(this.ctx.canvas, view.x + xx + zx, view.y + yy + zy, view.width - zx - zzx, view.height - zy - zzy, 
-                                                            view.portX, view.portY, view.width, view.height);
+                var FX1 = clamp(0, this.ctx.canvas.width, view.x + xx + zx);
+                var FY1 = clamp(0, this.ctx.canvas.height, view.y + yy + zy);
+                var FW1 = clamp(0, this.ctx.canvas.width - FX1, view.width - zx - zzx);
+                var FH1 = clamp(0, this.ctx.canvas.height - FY1, view.height - zy - zzy);
+                
+                var FX2 = clamp(0, this.canvasctx.canvas.width, view.portX);
+                var FY2 = clamp(0, this.canvasctx.canvas.height, view.portY);
+                var FW2 = clamp(0, this.canvasctx.canvas.width - FX2, view.width);
+                var FH2 = clamp(0, this.canvasctx.canvas.height - FY2, view.height);
+                
+                this.canvasctx.drawImage(this.ctx.canvas, FX1, FY1, FW1, FH1, FX2, FY2, FW2, FH2);
+                                                            
+                /*
+                this.canvasctx.drawImage(this.ctx.canvas, Math.floor(view.x + xx + zx),      Math.floor(view.y + yy + zy), 
+                                                          Math.floor(view.width - zx - zzx), Math.floor(view.height - zy - zzy), 
+                                                          Math.floor(view.portX),            Math.floor(view.portY), 
+                                                          Math.floor(view.width),            Math.floor(view.height));
+                */                
                 
             } else {
                 this.canvasctx.drawImage(this.ctx.canvas, 0, 0);

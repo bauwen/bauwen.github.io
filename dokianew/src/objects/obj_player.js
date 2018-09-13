@@ -291,7 +291,10 @@ game.addObject("obj_player", {
         
         ctx.globalAlpha = this.alpha;
         
-        var sgn = Math.sign(this.gravity);
+        //var sgn = Math.sign(this.gravity);
+        var sgn = 0;
+        if (this.gravity < 0) sgn = -1;
+        if (this.gravity > 0) sgn = 1;
         var hitGround = false;
         
         ctx.save();
