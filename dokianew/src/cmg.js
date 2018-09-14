@@ -6,10 +6,13 @@ function unlockAllLevels() {
     
     worldnumber = 4;
     levelnumber = 10;
-    stopAllMusic();
-    if (MUSIC) startCurrentMusic();
     
-    game.enterScene("scn_world");
+    if (game.scene.name === "scn_world") {
+        stopAllMusic();
+        if (MUSIC) startCurrentMusic();
+        
+        game.enterScene("scn_world");
+    }
 }
 
 parent.unlockAllLevels = unlockAllLevels;

@@ -257,8 +257,8 @@ function createPatterns(callback) {
         patternCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
         pattern.draw(patternCtx);
         
-        imageCanvas.width = canvas.width + 2 * pattern.size;
-        imageCanvas.height = canvas.height + 2 * pattern.size;
+        imageCanvas.width = canvas.width + 3 * pattern.size;
+        imageCanvas.height = canvas.height + 3 * pattern.size;
         
         //imageCanvas.width = 4000;//canvas.width + 2 * pattern.size;
         //imageCanvas.height = 4000;//canvas.height + 2 * pattern.size;

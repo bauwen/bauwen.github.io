@@ -60,10 +60,15 @@ game.addObject("obj_background", {
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
         if (backgroundImage) {
-            var deltaX = VIEW.x % backgroundPatternSize;
-            var deltaY = VIEW.y % backgroundPatternSize;
+            var deltaX = VIEW.x % backgroundPatternSize + backgroundPatternSize;
+            var deltaY = VIEW.y % backgroundPatternSize + backgroundPatternSize;
             
-            ctx.drawImage(backgroundImage, deltaX, deltaY, VIEW.width, VIEW.height, VIEW.x, VIEW.y, VIEW.width, VIEW.height);
+            var fx = clamp(0, ctx.canvas.width, VIEW.x - 16);
+            var fy = clamp(0, ctx.canvas.height, VIEW.y - 16);
+            var fw = clamp(0, ctx.canvas.width - VIEW.x + 16, VIEW.width + 32);
+            var fh = clamp(0, ctx.canvas.height - VIEW.y + 16, VIEW.height + 32);
+            
+            ctx.drawImage(backgroundImage, deltaX, deltaY, VIEW.width, VIEW.height, fx, fy, fw, fh);
         }
         
         /*ctx.globalAlpha = 0.05;
@@ -189,9 +194,9 @@ game.addObject("obj_foreground", {
             ctx.fillStyle = "black";
             ctx.fillRect(x, y, w, h);
             ctx.beginPath();
-            ctx.arc(x + w - r / 2, y + h - r / 2, r, 0, Math.PI / 2);
+            ctx.arc(x + w - r / 2, y + h - r / 2, r, 0, Math.PI * 2);
             ctx.fill();
-            fillTriangle(x + w + r / 2, y + h - r / 2, x + w - r / 2, y + h + r / 2, x + w - r / 2, y + h - r / 2);
+            //fillTriangle(x + w + r / 2, y + h - r / 2, x + w - r / 2, y + h + r / 2, x + w - r / 2, y + h - r / 2);
             ctx.fillRect(x, y + h - 1, w - r / 2, r / 2 + 1);
             ctx.fillRect(x + w - 1, y, r / 2 + 1, h - r / 2);
             
@@ -199,6 +204,43 @@ game.addObject("obj_foreground", {
             ctx.font = "bold 42px gamefont, sans-serif";
             ctx.textAlign = "center";
             ctx.fillText(worldnumber + " - " + levelnumber, x + w / 2 + 10, y + 60);
+            
+            w = 100;
+            x = VIEW.x + VIEW.width - w + 10;
+            
+            ctx.fillStyle = "black";
+            ctx.fillRect(x, y, w, h);
+            ctx.beginPath();
+            ctx.arc(x + r / 2, y + h - r / 2, r, 0, Math.PI * 2);
+            ctx.fill();
+            //fillTriangle(x + w + r / 2, y + h - r / 2, x + w - r / 2, y + h + r / 2, x + w - r / 2, y + h - r / 2);
+            ctx.fillRect(x + r / 2, y + h - 1, w - r / 2, r / 2 + 1);
+            ctx.fillRect(x - r / 2, y, r / 2 + 1, h - r / 2);
+            
+            ctx.fillStyle = "white";
+            x -= 14;
+            
+            if (mouseInBox(x - VIEW.x - r / 2, y - VIEW.y, w, h + r / 2)) {
+                ctx.fillRect(x + 24, y + 24, 16, 16);
+                ctx.fillRect(x + 24 + 24, y + 24, 16, 16);
+                ctx.fillRect(x + 24, y + 24 + 24, 16, 16);
+                ctx.fillRect(x + 24 + 24, y + 24 + 24, 16, 16);
+                ctx.fillRect(x + 24 + 24 + 24, y + 24, 16, 16);
+                ctx.fillRect(x + 24 + 24 + 24, y + 24 + 24, 16, 16);
+                
+                if (game.mousePressed("Left")) {
+                    game.enterScene("scn_levelmenu");
+                }
+            } else {
+                x += 8;
+                y += 8;
+                fillCircle(x + 24, y + 24, 8);
+                fillCircle(x + 24 + 24, y + 24, 8);
+                fillCircle(x + 24, y + 24 + 24, 8);
+                fillCircle(x + 24 + 24, y + 24 + 24, 8);
+                fillCircle(x + 24 + 24 + 24, y + 24, 8);
+                fillCircle(x + 24 + 24 + 24, y + 24 + 24, 8);
+            }
         }
         
         if (completed) {
@@ -539,7 +581,7 @@ function startLoading() {
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
             canvasCtx.drawImage(banner, (canvas.width - bw) / 2, (canvas.height - bh) / 2);
             
-            setTimeout(loadTheGame, 3000);
+            setTimeout(loadTheGame, 30/*00*/);
         }
     });
 }
@@ -637,3 +679,109 @@ function saveCounters() {
 }
 
 var startedPlaying = false;
+
+
+
+// addition
+
+game.addScene("scn_levelmenu", {
+    enter: function () {
+        var w = ctx.canvas.width;
+        var h = ctx.canvas.height;
+        //console.log(w, h);
+        game.scene.width = w;
+        game.scene.height = h;
+        game.ctx.canvas.width = w;
+        game.ctx.canvas.height = h;
+        
+        //game.createInstance("obj_foreground");
+        game.createInstance("obj_levelmenu");
+        stopAllMusic();
+        //if (MUSIC) game.playMusic("mus_end", false);
+        
+        completed = false;
+        quake = false;
+        quakeTimer = 0;
+        zoomX = 0;
+        zoomY = 0;
+        spikeSwitch = false;
+        VIEW.x = 0;
+        VIEW.y = 0;
+    }
+});
+
+game.addObject("obj_levelmenu", {
+    create: function () {
+        this.depth = -100;
+    },
+    
+    update: function () {
+        ctx.fillStyle = "rgb(20, 20, 20)";
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        ctx.fillStyle = "white";
+        ctx.font = "48px gamefont, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("LEVEL SELECTION", 50, 70);
+        
+        ctx.font = "30px gamefont, sans-serif";
+        
+        for (var i = 0; i < 4; i++) {
+            var x = 50;
+            var y = 160 + i * 107;
+            ctx.fillStyle = "white";
+            ctx.fillText("WORLD " + (i + 1), x, y);
+            ctx.textAlign = "center";
+            
+            for (var j = 0; j < 10; j++) {
+                drawLevelButton(x + 160 + j * 70, y - 39, i + 1, j + 1);
+            }
+            
+            ctx.textAlign = "left";
+        }
+    }
+});
+
+function drawLevelButton(x, y, world, level) {
+    var unlocked = false;
+    if (highworldnumber > world) {
+        unlocked = true;
+    } else if (highworldnumber === world && highlevelnumber >= level) {
+        unlocked = true;
+    }
+    
+    var color1 = unlocked ? "white" : "rgb(60, 60, 60)";
+    var color2 = "black";
+    ctx.lineWidth = 2;
+    
+    var s = 55;
+    
+    if (unlocked && mouseInBox(x, y, s, s)) {
+        color1 = "black";
+        color2 = "white";
+        
+        if (game.mousePressed("Left")) {
+            cmgStartLevel(level + (world - 1) * 10);
+            worldnumber = world;
+            levelnumber = level;
+            if (MUSIC) startCurrentMusic();
+            game.enterScene("scn_world");
+        }
+    }
+    
+    if (true || unlocked) {
+        ctx.fillStyle = color1;
+        ctx.fillRect(x + 3, y + 3, s, s);
+    }
+
+    ctx.strokeStyle = color1;
+    ctx.strokeRect(x, y, s, s);
+    
+    ctx.fillStyle = unlocked ? color2 : "rgb(30, 30, 30)";
+    ctx.fillRect(x, y, s, s);
+    
+    ctx.fillStyle = color1;
+    ctx.fillText(level, x + s / 2, y + 38);
+}
+
+

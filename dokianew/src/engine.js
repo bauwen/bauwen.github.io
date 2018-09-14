@@ -6,8 +6,15 @@ var deviceMobile = false;
 var internetExplorer = false;
 var msEdge = false;
 
+var WIDTH_RATIO = 1;
+var HEIGHT_RATIO = 1;
+
 function clamp(a, b, v) {
     return Math.max(a, Math.min(v, b));
+}
+
+function mouseInBox(x, y, width, height) {
+    return x <= game.mouseX && game.mouseX < x + width && y <= game.mouseY && game.mouseY < y + height;
 }
 
 function Game(canvas, useViews) {
@@ -128,8 +135,10 @@ function Game(canvas, useViews) {
         
         event.preventDefault();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
+        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
         
         if (!self.buttonsDown[button]) {
             self.buttonsDown[button] = true;
@@ -152,8 +161,12 @@ function Game(canvas, useViews) {
     window.addEventListener("mousemove", function (event) {
         var rect = canvas.getBoundingClientRect();
         
-        self.mouseX = event.pageX - window.scrollX - rect.left;
-        self.mouseY = event.pageY - window.scrollY - rect.top;
+        event.preventDefault();
+        
+        self.mouseX = (event.pageX - window.scrollX - rect.left) * WIDTH_RATIO;
+        self.mouseY = (event.pageY - window.scrollY - rect.top) * HEIGHT_RATIO;
+        self.mouseX = Math.floor(self.mouseX);
+        self.mouseY = Math.floor(self.mouseY);
     });
     
     this.objects = {};
@@ -739,8 +752,8 @@ var resizeHandler = function () {
         sw = w;
     }
     
-    //WIDTH_RATIO = c.width / sw;
-    //HEIGHT_RATIO = c.height / sh;
+    WIDTH_RATIO = c.width / sw;
+    HEIGHT_RATIO = c.height / sh;
     
     c.style.width = Math.floor(sw) + "px";
     c.style.height = Math.floor(sh) + "px";
