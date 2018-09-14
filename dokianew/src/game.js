@@ -60,15 +60,27 @@ game.addObject("obj_background", {
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
         if (backgroundImage) {
-            var deltaX = VIEW.x % backgroundPatternSize + backgroundPatternSize;
-            var deltaY = VIEW.y % backgroundPatternSize + backgroundPatternSize;
-            
+            /*
             var fx = clamp(0, ctx.canvas.width, VIEW.x - 16);
             var fy = clamp(0, ctx.canvas.height, VIEW.y - 16);
             var fw = clamp(0, ctx.canvas.width - VIEW.x + 16, VIEW.width + 32);
             var fh = clamp(0, ctx.canvas.height - VIEW.y + 16, VIEW.height + 32);
             
+            var deltaX = fx % backgroundPatternSize + backgroundPatternSize;
+            var deltaY = fy % backgroundPatternSize + backgroundPatternSize;
+            
             ctx.drawImage(backgroundImage, deltaX, deltaY, VIEW.width, VIEW.height, fx, fy, fw, fh);
+            */
+            
+            var fx = VIEW.x - 16;
+            var fy = VIEW.y - 16;
+            var fw = VIEW.width + 32;
+            var fh = VIEW.height + 32;
+            
+            var deltaX = VIEW.x % backgroundPatternSize + backgroundPatternSize;
+            var deltaY = VIEW.y % backgroundPatternSize + backgroundPatternSize;
+            
+            ctx.drawImage(backgroundImage, deltaX, deltaY, fw, fh, fx, fy, fw, fh);
         }
         
         /*ctx.globalAlpha = 0.05;
@@ -581,7 +593,7 @@ function startLoading() {
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
             canvasCtx.drawImage(banner, (canvas.width - bw) / 2, (canvas.height - bh) / 2);
             
-            setTimeout(loadTheGame, 30/*00*/);
+            setTimeout(loadTheGame, 3000);
         }
     });
 }
