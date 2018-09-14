@@ -257,8 +257,11 @@ function createPatterns(callback) {
         patternCtx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
         pattern.draw(patternCtx);
         
-        imageCanvas.width = 4000;//canvas.width + 2 * pattern.size;
-        imageCanvas.height = 4000;//canvas.height + 2 * pattern.size;
+        imageCanvas.width = canvas.width + 2 * pattern.size;
+        imageCanvas.height = canvas.height + 2 * pattern.size;
+        
+        //imageCanvas.width = 4000;//canvas.width + 2 * pattern.size;
+        //imageCanvas.height = 4000;//canvas.height + 2 * pattern.size;
         
         var w = Math.floor(imageCanvas.width / patternCanvas.width);
         var h = Math.floor(imageCanvas.height / patternCanvas.height);
@@ -288,11 +291,18 @@ function createPatterns(callback) {
         return imageCanvas;
     };
     
+    var getBackgroundImageFrom = function (pattern) {
+        return {
+            image: getBackgroundImage(pattern),
+            patternSize: pattern.size
+        };
+    }
+    
     BACKGROUNDS = [
-        getBackgroundImage(backgroundPattern1),
-        getBackgroundImage(backgroundPattern2),
-        getBackgroundImage(backgroundPattern3),
-        getBackgroundImage(backgroundPattern4)
+        getBackgroundImageFrom(backgroundPattern1),
+        getBackgroundImageFrom(backgroundPattern2),
+        getBackgroundImageFrom(backgroundPattern3),
+        getBackgroundImageFrom(backgroundPattern4)
     ];
     
     BLOCKS = [

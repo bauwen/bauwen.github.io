@@ -248,7 +248,7 @@ game.addObject("obj_player", {
     },
     
     update: function () {
-        game.attachView(VIEW, this);
+        //game.attachView(VIEW, this);
         
         if (this.dead) {
             if (this.restartTimer > 0) {

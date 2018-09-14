@@ -39,8 +39,11 @@ var zoomY = 0;
 var fixedX = 0;
 var fixedY = 0;
 
+var backgroundPatternSize = 96;
 var backgroundImage = null;
 var blockImage = null;
+
+var PLAYER = null;
 
 var backgradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 backgradient.addColorStop(0, "white");
@@ -53,15 +56,20 @@ game.addObject("obj_background", {
     },
     
     update: function () {
-        ctx.fillStyle = "rgb(20, 200, 200)";
+        ctx.fillStyle = "black";//"rgb(20, 200, 200)";
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
-        if (backgroundImage) ctx.drawImage(backgroundImage, 0, 0);
+        if (backgroundImage) {
+            var deltaX = VIEW.x % backgroundPatternSize;
+            var deltaY = VIEW.y % backgroundPatternSize;
+            
+            ctx.drawImage(backgroundImage, deltaX, deltaY, VIEW.width, VIEW.height, VIEW.x, VIEW.y, VIEW.width, VIEW.height);
+        }
         
-        ctx.globalAlpha = 0.05;
+        /*ctx.globalAlpha = 0.05;
         ctx.fillStyle = backgradient;
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = 1;*/
         
         if (worldnumber === 1) {
             ctx.font = "bold 48px gamefont, sans-serif";
@@ -383,6 +391,10 @@ game.addScene("scn_end", {
 
 game.addScene("scn_world", {
     enter: function () {
+        PLAYER = null;
+        VIEW.x = 0;
+        VIEW.y = 0;
+        
         if (levelnumber < 1) {
             levelnumber = 10;
             worldnumber -= 1;
@@ -407,7 +419,9 @@ game.addScene("scn_world", {
             setLocalStorage("level", highlevelnumber);
         }
                 
-        backgroundImage = BACKGROUNDS[worldnumber - 1];
+        var BACKGROUND = BACKGROUNDS[worldnumber - 1];
+        backgroundImage = BACKGROUND.image;
+        backgroundPatternSize = BACKGROUND.patternSize;
         blockImage = BLOCKS[worldnumber - 1];
         
         switch (worldnumber) {

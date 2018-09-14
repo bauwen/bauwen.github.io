@@ -284,6 +284,10 @@ Game.prototype = {
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         }
         
+        if (PLAYER) {
+            game.attachView(VIEW, PLAYER);
+        }
+        
         if (this.nextScene) {
             this.scene.leave();
             
@@ -590,7 +594,7 @@ Game.prototype = {
                     count += 1;
                     progress(count / total);    
                     window.setTimeout(loadMusic, 1, index + 2);
-                }, 1000);
+                }, 2000);
             } else {
                 audio.onloadeddata = function () {
                     self.music[musicAssets[index]] = audio;

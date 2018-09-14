@@ -24,6 +24,10 @@ function loadWorld(world) {
             case "obj_spike_wall_counterclockwise":
                 game.createInstance("obj_spike_wall", thing.x * f, thing.y * f).clockwise = false;
                 break;
+                
+            case "obj_player":
+                PLAYER = game.createInstance(thing.name, thing.x * f, thing.y * f);
+                break;
             
             default:
                 game.createInstance(thing.name, thing.x * f, thing.y * f);
