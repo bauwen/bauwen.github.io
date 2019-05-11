@@ -9,12 +9,15 @@
 <button id="button">Let's go!</button>
 
 <script>
-document.getElementById("button").onclick = function () {
+window.addEventListener("load", letsGo);
+//document.getElementById("button").onclick = letsGo;
+
+function letsGo() {
     var link = document.getElementById("link").value;
     x = window.open(link ? link : "www.google.be://something");
     setTimeout(function () {
         setTimeout(function () {
-            x.document.write("Hello from [" + window.origin + "], [" + document.domain + "]!");
+            x.document.write("Hello from [" + window.origin + "], [" + document.domain + "]! <button onclick='alert(1)'>Run code</button>");
         }, 10);
     }, 500);
 }
