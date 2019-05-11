@@ -9,8 +9,8 @@
 <button id="button">Let's go!</button>
 
 <script>
-window.addEventListener("load", letsGo);
-//document.getElementById("button").onclick = letsGo;
+window.addEventListener("load", function () { setTimeout(letsGo, 500); });
+document.getElementById("button").onclick = letsGo;
 
 function letsGo() {
     var link = document.getElementById("link").value;
