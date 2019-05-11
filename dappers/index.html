@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <title>Dappertest</title>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<input id="link" size="30"></input>
+<button id="button">Let's go!</button>
+
+<script>
+document.getElementById("button").onclick = function () {
+    var link = document.getElementById("link").value;
+    x = window.open(link ? link : "www.google.be://something");
+    setTimeout(function () {
+        setTimeout(function () {
+            x.document.write("Hello from [" + window.origin + "], [" + document.domain + "]!");
+        }, 10);
+    }, 500);
+}
+</script>
+
+</body>
+</html>
