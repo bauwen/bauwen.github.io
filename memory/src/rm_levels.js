@@ -56,7 +56,7 @@ var guessTimer = 0;
 
 var LIVES_COUNT = 1;
 var SHOW_TIME = 60 * 0.5;
-var GUESS_TIME = 60 * 4.0;
+var GUESS_TIME = 60 * 8.0;
 var ERROR_COUNT = 2;
 
 var GRIDSIZE = 3;
@@ -70,7 +70,7 @@ function resetGame() {
     stage = 1;
     LIVES_COUNT = 2;
     SHOW_TIME = 60 * 0.5;
-    GUESS_TIME = 60 * 4.0;
+    GUESS_TIME = 60 * 8.0;
     ERROR_COUNT = 1;
     textState = 0;
 }
