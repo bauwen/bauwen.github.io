@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Connect Four AI</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            margin-top: 32px;
+            font: 14px sans-serif;
+        }
+        
+        .buttons {
+            margin-top: 16px;
+        }
+        
+        .buttons button {
+            font-size: 16px;
+            margin: 8px;
+        }
+        
+        .buttons span {
+            font-size: 16px;
+        }
+        
+        select {
+            padding: 2px 6px;
+            font: 16px sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<div align="center">
+    <canvas id="display"></canvas>
+    <div class="buttons">
+        <button id="restart">Restart Game</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>AI</span> <input id="ai" type="checkbox" checked>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>Depth:</span>&nbsp;
+        <select id="depth">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option selected>6</option>
+            <option>7</option>
+            <option>8</option>
+        </select>
+    </div>
+</div>
+
+<script src="connectfour_ai.js"></script>
+
+<script>
+const width = 7;
+const height = 6;
+const diskSize = 64;
+const ctx = document.getElementById("display").getContext("2d");
+ctx.canvas.width = 7 * diskSize + 20;
+ctx.canvas.height = 6 * diskSize + 100;
+const selectDepth = document.getElementById("depth");
+
+let currentPlayer = 1;
+let AI = true;
+
+let falling = false;
+let diskY = 0;
+let diskX = 0;
+let targetRow = 0;
+let targetColumn = 0;
+let connection = null;
+let gameOver = false;
+let wonAlpha = 1;
+let wonBlink = false;
+
+let mouseX = 0;
+let mouseY = 0;
+let clicking = false;
+let clicked = false;
+let grid;
+
+const clearGrid = () => {
+    grid = [];
+    for (let i = 0; i < width; i++) {
+        const column = [];
+        for (let j = 0; j < height; j++) {
+            column.push(0);
+        }
+        grid.push(column);
+    }
+};
+
+const getPlayerColor = (player) => {
+    return player === 1 ? "red" : "rgb(240, 240, 40)";
+};
+
+const checkDirection = (grid, player, sx, sy, dx, dy) => {
+    let discs = [{ x: sx, y: sy }];
+    
+    for (let i = 0; i < 2; i++) {
+        dx = -dx;
+        dy = -dy;
+        let x = sx;
+        let y = sy;
+        let radius = 0;
+        
+        while (true) {
+            x += dx;
+            y += dy;
+            radius += 1;
+            
+            if (x < 0 || width <= x || y < 0 || height <= y || radius >= 4) {
+                break;
+            }
+            
+            const cell = grid[x][y];
+            if (cell === player) {
+                discs.push({ x, y });
+                
+                if (discs.length >= 4) {
+                    return discs;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    
+    return null;
+};
+
+const checkGrid = (player, x, y) => {
+    connection = null;
+    const directions = [[1, 0], [0, 1], [1, 1], [-1, 1]];
+    
+    for (let i = 0; i < directions.length; i++) {
+        const pair = directions[i];
+        const discs = checkDirection(grid, player, x, y, pair[0], pair[1]);
+        if (discs) {
+            connection = discs;
+            gameOver = true;
+            wonAlpha = 0.4;
+            wonBlink = false;
+            return;
+        }
+    }
+};
+
+const gameloop = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    
+    const ox = 10;
+    const oy = ctx.canvas.height - diskSize * height - 10;
+    
+    if (gameOver) {
+        if (wonBlink) {
+            if (wonAlpha > 0.6) {
+                wonAlpha -= 0.01;
+            } else {
+                wonBlink = false;
+            }
+        } else {
+            if (wonAlpha < 1.2) {
+                wonAlpha += 0.01;
+            } else {
+                wonBlink = true;
+            }
+        }
+    }
+    
+    for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+            const player = grid[i][j];
+            if (player === 0) {
+                continue;
+            }
+            ctx.fillStyle = getPlayerColor(player);
+            ctx.globalAlpha = 1;
+            
+            if (connection) {
+                for (let k = 0; k < connection.length; k++) {
+                    const c = connection[k];
+                    if (c.x === i && c.y === j) {
+                        ctx.fillStyle = "black";
+                        ctx.globalAlpha = Math.min(wonAlpha, 1);
+                        break;
+                    }
+                }
+            }
+            
+            ctx.fillRect(ox + i * diskSize, oy + (height - 1 - j) * diskSize, diskSize, diskSize);
+        }
+    }
+    
+    ctx.globalAlpha = 1;
+    
+    const column = Math.floor((mouseX - ox) / diskSize);
+    
+    if (0 <= column && column < width && 0 <= mouseY && mouseY < ctx.canvas.height) {
+        const x = ox + column * diskSize + diskSize/2;
+        
+        if (!gameOver && !falling && (currentPlayer === 1 || !AI)) {
+            ctx.fillStyle = getPlayerColor(currentPlayer);
+            ctx.beginPath();
+            ctx.arc(x, 40, diskSize/2 - 5, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, 40, diskSize/2 - 5, 0, 2*Math.PI);
+            ctx.stroke();
+            
+            if (clicked) {
+                targetRow = -1;
+                for (let i = 0; i < height; i++) {
+                    if (grid[column][i] === 0) {
+                        targetRow = i;
+                        break;
+                    }
+                }
+                if (targetRow >= 0) {
+                    diskX = x;
+                    diskY = 0;
+                    targetColumn = column;
+                    falling = true;
+                }
+            }
+        }
+    }
+    
+    if (falling) {
+        ctx.fillStyle = getPlayerColor(currentPlayer);
+        ctx.beginPath();
+        ctx.arc(diskX, 40 + diskY, diskSize/2 - 3, 0, 2*Math.PI);
+        ctx.fill();
+        
+        diskY += 8;
+        const row = height - 1 - targetRow;
+        if (diskY >= oy + row * diskSize) {
+            grid[targetColumn][targetRow] = currentPlayer;
+            checkGrid(currentPlayer, targetColumn, targetRow);
+            currentPlayer = 3 - currentPlayer;
+            falling = false;
+        }
+    }
+    
+    ctx.strokeStyle = "teal";
+    ctx.lineWidth = 12;
+    
+    for (let i = 0; i <= width; i++) {
+        ctx.beginPath();
+        ctx.moveTo(ox + i * diskSize, oy);
+        ctx.lineTo(ox + i * diskSize, oy + height * diskSize);
+        ctx.stroke();
+    }
+    for (let i = 0; i <= height; i++) {
+        ctx.beginPath();
+        ctx.moveTo(ox, oy + i * diskSize);
+        ctx.lineTo(ox + width * diskSize, oy + i * diskSize);
+        ctx.stroke();
+    }
+    
+    ctx.lineWidth = 14;
+    for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+            ctx.beginPath();
+            const x = ox + i * diskSize + diskSize/2;
+            const y = oy + j * diskSize + diskSize/2;
+            ctx.arc(x, y, diskSize/2 - 2, 0, 2*Math.PI);
+            ctx.stroke();
+        }
+    }
+    
+    ctx.strokeRect(ox, oy, width * diskSize, height * diskSize);
+    
+    if (!gameOver && !falling && AI && currentPlayer === 2) {
+        const depth = parseInt(selectDepth.options[selectDepth.selectedIndex].textContent);
+        targetColumn = findNextMove(grid, currentPlayer, depth);  // the magic happens here
+        
+        for (let i = 0; i < height; i++) {
+            if (grid[targetColumn][i] === 0) {
+                targetRow = i;
+                break;
+            }
+        }
+        diskX = ox + targetColumn * diskSize + diskSize/2;
+        diskY = 0;
+        falling = true;
+    }
+    
+    clicked = false;
+    window.requestAnimationFrame(gameloop);
+};
+
+document.getElementById("restart").addEventListener("click", function () {
+    gameOver = false;
+    falling = false;
+    currentPlayer = 1;
+    clearGrid();
+});
+
+document.getElementById("ai").addEventListener("change", function () {
+    AI = this.checked;
+});
+
+window.addEventListener("mousemove", function (e) {
+    e.preventDefault();
+    
+    const rect = ctx.canvas.getBoundingClientRect();
+    mouseX = e.pageX - window.scrollX - rect.left;
+    mouseY = e.pageY - window.scrollY - rect.top;
+});
+
+ctx.canvas.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    
+    const rect = ctx.canvas.getBoundingClientRect();
+    mouseX = e.pageX - window.scrollX - rect.left;
+    mouseY = e.pageY - window.scrollY - rect.top;
+    
+    if (e.button === 0 && !clicking) {
+        clicked = true;
+        clicking = true;
+    }
+});
+
+ctx.canvas.addEventListener("mouseup", function (e) {
+    e.preventDefault();
+    
+    const rect = ctx.canvas.getBoundingClientRect();
+    mouseX = e.pageX - window.scrollX - rect.left;
+    mouseY = e.pageY - window.scrollY - rect.top;
+    
+    if (e.button === 0) {
+        clicking = false;
+    }
+});
+
+window.addEventListener("load", function () {
+    clearGrid();
+    gameloop();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Subtitle Shifter - Online SRT Synchronizer</title>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="apple-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet"> 
+<meta name="description" content="Shift the time stamps of an SRT subtitle file.">
+<meta name="keywords" content="free, online, browser, tool, web, utility, text, free, online, convert, converter, edit, editor, shift, shifter, srt, subtitle, subtitles, sync, synchronize, resync, resynchronize, video, movie, film">
+    
+<style>
+body {
+    background-color: rgb(220, 235, 235);
+    /*padding-top: 5vh;*/
+    color: rgb(250, 250, 250);
+    margin: 0;
+    padding: 0;
+    font: 16px asap, sans-serif;
+}
+
+.about {
+    text-decoration: none;
+    color: rgb(250, 250, 250);
+}
+
+.about:hover {
+    color: rgb(220, 50, 50);
+}
+
+.outer {
+    /*position: absolute;
+    top: 50%;
+    margin-top: -260px;
+    left: 0;
+    width: 100%;*/
+    margin-bottom: 64px;
+    margin-top: 8vh;
+}
+
+.title {
+    color: black;
+    font: bold 36px asap, sans-serif;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+
+.subtitle {
+    color: black;
+    font: 20px asap, sans-serif;
+    margin-top: 4px;
+    margin-bottom: 28px;
+}
+
+.ad {
+    display: none;
+    padding-left: 9vw;
+}
+
+.box {
+    display: inline-block;
+    min-width: 600px;
+    padding: 24px;
+    background-color: rgb(190, 210, 220);
+    border-radius: 4px;
+    text-align: left;
+    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.3);
+    color: black;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(170, 185, 185);
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*padding-left: 100px;*/
+    font: 16px asap, sans-serif;
+    z-index: 2;
+    /*border-top: 1px solid rgb(140, 155, 155);*/
+}
+
+.button1 {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 4px;
+    background: hsl(220, 100%, 67%);
+    border-style: outset;
+    font: 18px asap, sans-serif;
+    color: white;
+    border-width: 2px;
+    cursor: pointer;
+    outline: none;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.button1:active {
+    border-style: inset;
+}
+
+.button1-disabled {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 4px;
+    background-color: rgb(180, 180, 180);
+    border-style: outset;
+    font: 18px asap, sans-serif;
+    color: white;
+    border-width: 2px;
+    cursor: default;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.label {
+    display: inline-block;
+    width: 130px;
+    font: bold 20px asap, sans-serif;
+}
+
+.fileinput {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+select {
+    font-size: 14px;
+}
+
+@media screen and (max-height: 700px) {
+    .outer {
+        margin-top: 3vh;
+    }
+}
+
+@media screen and (max-width: 700px) {    
+    select {
+        font-size: 11px;
+    }
+    
+    .box {
+        padding: 16px;
+        min-width: 0px;
+    }
+    
+    .outer {
+        margin-top: 5vh;
+    }
+    
+    .footer {
+        font-size: 14px;
+    }
+    
+    .button1 {
+        font-size: 16px;
+    }
+    
+    .button1-disabled {
+        font-size: 16px;
+    }
+    
+    .title {
+        font-size: 22px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .ad {
+        padding-top: 32px;
+        padding-left: 0px;
+    }
+    
+    td {
+        display: block;
+    }
+}
+
+.amount {
+    padding: 4px 8px;
+    width: 65px;
+    font: 16px asap, sans-serif;
+}
+
+</style>
+</head>
+<body>
+
+<div align="center">
+    <div class="outer">
+    <table>
+    <tr><td>
+<div class="title">Shift Subtitles</div>
+<div class="subtitle">Shift the time stamps of an SRT subtitle file.</div>
+
+<div class="box">
+<div style="margin: 0px 16px; margin-top: 16px; margin-bottom: 16px;">
+    <div class="label">Input File:</div>
+    <input id="input-file" class="fileinput" type="file" accept=".srt">
+    <br><br><br><br>
+    <div class="label">Direction:</div>
+    <input id="input-direction" type="radio" name="direction" checked> Backwards
+    &nbsp;&nbsp;&nbsp;
+    <input type="radio" name="direction"> Forwards
+    <br><br><br><br>
+    <div class="label">Amount:</div>
+    <input id="input-minutes" class="amount" type="number" min="0" step="1" placeholder="0">&nbsp; minutes
+    &nbsp;&nbsp;&nbsp;
+    <input id="input-seconds" class="amount" type="number" min="0" step="0.001" placeholder="0">&nbsp; seconds
+</div>
+</div>
+
+<div style="margin-top: 42px" align="center">
+    <a id="button-shift" class="button1-disabled" role="button">Download Shifted Subtitles</a>
+</div>
+
+    </td><td>
+        <div class="ad" align="center">
+            
+        </div>
+    </td></tr>
+    </table>
+    </div>
+</div>
+
+
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+var filename = "";
+var schedule = null;
+
+function loadSrtFile(file) {
+    if (!file) {
+        return;
+    }
+    
+    schedule = null;
+    filename = file.name.trim();
+    if (filename.lastIndexOf(".") >= 0) {
+        filename = filename.slice(0, filename.lastIndexOf("."));
+    }
+    $("button-shift").setAttribute("class", "button1");
+    
+    var reader = new FileReader();
+    reader.addEventListener("load", function (event) {
+        var srt = event.target.result;
+        if (srt.trim() !== "") {
+            schedule = parseSrt(srt);
+        }
+    });
+    reader.readAsText(file);
+}
+
+$("input-file").addEventListener("change", function (event) {
+    loadSrtFile(event.target.files[0]);
+});
+
+window.addEventListener("dragleave", function (event) {
+    event.preventDefault();
+});
+
+window.addEventListener("dragover", function (event) {
+    event.preventDefault();
+});
+
+window.addEventListener("drop", function (event) {
+    event.preventDefault();
+    loadSrtFile(event.dataTransfer.files[0]);
+});
+
+$("button-shift").addEventListener("click", function () {
+    if (this.getAttribute("class") === "button1-disabled") {
+        return;
+    }
+    if (!schedule || !filename) {
+        return;
+    }
+    
+    var direction = $("input-direction").checked ? -1 : 1;
+    var minutesValue = $("input-minutes").value.trim();
+    var secondsValue = $("input-seconds").value.trim();
+    var minutes = minutesValue === "" ? 0 : parseInt(minutesValue);
+    var seconds = secondsValue === "" ? 0 : parseInt(secondsValue);
+    
+    if (minutes < 0 || seconds < 0 || isNaN(minutes) || isNaN(seconds)) {
+        return;
+    }
+    
+    var delta = (minutes * 60 + seconds) * 1000;
+    var shiftedSchedule = schedule.shift(delta * direction);
+    var srt = shiftedSchedule.convertToSrt();
+    
+    this.setAttribute("href", URL.createObjectURL(new Blob([srt], { type: "text/srt" })));
+    this.setAttribute("download", filename + "_shifted.srt");
+});
+
+function Subtitle(time, duration, text) {
+    this.time = time;
+    this.duration = duration;
+    this.text = text;
+}
+
+function Schedule() {
+    this.subtitles = [];
+}
+
+Schedule.prototype.addSubtitle = function (subtitle) {
+    this.subtitles.push(subtitle);
+};
+
+Schedule.prototype.convertToSrt = function () {
+    var convertToTime = function (millis) {
+        var seconds = Math.floor(millis / 1000);
+        var minutes = Math.floor(seconds / 60);
+        var hours = Math.floor(minutes / 60);
+        minutes %= 60;
+        seconds %= 60;
+        millis %= 1000;
+        
+        var hoursFormat = (hours < 10 ? "0" : "") + hours;
+        var minutesFormat = (minutes < 10 ? "0" : "") + minutes;
+        var secondsFormat = (seconds < 10 ? "0" : "") + seconds;
+        var millisFormat = (millis < 100 ? "0" : "") + (millis < 10 ? "0" : "") + millis;
+        
+        return hoursFormat + ":" + minutesFormat + ":" + secondsFormat + "," + millisFormat;
+    };
+    var lines = [];
+    
+    for (var i = 0; i < this.subtitles.length; i++) {
+        var subtitle = this.subtitles[i];
+        var begin = subtitle.time;
+        var end = begin + subtitle.duration;
+        var text = subtitle.text;
+        
+        lines.push((i + 1) + "");
+        lines.push(convertToTime(begin) + " --> " + convertToTime(end));
+        for (var j = 0; j < text.length; j++) {
+            lines.push(text[j]);
+        }
+        lines.push("");
+    }
+    
+    return lines.join("\r\n");
+};
+
+Schedule.prototype.shift = function (dt) {
+    var schedule = new Schedule();
+    
+    for (var i = 0; i < this.subtitles.length; i++) {
+        var subtitle = this.subtitles[i];
+        var time = subtitle.time + dt;
+        var duration = subtitle.duration;
+        
+        if (time + duration < 0) {
+            continue;
+        }  
+        if (time < 0) {
+            duration += time;
+            time = 0;
+        }
+        
+        schedule.addSubtitle(new Subtitle(time, duration, subtitle.text));
+    }
+    
+    return schedule;
+};
+
+function parseSrt(srt) {
+    var schedule = new Schedule();
+    var parseTime = function (time) {
+        var parts = time.split(":");
+        var hours = parseInt(parts[0]);
+        var minutes = parseInt(parts[1]);
+        parts = parts[2].split(",");
+        var seconds = parseInt(parts[0]);
+        var millis = parseInt(parts[1]);
+        
+        return (hours * 3600 + minutes * 60 + seconds) * 1000 + millis;
+    };
+    var lines = srt.replace(/\r/g, "").split("\n");
+    
+    for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim === "") {
+            continue;
+        }
+        
+        i += 1;
+        var parts = lines[i].split("-->");
+        var time = parseTime(parts[0].trim());
+        var duration = parseTime(parts[1].trim()) - time;
+        var text = [];
+        i += 1;
+        while (i < lines.length && lines[i].trim() !== "") {
+            text.push(lines[i]);
+            i += 1;
+        }
+        
+        schedule.addSubtitle(new Subtitle(time, duration, text));
+    }
+    
+    return schedule;
+}
+
+</script>
+</body>
+</html>

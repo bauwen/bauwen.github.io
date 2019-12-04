@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Audio Reverser- Online Audio Reverse Tool</title>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="apple-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet"> 
+<meta name="description" content="Reverse a complete audio track and listen to the result.">
+<meta name="keywords" content="free, online, browser, tool, web, utility, audio, sound, mp3, reverse, reversal, playback, change, edit, editor, convert, converter, backwards">
+    
+<style>
+body {
+    background-color: rgb(220, 235, 235);
+    /*padding-top: 5vh;*/
+    color: rgb(250, 250, 250);
+    margin: 0;
+    padding: 0;
+    font: 16px asap, sans-serif;
+}
+
+.about {
+    text-decoration: none;
+    color: rgb(250, 250, 250);
+}
+
+.about:hover {
+    color: rgb(220, 50, 50);
+}
+
+.outer {
+    /*position: absolute;
+    top: 50%;
+    margin-top: -260px;
+    left: 0;
+    width: 100%;*/
+    margin-bottom: 64px;
+    margin-top: 8vh;
+}
+
+.title {
+    color: black;
+    font: bold 36px asap, sans-serif;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+
+.subtitle {
+    color: black;
+    font: 20px asap, sans-serif;
+    margin-top: 4px;
+    margin-bottom: 28px;
+}
+
+.ad {
+    display: none;
+    padding-left: 9vw;
+}
+
+.box {
+    display: inline-block;
+    min-width: 600px;
+    padding: 24px;
+    background-color: rgb(190, 210, 220);
+    border-radius: 4px;
+    text-align: left;
+    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.3);
+    color: black;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(170, 185, 185);
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*padding-left: 100px;*/
+    font: 16px asap, sans-serif;
+    z-index: 2;
+    /*border-top: 1px solid rgb(140, 155, 155);*/
+}
+
+.button1 {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 4px;
+    background: hsl(220, 100%, 67%);
+    border-style: outset;
+    font: 18px asap, sans-serif;
+    color: white;
+    border-width: 2px;
+    cursor: pointer;
+    outline: none;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.button1:active {
+    border-style: inset;
+}
+
+.button1-disabled {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 4px;
+    background-color: rgb(180, 180, 180);
+    border-style: outset;
+    font: 18px asap, sans-serif;
+    color: white;
+    border-width: 2px;
+    cursor: default;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.label {
+    display: inline-block;
+    width: 130px;
+    font: bold 20px asap, sans-serif;
+}
+
+.fileinput {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+select {
+    font-size: 14px;
+}
+
+@media screen and (max-height: 700px) {
+    .outer {
+        margin-top: 3vh;
+    }
+}
+
+@media screen and (max-width: 700px) {    
+    select {
+        font-size: 11px;
+    }
+    
+    .box {
+        padding: 16px;
+        min-width: 0px;
+    }
+    
+    .outer {
+        margin-top: 5vh;
+    }
+    
+    .footer {
+        font-size: 14px;
+    }
+    
+    .button1 {
+        font-size: 16px;
+    }
+    
+    .button1-disabled {
+        font-size: 16px;
+    }
+    
+    .title {
+        font-size: 22px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .ad {
+        padding-top: 32px;
+        padding-left: 0px;
+    }
+    
+    td {
+        display: block;
+    }
+}
+
+.tuner-info {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding: 0px 16px;
+}
+
+.slider-container {
+    margin-bottom: 24px;
+    padding: 0px 12px;
+    background-color: rgba(40, 40, 80, 0.1);
+    border-radius: 2px;
+}
+
+.slider {
+    width: 540px;
+    background-color: transparent;
+    padding: 4px 0px;
+    border-radius: 4px;
+}
+
+.player-button {
+    display: inline-block;
+    padding: 4px;
+    background-color: rgb(160, 180, 200);
+    border-radius: 2px;
+    border: 1px solid rgb(120, 140, 170);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.player-button:hover {
+    background-color: rgb(140, 160, 190);
+}
+
+.player-controls {
+    padding: 0px 16px;
+    margin-bottom: 16px;
+}
+
+.timer {
+    float: right;
+    font-size: 20px;
+    margin-top: 4px;
+}
+
+#state-info {
+    margin-left: 42px;
+    display: inline-block;
+    font-style: italic;
+    color: rgb(100, 100, 100);
+}
+
+</style>
+</head>
+<body>
+
+<div align="center">
+    <div class="outer">
+    <table>
+    <tr><td>
+<div class="title">Reverse Audio</div>
+<div class="subtitle">Reverse a complete audio track and listen to the result.</div>
+
+<div class="box">
+    <div style="margin: 0px 16px; margin-top: 16px; margin-bottom: 16px;">
+        <div class="label">Input File:</div>
+        <input id="input-file" class="fileinput" type="file" accept=".mp3, .wav, .ogg">
+        
+        <br><br><br><br>
+        
+        <div class="player-controls">
+            <div id="button-play" class="player-button" title="Play"><img id="image-play" src="play.png"/></div>
+            &nbsp;&nbsp;&nbsp;
+            <div id="button-stop" class="player-button" title="Stop"><img src="stop.png"/></div>
+            &nbsp;&nbsp;&nbsp;
+            <div id="button-loop" class="player-button" title="Loop"><img id="image-loop" src="looping.png"/></div>
+            
+            <div id="state-info"></div>
+            
+            <div class="timer">
+                <span id="label-time-current">0:00</span>
+                <span id="label-time-total" style="color: rgb(120, 120, 120)"> / 0:00</span>
+            </div>
+        </div>
+        <div class="slider-container"><input id="seeker" type="range" value="0" min="0" max="400" step="1" class="slider"></div>
+    </div>
+</div>
+
+<div style="margin-top: 42px" align="center">
+    <a id="button-download" class="button1-disabled" role="button">Export to WAV</a>
+    <a id="button-export" href="#" style="display: none">Export WAV</a>
+</div>
+
+
+    </td><td>
+        <div class="ad" align="center">
+            
+        </div>
+    </td></tr>
+    </table>
+    </div>
+</div>
+
+
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+var audioContext = window.AudioContext || window.webkitAudioContext;
+var offlineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+
+var ac = new audioContext();
+var source = ac.createBufferSource();
+var gain = ac.createGain();
+var analyser = ac.createAnalyser();
+
+source.connect(gain);
+gain.connect(analyser);
+analyser.connect(ac.destination);
+
+var filename = "";
+var extension = "";
+
+var LOADING = false;
+var PLAYING = false;
+var LOOPING = false;
+var SEEKING = false;
+var BUFFER = null;
+
+var currentTime = 0;
+var totalTime = 0;
+
+var prevTime = 0;
+var currentTime = 0;
+var totalTime = 0.0001;
+var wasPlaying = false;
+
+function loadAudioFile(file) {
+    if (!file || LOADING) {
+        return;
+    }
+    
+    $("state-info").innerHTML = "Please wait. Loading audio...";
+    
+    var index = file.name.lastIndexOf(".");
+    filename = file.name.slice(0, index);
+    extension = file.name.slice(index);
+    
+    stopAudio();
+    LOADING = true;
+    
+    var reader = new FileReader();
+    
+    reader.addEventListener("load", function (event) {
+        ac.decodeAudioData(event.target.result, function (buffer) {
+            $("state-info").innerHTML = "";//"<i>" + file.name + "</i>";
+            //$("state-info").setAttribute("title", file.name);
+            $("button-download").setAttribute("class", "button1");
+            
+            Array.prototype.reverse.call(buffer.getChannelData(0));
+            if (buffer.numberOfChannels > 1) {
+                Array.prototype.reverse.call(buffer.getChannelData(1));
+            }
+            
+            LOADING = false;
+            BUFFER = buffer;
+            currentTime = 0;
+            totalTime = buffer.duration;
+            
+            try {
+                source.disconnect(gain);
+            } catch (err) {
+                // do nothing
+            }
+            
+            stopAudio();
+            source.playbackRate.value = 1;
+            playAudio();
+        }, function (err) {
+            if (err) {
+                $("state-info").innerHTML = "Unable to load file.";
+                LOADING = false;
+            }
+        });
+    });
+    
+    reader.readAsArrayBuffer(file);
+}
+
+function playAudio() {
+    if (BUFFER === null || LOADING) {
+        return;
+    }
+    
+    PLAYING = true;
+    $("image-play").src = "pause.png";
+    $("button-play").setAttribute("title", "Pause");
+    
+    source = ac.createBufferSource();
+    source.buffer = BUFFER;
+    source.connect(gain);
+    source.start(ac.currentTime, currentTime);
+}
+
+function pauseAudio() {
+    if (!PLAYING) {
+        return;
+    }
+    
+    PLAYING = false;
+    $("image-play").src = "play.png";
+    $("button-play").setAttribute("title", "Play");
+    
+    source.stop(ac.currentTime);
+    source.disconnect(gain);
+}
+
+function stopAudio() {
+    pauseAudio();
+    currentTime = 0;
+}
+
+function seekAudio(p) {
+    currentTime = totalTime * p;
+    
+    if (!SEEKING) {
+        wasPlaying = PLAYING;
+        pauseAudio();
+        SEEKING = true;
+    }
+}
+
+function updateControl() {
+    if (PLAYING) {
+        currentTime += (ac.currentTime - prevTime) * source.playbackRate.value;
+        
+        if (currentTime > totalTime) {
+            if (LOOPING) {
+                stopAudio();
+                playAudio();
+            } else {
+                currentTime = totalTime;
+                pauseAudio();
+            }
+        }
+    }
+    
+    if (wasPlaying && !SEEKING) {
+        wasPlaying = false;
+        playAudio();
+    }
+    
+    prevTime = ac.currentTime;
+    
+    $("label-time-current").innerHTML = formatTime(currentTime);
+    $("label-time-total").innerHTML = " / " + formatTime(totalTime);
+    
+    var max = parseInt($("seeker").max);
+    $("seeker").value = Math.floor(currentTime / totalTime * max);
+}
+
+function formatTime(seconds) {
+    var sec = Math.floor(seconds) % 60;
+    var min = Math.floor(seconds / 60);
+    
+    return min + ":" + (sec < 10 ? "0" : "") + sec
+}
+
+function exportAudio() {
+    if (BUFFER === null || LOADING) {
+        return;
+    }
+    
+    stopAudio();
+    
+    //var previousLabel = $("state-info").innerHTML;
+    $("state-info").innerHTML = "Please wait. Encoding audio...";
+    
+    LOADING = true;
+
+    var rate = ac.sampleRate;
+    var $ac = new offlineAudioContext(2, rate * source.buffer.duration / source.playbackRate.value, rate);
+    
+    var $source = $ac.createBufferSource();
+    var $gain = $ac.createGain();
+
+    $source.connect($gain);
+    $gain.connect($ac.destination);
+    
+    $source.buffer = BUFFER;
+    $source.playbackRate.value = source.playbackRate.value;
+    $gain.gain.value = gain.gain.value;
+    
+    $source.start(0);
+    
+    $ac.startRendering();
+    $ac.addEventListener("complete", function (data) {
+        var buffer = data.renderedBuffer;
+        var leftChannel = buffer.getChannelData(0);
+        var rightChannel = buffer.getChannelData(1);
+        var encoding = encodeWAVStereo(leftChannel, rightChannel, ac.sampleRate);
+        var blob = new Blob([encoding], { type: "audio/wav" });
+        
+        $("state-info").innerHTML = "";//previousLabel;
+        LOADING = false;
+        
+        var url = URL.createObjectURL(blob);
+        $("button-export").setAttribute("download", filename + "_reversed.wav");
+        $("button-export").setAttribute("href", url);
+        $("button-export").click();
+    });
+}
+
+$("input-file").addEventListener("change", function (event) {
+    if (LOADING) {
+        return;
+    }
+    
+    loadAudioFile(event.target.files[0]);
+});
+
+window.addEventListener("dragleave", function (event) {
+    event.preventDefault();
+    //$("state-info").style.backgroundColor = "transparent";
+});
+
+window.addEventListener("dragover", function (event) {
+    event.preventDefault();
+    //$("state-info").style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+});
+
+window.addEventListener("drop", function (event) {
+    event.preventDefault();
+    //$("state-info").style.backgroundColor = "transparent";
+    loadAudioFile(event.dataTransfer.files[0]);
+});
+
+$("seeker").addEventListener("input", function () {
+    var p = parseFloat($("seeker").value);
+    seekAudio(p / parseFloat($("seeker").max));
+});
+
+$("seeker").addEventListener("mouseup", function () {
+    SEEKING = false;
+});
+
+$("button-play").addEventListener("click", function () {
+    if (PLAYING) {
+        pauseAudio();
+    } else {
+        if (currentTime === totalTime) {
+            currentTime = 0;
+        }
+        
+        playAudio();
+    }
+});
+
+$("button-stop").addEventListener("click", function () {
+    stopAudio();
+});
+
+$("button-loop").addEventListener("click", function () {
+    LOOPING = !LOOPING;
+    this.setAttribute("title", LOOPING ? "Don't Loop" : "Loop");
+    $("image-loop").src = LOOPING ? "notlooping.png" : "looping.png";
+});
+
+$("button-download").addEventListener("click", function () {
+    if (this.getAttribute("class") === "button1-disabled") {
+        return;
+    }
+    if (LOADING) {
+        return;
+    }
+    
+    exportAudio();
+});
+
+window.addEventListener("load", function () {
+    setInterval(updateControl, 1000 / 30);
+});
+
+function encodeWAVStereo(leftChannel, rightChannel, sampleRate) {
+    var numChannels = 2;
+    var bitsPerSample = 16;
+    var sampleSize = leftChannel.length * numChannels * bitsPerSample/8;
+    
+    var buffer = new ArrayBuffer(44 + sampleSize);
+    var view = new DataView(buffer);
+
+    writeString(view, 0, "RIFF");
+    view.setUint32(4, 36 + sampleSize, true);
+    writeString(view, 8, "WAVE");
+    writeString(view, 12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * numChannels * bitsPerSample/8, true);
+    view.setUint16(32, numChannels * bitsPerSample/8, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeString(view, 36, "data");
+    view.setUint32(40, sampleSize, true);
+    
+    var offset = 44;
+    for (var i = 0; i < leftChannel.length; i++) {
+        var l = Math.max(-1, Math.min(leftChannel[i], 1));
+        view.setInt16(offset, l < 0 ? l * 0x8000 : l * 0x7FFF, true);
+        offset += 2;
+        var r = Math.max(-1, Math.min(rightChannel[i], 1));
+        view.setInt16(offset, r < 0 ? r * 0x8000 : r * 0x7FFF, true);
+        offset += 2;
+    }
+
+    return view.buffer;
+}
+
+function writeString(view, offset, string) {
+    for (var i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
+</script>
+</body>
+</html>

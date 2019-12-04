@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sudoku Generator & Solver</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            margin: 16px;
+            font: 14px sans-serif;
+        }
+        
+        #display {
+            border: 2px solid black;
+        }
+        
+        .buttons {
+            margin-top: 16px;
+        }
+        
+        .buttons button {
+            font-size: 16px;
+            margin: 8px;
+        }
+        
+        .buttons span {
+            font-size: 16px;
+        }
+        
+        .buttons input {
+            margin-left: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div align="center">
+    <i>Use mouse or keyboard to enter digits</i>
+    <br><br><br>
+    <canvas id="display"></canvas>
+    <div class="buttons">
+        <button id="solve">Show Solution</button>
+        <button id="generate">Generate New Sudoku</button>
+        <input id="edit" type="checkbox"> <span>Edit</span>
+    </div>
+</div>
+
+<script src="sudoku.js"></script>
+
+<script>
+const cellSize = 54;
+const ctx = document.getElementById("display").getContext("2d");
+ctx.canvas.width = 9 * cellSize;
+ctx.canvas.height = ctx.canvas.width;
+const editBox = document.getElementById("edit");
+
+let cellX = -1;
+let cellY = -1;
+let staticSudoku, dynamicSudoku;
+
+const renderBoard = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "black";
+    ctx.strokeStyle = "black";
+    
+    for (let i = 0; i <= 9; i++) {
+        ctx.lineWidth = i % 3 === 0 ? 4 : 2;
+        ctx.beginPath();
+        ctx.moveTo(i * cellSize, 0);
+        ctx.lineTo(i * cellSize, ctx.canvas.height);
+        ctx.stroke();
+    }
+    
+    for (let i = 0; i <= 9; i++) {
+        ctx.lineWidth = i % 3 === 0 ? 4 : 2;
+        ctx.beginPath();
+        ctx.moveTo(0, i * cellSize);
+        ctx.lineTo(ctx.canvas.width, i * cellSize);
+        ctx.stroke();
+    }
+    
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            const digit = dynamicSudoku.get(i, j);
+            if (digit > 0) {
+                const fixed = staticSudoku.get(i, j);
+                ctx.font = (fixed > 0 ? "bold " : "") + "24px monospace";
+                ctx.fillText(digit, i * cellSize + cellSize/2, j * cellSize + cellSize/2 + 2);
+            }
+        }
+    }
+    
+    if (dynamicSudoku.isSolved()) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "lime";
+        ctx.strokeRect(1, 1, ctx.canvas.width - 2, ctx.canvas.height - 2);
+    }
+    if (!dynamicSudoku.isValid()) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(1, 1, ctx.canvas.width - 2, ctx.canvas.height - 2);
+    }
+    
+    if (0 <= cellX && cellX < 9 && 0 <= cellY && cellY < 9) {
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(cellX * cellSize, cellY * cellSize, cellSize, cellSize);
+    }
+};
+
+document.getElementById("solve").addEventListener("click", function () {
+    dynamicSudoku = new Sudoku(staticSudoku);
+    dynamicSudoku.solve();
+    renderBoard();
+});
+
+document.getElementById("generate").addEventListener("click", function () {
+    staticSudoku = Sudoku.generate();
+    dynamicSudoku = new Sudoku(staticSudoku);
+    renderBoard();
+});
+
+window.addEventListener("mousemove", function (e) {
+    const rect = ctx.canvas.getBoundingClientRect();
+    const mouseX = e.pageX - window.scrollX - rect.left;
+    const mouseY = e.pageY - window.scrollY - rect.top;
+    cellX = Math.floor(mouseX / cellSize);
+    cellY = Math.floor(mouseY / cellSize);
+    renderBoard();
+});
+
+ctx.canvas.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    
+    const sign = e.button === 0 ? 1 : -1;
+    const rect = ctx.canvas.getBoundingClientRect();
+    const mouseX = e.pageX - window.scrollX - rect.left;
+    const mouseY = e.pageY - window.scrollY - rect.top;
+    cellX = Math.floor(mouseX / cellSize);
+    cellY = Math.floor(mouseY / cellSize);
+    
+    if (0 <= cellX && cellX < 9 && 0 <= cellY && cellY < 9) {
+        if (editBox.checked) {
+            staticSudoku.set(cellX, cellY, (dynamicSudoku.get(cellX, cellY) + sign + 10) % 10);
+            dynamicSudoku.set(cellX, cellY, staticSudoku.get(cellX, cellY));
+        } else if (staticSudoku.get(cellX, cellY) === 0) {
+            dynamicSudoku.set(cellX, cellY, (dynamicSudoku.get(cellX, cellY) + sign + 10) % 10);
+        }
+    }
+    
+    renderBoard();
+});
+
+ctx.canvas.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+});
+
+window.addEventListener("keydown", function (e) {
+    if (0 <= cellX && cellX < 9 && 0 <= cellY && cellY < 9) {
+        switch (e.key) {
+            case "Backspace":
+            case "Escape":
+                e.preventDefault();
+                
+                if (editBox.checked) {
+                    staticSudoku.set(cellX, cellY, 0);
+                    dynamicSudoku.set(cellX, cellY, 0);
+                } else if (staticSudoku.get(cellX, cellY) === 0) {
+                    dynamicSudoku.set(cellX, cellY, 0);
+                }
+                
+                renderBoard();
+                break;
+                
+            case "0":
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+                e.preventDefault();
+                
+                if (editBox.checked) {
+                    staticSudoku.set(cellX, cellY, parseInt(e.key));
+                    dynamicSudoku.set(cellX, cellY, parseInt(e.key));
+                } else if (staticSudoku.get(cellX, cellY) === 0) {
+                    dynamicSudoku.set(cellX, cellY, parseInt(e.key));
+                }
+                
+                renderBoard();
+                break;
+        }
+    }
+});
+
+window.addEventListener("load", function () {
+    staticSudoku = Sudoku.generate();
+    dynamicSudoku = new Sudoku(staticSudoku);
+    renderBoard();
+});
+</script>
+
+</body>
+</html>
