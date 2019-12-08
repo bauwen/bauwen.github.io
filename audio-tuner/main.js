@@ -1,7 +1,8 @@
 var canvas = document.getElementById("display");
 var ctx = canvas.getContext("2d");
 
-var ac = new AudioContext();
+var audioContext = window.AudioContext || window.webkitAudioContext;
+var ac = new audioContext();
 var source = ac.createBufferSource();
 var gain = ac.createGain();
 var filter = ac.createBiquadFilter();
