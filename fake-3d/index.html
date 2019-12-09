@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Fake 3D perspectives</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow-y: hidden;
+        }
+        
+        canvas {
+            background-color: white;
+        }
+        
+        .square {
+            border: 2px solid black;
+        }
+        
+        #settings {
+            padding: 16px;
+            box-sizing: border-box;
+            font: 20px sans-serif;
+            display: flex;
+            align-items: center;
+        }
+        
+        @media only screen and (max-height: 530px) {
+            #settings {
+                font: 14px sans-serif;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div align="center">
+    <table id="container">
+        <tr>
+            <td>
+                <div class="square">
+                    <canvas id="firstperson"></canvas>
+                </div>
+            </td>
+            <td>
+                <div class="square">
+                    <canvas id="topdown"></canvas>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="square" id="settings">
+                    <div align="center">
+                        Use the arrow keys to move, use Shift to strafe.
+                        You can also connect a gamepad.<br><br>
+                        <button onclick="OUTLINE = !OUTLINE">Toggle Outline</button>
+                        <button onclick="createNewWorld()">Create New Maze</button>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="square">
+                    <canvas id="raycaster"></canvas>
+                </div>
+            </td>   
+        </tr>
+    </table>
+</div>
+
+<script>
+    function handleResizeEvent() {
+        var size = Math.floor(window.innerHeight / 2.3);
+        var elements = document.getElementsByClassName("square");
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            element.style.width = size + "px";
+            element.style.height = size + "px";
+        }
+        elements = document.getElementsByTagName("canvas");
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            element.style.width = size + "px";
+            element.style.height = size + "px";
+        }
+        var container = document.getElementById("container");
+        var spacing = 12;
+        container.style.borderSpacing = spacing + "px";
+        var margin = Math.floor(window.innerHeight / 2 - size - spacing * 2);
+        container.style.marginTop = margin + "px";
+    }
+    
+    window.addEventListener("resize", handleResizeEvent);
+    window.addEventListener("load", function () {
+        var elements = document.getElementsByTagName("canvas");
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            element.setAttribute("width", CANVAS_SIZE);
+            element.setAttribute("height", CANVAS_SIZE);
+        }
+        for (var i = 0; i < canvasResizeListeners.length; i++) {
+            canvasResizeListeners[i]();
+        }
+        handleResizeEvent();
+    });
+    
+    var canvasResizeListeners = [];
+    function addCanvasResizeListener(callback) {
+        canvasResizeListeners.push(callback);
+    }
+</script>
+<script src="main.js"></script>
+<script src="topdown.js"></script>
+<script src="firstperson.js"></script>
+<script src="raycaster.js"></script>
+
+</body>
+</html>

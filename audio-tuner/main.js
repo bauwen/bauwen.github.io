@@ -3,19 +3,24 @@ var ctx = canvas.getContext("2d");
 
 var audioContext = window.AudioContext || window.webkitAudioContext;
 var ac = new audioContext();
+var safariProblem = typeof ac.createStereoPanner !== "function";
 var source = ac.createBufferSource();
 var gain = ac.createGain();
 var filter = ac.createBiquadFilter();
 var analyser = ac.createAnalyser();
-var panner = ac.createStereoPanner();
+var panner = safariProblem ? { pan: { value: 0 } } : ac.createStereoPanner();
 var convolver = ac.createConvolver();
 var shaper = ac.createWaveShaper();
 
 source.connect(filter);
 filter.connect(shaper);
 //convolver.connect(shaper);
-shaper.connect(panner);
-panner.connect(gain);
+if (safariProblem) {
+    shaper.connect(gain);
+} else {
+    shaper.connect(panner);
+    panner.connect(gain);
+}
 gain.connect(analyser);
 analyser.connect(ac.destination);
 
@@ -264,7 +269,7 @@ function exportMP3(buffer, callback) {
 }
 
 function exportAudio(type) {
-    if (BUFFER === null) {
+    if (BUFFER === null || safariProblem) {
         return;
     }
     
