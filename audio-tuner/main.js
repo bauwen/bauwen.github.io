@@ -111,6 +111,7 @@ function setConvolverImpulse(seconds, decay) {
 }
 
 function setDistortionCurve(shaper, k) {
+    if (safariProblem) return;
     if (k < 0.1) {
         shaper.curve = null;
         return;

@@ -73,7 +73,9 @@ window.addEventListener("load", function () {
     } catch (err) {}
 });
 
-let ac = new AudioContext();
+var audioContext = window.AudioContext || window.webkitAudioContext;
+var ac = new audioContext();
+//let ac = new AudioContext();
 let source;
 let gain = ac.createGain();
 let analyser = ac.createAnalyser();
