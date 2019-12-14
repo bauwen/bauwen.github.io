@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Image Scrambler</title>
+<meta charset="utf-8">
+</head>
+<body style="font-family: monospace; margin: 32px">
+
+<input id="input" type="file" accept=".png,.jpg"><br><br>
+<canvas id="display" style="border: 1px solid black"></canvas><br><br>
+<i>Rechtermuisknop -&gt; Afbeelding opslaan als...</i><br><br><br>
+<b>horizontaal:</b> <input id="input-sx" type="text" size="5" placeholder="3"><br><br>
+<b>verticaal:</b> &nbsp;&nbsp;<input id="input-sy" type="text" size="5" placeholder="5"><br><br><br>
+<button onclick="scrambleImage()">Afbeelding door elkaar halen</button>
+
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+var image;
+var sx = 3;  // slices horizontally
+var sy = 5;  // slices vertically
+
+$("input").addEventListener("change", function () {
+    if (!this.files) return;
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        image = new Image();
+        image.src = event.target.result;
+        image.onload = function () {
+            showImage();
+        };
+    };
+    reader.readAsDataURL(this.files[0]);
+});
+
+function showImage() {
+    if (!image) return;
+    var ctx = $("display").getContext("2d");
+    setupCanvas(ctx);
+}
+
+function setupCanvas(ctx) {
+    var w = 800;
+    var h = 600;
+    var sw = image.naturalWidth;
+    var sh = image.naturalHeight;
+    
+    if (sw > w || sh > h) {
+        var r = w / h;
+        var sr = sw / sh;
+        
+        if (r > sr) {
+            sw *= h / sh;
+            sh = h;
+        } else {
+            sh *= w / sw;
+            sw = w;
+        }
+    }
+    
+    ctx.canvas.width = Math.floor(sw / sx) * sx;
+    ctx.canvas.height = Math.floor(sh / sy) * sy;
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, sw, sh);
+}
+
+function scrambleImage() {
+    if (!image) return;
+    var isx = parseInt($("input-sx").value);
+    var isy = parseInt($("input-sy").value);
+    if (!isNaN(isx)) sx = isx;
+    if (!isNaN(isy)) sy = isy;
+    
+    var ctx = $("display").getContext("2d");
+    setupCanvas(ctx);
+    
+    var imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    var w = Math.floor(ctx.canvas.width / sx);
+    var h = Math.floor(ctx.canvas.height / sy);
+    
+    var blocks = [];
+    
+    // read blocks
+    for (var i = 0; i < sx*sy; i++) {
+        var block = [];
+        for (var j = 0; j < w; j++) {
+            for (var k = 0; k < h; k++) {
+                var x = (i % sx) * w + j;
+                var y = Math.floor(i / sx) * h + k;
+                var index = (y * ctx.canvas.width + x) * 4;
+                block.push({
+                    r: imageData.data[index + 0],
+                    g: imageData.data[index + 1],
+                    b: imageData.data[index + 2]
+                });
+            }
+        }
+        blocks.push(block);
+    }
+    
+    // shuffle blocks
+    for (var i = blocks.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = blocks[i];
+        blocks[i] = blocks[j];
+        blocks[j] = tmp;
+    }
+    
+    // write blocks
+    for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i];
+        for (var j = 0; j < w; j++) {
+            for (var k = 0; k < h; k++) {
+                var x = (i % sx) * w + j;
+                var y = Math.floor(i / sx) * h + k;
+                var index = (y * ctx.canvas.width + x) * 4;
+                var color = block[j * h + k];
+                imageData.data[index + 0] = color.r;
+                imageData.data[index + 1] = color.g;
+                imageData.data[index + 2] = color.b;
+            }
+        }
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+}
+</script>
+</body>
+</html>
