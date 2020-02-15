@@ -70,100 +70,151 @@
     </div>
 </div>
 
+<script src="lzma_worker.js"></script>
 <script>
-var nothingChars = [ "\u200C", "\u200D", "\u202C", "\uFEFF" ];
-
-function $(id) {
-    return document.getElementById(id);
-}
-
-$("outside-message").addEventListener("input", encodeMessage);
-$("inside-message").addEventListener("input", encodeMessage);
-$("input-message").addEventListener("input", decodeMessage);
-
-$("output-message").addEventListener("click", function () { this.select(); });
-
-function encodeMessage() {
-    var container = $("outside-message").value;
-    var payload = $("inside-message").value;
-    $("output-message").value = encmes(container, payload);
-}
-
-function decodeMessage() {
-    var message = $("input-message").value;
-    $("secret-message").value = decmes(message);
-    
-    if ($("secret-message").value === "") {
-        $("secret-message").setAttribute("placeholder", "No payload found!");
+(function () {
+    var nothingChars = [ "\u200B", "\u200C", "\u200D", "\u2062" ];
+    var nothingBytes = [];
+    for (var i = 0; i < nothingChars.length; i++) {
+        var bytes = new TextEncoder("utf-8").encode(nothingChars[i]);
+        nothingBytes.push(bytes[0] + (bytes[1] << 8) + (bytes[2] << 16));
     }
-}
+    var compressionFlags = [ "\u200C", "\u200D" ];
+    var compressionBytes = [];
+    for (var i = 0; i < compressionFlags.length; i++) {
+        var bytes = new TextEncoder("utf-8").encode(compressionFlags[i]);
+        compressionBytes.push(bytes[0] + (bytes[1] << 8) + (bytes[2] << 16));
+    }
 
-function encmes(container, payload) {
-    var bytes = new TextEncoder("utf-8").encode(payload);
-    var nothings = "";
-    
-    for (var i = 0; i < bytes.length; i++) {
-        nothings += byteToNothings(bytes[i]);
+    function $(id) {
+        return document.getElementById(id);
     }
-    
-    if (container.length < 2) return container + nothings;
-    return container.slice(0, 1) + nothings + container.slice(1);
-}
 
-function decmes(message) {
-    var bytes = (new TextEncoder("utf-8")).encode(message);
-    var list = [];
-    var i;
-    
-    for (i = 0; i < bytes.length - 2; i++) {
-        if (isNothing(bytes[i], bytes[i + 1], bytes[i + 2])) break;
+    $("outside-message").addEventListener("input", encodeMessage);
+    $("inside-message").addEventListener("input", encodeMessage);
+    $("input-message").addEventListener("input", decodeMessage);
+
+    $("output-message").addEventListener("click", function () { this.select(); });
+
+    function encodeMessage() {
+        var container = $("outside-message").value;
+        var payload = $("inside-message").value;
+        
+        encode(container, payload, function (result) {
+            $("output-message").value = result;
+        });
     }
-    if (i === bytes.length - 2) {
-        return "";
+
+    function decodeMessage() {
+        var message = $("input-message").value;
+        
+        decode(message, function (result) {
+            $("secret-message").value = result;
+            
+            if ($("secret-message").value === "") {
+                $("secret-message").setAttribute("placeholder", "No payload found!");
+            }
+        });
     }
-    
-    for (; i < bytes.length - 2; i += 4 * 3) {
-        if (!isNothing(bytes[i], bytes[i + 1], bytes[i + 2])) break;
-        var value = 0;
-        for (var k = 0; k < 4; k++) {
-            var j = i + k * 3;
-            var twoBits = nothingToTwoBits(bytes[j], bytes[j + 1], bytes[j + 2]);
-            if (twoBits < 0) break;
-            value |= twoBits << (2 * k);
+
+    function encode(container, payload, callback) {
+        var bytes = new TextEncoder("utf-8").encode(payload);
+        var nothings = compressionFlags[0];
+        
+        compress(bytes, function (compressedBytes) {
+            if (compressedBytes.length < bytes.length) {
+                bytes = compressedBytes;
+                nothings = compressionFlags[1];
+            }
+            
+            for (var i = 0; i < bytes.length; i++) {
+                nothings += byteToNothings(bytes[i]);
+            }
+            
+            if (container.length < 2) {
+                callback(container + nothings);
+            } else {
+                callback(container.slice(0, 1) + nothings + container.slice(1));
+            }
+        });
+    }
+
+    function decode(message, callback) {
+        var bytes = (new TextEncoder("utf-8")).encode(message);
+        var list = [];
+        var i;
+        
+        for (i = 0; i < bytes.length - 2; i++) {
+            if (isCompressionFlag(bytes[i], bytes[i + 1], bytes[i + 2])) break;
         }
-        list.push(value);
+        if (i === bytes.length - 2) {
+            callback("");
+            return;
+        }
+        
+        var array = new Uint8Array([bytes[i], bytes[i + 1], bytes[i + 2]]);
+        var flag = (new TextDecoder("utf-8")).decode(array);
+        var compressed = flag === compressionFlags[1];
+        
+        for (i += 3; i < bytes.length - 2; i += 4 * 3) {
+            if (!isNothing(bytes[i], bytes[i + 1], bytes[i + 2])) break;
+            var value = 0;
+            for (var k = 0; k < 4; k++) {
+                var j = i + k * 3;
+                var twoBits = nothingToTwoBits(bytes[j], bytes[j + 1], bytes[j + 2]);
+                if (twoBits < 0) break;
+                value |= twoBits << (2 * k);
+            }
+            list.push(value);
+        }
+        
+        if (compressed) {
+            decompress(list, function (decompressedString) {
+                callback(decompressedString);
+            });
+        } else {
+            callback((new TextDecoder("utf-8")).decode(new Uint8Array(list)));
+        }
     }
-    
-    return (new TextDecoder("utf-8")).decode(new Uint8Array(list));
-}
 
-function byteToNothings(value) {
-    var nothings = "";
-    for (var i = 0; i < 4; i++) {
-        nothings += nothingChars[(value >> (2 * i)) & 3];
+    function byteToNothings(value) {
+        var nothings = "";
+        for (var i = 0; i < 4; i++) {
+            nothings += nothingChars[(value >> (2 * i)) & 3];
+        }
+        return nothings;
     }
-    return nothings;
-}
 
-function nothingToTwoBits(byte1, byte2, byte3) {
-    if (byte1 === 226 && byte2 === 128) {
-        if (byte3 === 140) return 0;
-        if (byte3 === 141) return 1;
-        if (byte3 === 172) return 2;
+    function nothingToTwoBits(byte1, byte2, byte3) {
+        return nothingBytes.indexOf(byte1 + (byte2 << 8)  + (byte3 << 16));
     }
-    if (byte1 === 239 && byte2 === 187 && byte3 === 191) return 3;
-    return -1;
-}
 
-function isNothing(byte1, byte2, byte3) {
-    return nothingToTwoBits(byte1, byte2, byte3) >= 0;
-}
+    function isNothing(byte1, byte2, byte3) {
+        return nothingToTwoBits(byte1, byte2, byte3) >= 0;
+    }
 
-window.addEventListener("load", function () {
-    var message = decodeURIComponent(location.search);
-    if (!message) return;
-    document.body.innerHTML = decmes(message.slice(1));
-});
+    function isCompressionFlag(byte1, byte2, byte3) {
+        return compressionBytes.indexOf(byte1 + (byte2 << 8)  + (byte3 << 16)) >= 0;
+    }
+
+    function compress(bytes, callback) {
+        LZMA.compress(bytes, 9, function (result, error) {
+            callback(error ? null : result);
+        }, function (percent) {});
+    }
+
+    function decompress(bytes, callback) {
+        LZMA.decompress(bytes, function (result, error) {
+            callback(error ? "" : result);
+        }, function (percent) {});
+    }
+
+    window.addEventListener("load", function () {
+        var message = decodeURIComponent(location.search);
+        if (!message) return;
+        document.body.innerHTML = decode(message.slice(1));
+    });
+})();
 </script>
 
 </body>
