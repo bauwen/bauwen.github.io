@@ -14,6 +14,12 @@
         margin-bottom: 32px;
     }
     
+    h2 {
+        font: bold 24px monospace;
+        margin-top: 42px;
+        margin-bottom: 20px;
+    }
+    
     textarea {
         font: 16px sans-serif;
         padding: 8px;
@@ -28,7 +34,12 @@
     
     .container {
         margin-left: 48px;
+        margin-right: 48px;
         margin-bottom: 48px;
+    }
+    
+    .explanation {
+        color: rgb(160, 160, 160);
     }
     
     #output-message, #secret-message {
@@ -39,7 +50,7 @@
 <body>
 
 <div class="container">
-    <h1>Secret Message Encoder</h1>
+    <h1>Secret Message <u>Encoder</u></h1>
 
     <div class="box">
         Container Message:<br>
@@ -58,7 +69,7 @@
 <hr>
 
 <div class="container">
-    <h1>Secret Message Decoder</h1>
+    <h1>Secret Message <u>Decoder</u></h1>
 
     <div class="box">
         Input Message (paste here):<br>
@@ -68,6 +79,16 @@
         Hidden Payload:<br>
         <textarea id="secret-message" cols="30" rows="3" readonly></textarea>
     </div>
+</div>
+
+<hr>
+
+<div class="container explanation">
+    <h2>How does it work?</h2>
+    The payload is encoded inside the container message by converting its UTF-8 bytes into <b>invisible characters</b>. 
+    Each pair of two bits gets encoded using one of the following unicode characters: <b>zero width space</b> (U+200B), <b>zero width non-joiner</b> (U+200C), <b>zero width joiner</b> (U+200D), <b>invisible times</b> (U+2062). 
+    Because these characters are not visibly printed by most programs (including the browser), the payload appears not to be part of the resulting output text. 
+    This trick comes at a cost, though: using UTF-8, each byte of the payload is encoded by 12 bytes (i.e. 4 invisible characters each consisting of 3 bytes), which means the payload becomes 12 times as big inside the container message. In order to mitigate this, the payload is compressed first using the Lempel–Ziv–Markov chain algorithm (LZMA), if effective.
 </div>
 
 <script src="lzma_worker.js"></script>
@@ -169,8 +190,12 @@
         }
         
         if (compressed) {
-            decompress(list, function (decompressedString) {
-                callback(decompressedString);
+            decompress(list, function (decompressed) {
+                if ((typeof decompressed) === "string") {
+                    callback(decompressed);
+                } else {
+                    callback((new TextDecoder("utf-8")).decode(new Uint8Array(decompressed)));
+                }
             });
         } else {
             callback((new TextDecoder("utf-8")).decode(new Uint8Array(list)));
@@ -186,7 +211,7 @@
     }
 
     function nothingToTwoBits(byte1, byte2, byte3) {
-        return nothingBytes.indexOf(byte1 + (byte2 << 8)  + (byte3 << 16));
+        return nothingBytes.indexOf(byte1 + (byte2 << 8) + (byte3 << 16));
     }
 
     function isNothing(byte1, byte2, byte3) {
@@ -194,7 +219,7 @@
     }
 
     function isCompressionFlag(byte1, byte2, byte3) {
-        return compressionBytes.indexOf(byte1 + (byte2 << 8)  + (byte3 << 16)) >= 0;
+        return compressionBytes.indexOf(byte1 + (byte2 << 8) + (byte3 << 16)) >= 0;
     }
 
     function compress(bytes, callback) {
@@ -212,7 +237,9 @@
     window.addEventListener("load", function () {
         var message = decodeURIComponent(location.search);
         if (!message) return;
-        document.body.innerHTML = decode(message.slice(1));
+        decode(message.slice(1), function (result) {
+            if (result) document.body.innerHTML = result;
+        });
     });
 })();
 </script>
