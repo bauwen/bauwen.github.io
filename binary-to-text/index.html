@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Binary-to-Text</title>
+    <meta charset="utf-8">
+    <style>
+    body {
+        margin: 0px;
+    }
+    
+    h1 {
+        font: bold 32px monospace;
+        margin-top: 42px;
+        margin-bottom: 32px;
+    }
+    
+    h2 {
+        font: bold 24px monospace;
+        margin-top: 42px;
+        margin-bottom: 20px;
+    }
+    
+    textarea {
+        font: 16px sans-serif;
+        padding: 8px;
+        margin-right: 24px;
+        margin-top: 12px;
+        border: 1px solid black;
+    }
+    
+    .box {
+        display: inline-block;
+    }
+    
+    .container {
+        margin-left: 48px;
+        margin-right: 48px;
+        margin-bottom: 48px;
+    }
+    
+    .explanation {
+        color: rgb(160, 160, 160);
+    }
+    
+    #output-text {
+        font-size: 14px;
+        background-color: rgba(100, 200, 100, 0.1);
+    }
+    
+    #input-text {
+        font-size: 14px;
+        background-color: rgba(200, 200, 200, 0.1);
+    }
+    
+    select {
+        font: bold 32px monospace;
+        padding: 2px 4px;
+    }
+    
+    #error-info {
+        display: block;
+        color: rgb(255, 100, 100);
+        font: italic 14px monospace;
+    }
+    
+    button {
+        font-size: 18px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+    }
+    
+    .hide-a {
+        text-decoration: none;
+        color: rgb(160, 160, 160);
+    }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Binary-to-Text <u>Encoder</u>: <select id="select-encoder">
+        <option>Base64</option>
+        <option>Base256</option>
+        <option selected>Base1024</option>
+        <option>Base65536</option>
+    </select></h1>
+    
+    <table><tr><td>
+        <div class="box">
+            Select any file (text, image, audio ...):<br><br>
+            <input id="input-binary" type="file">
+        </div>
+    </td><td style="padding-left: 128px">
+        <div class="box">
+            Text Encoding Output <span id="characters-info">(0 characters)</span>:<br>
+            <textarea id="output-text" cols="70" rows="5" placeholder="copy here..." readonly></textarea>
+        </div>
+    </td></tr></table>
+</div>
+
+<hr>
+
+<div class="container">
+    <h1>Binary-to-Text <u>Decoder</u>: <select id="select-decoder">
+        <option>Base64</option>
+        <option>Base256</option>
+        <option selected>Base1024</option>
+        <option>Base65536</option>
+    </select></h1>
+
+    <table><tr><td>
+        <div class="box">
+            Text Encoding Input:<br>
+            <textarea id="input-text" cols="70" rows="5" placeholder="paste here..."></textarea>
+        </div>
+    </td><td style="padding-left: 81px">
+        <button id="button-download" disabled>Download Binary Output<br>(0 bytes)</button>
+        <span id="error-info"></span>
+    </td></tr></table>
+</div>
+
+<hr>
+
+<div class="container explanation">
+    <h2>What is this?</h2>
+    
+    Binary-to-text encodings are a way to express arbitrary binary data as printable text. This is done by translating the value of bit groups into an ASCII or Unicode character. The most used text encoding is <b><a class="hide-a" href="https://en.wikipedia.org/wiki/Base64" target="_blank">Base64</a></b>, which uses 64 printable ASCII characters. As 64 is less than 256 (i.e. the number of values a byte can represent), Base64 outputs a string containing more characters than input bytes (more specifically, 4 characters per 3 bytes). The main advantage of Base64 is that every character is generally encoded by 1 byte, thus limiting the difference between the binary size of the output text and the input. <br><br><b>Base256</b>, <b>Base1024</b> and <b>Base65536</b> output strings that contain the same amount or fewer characters than the amount of input bytes. For example, Base65536 needs N/2 characters to express N bytes. However, this comes at a cost: using UTF-8, most of the characters used by these encodings are encoded by more than 1 byte (up to 4 bytes), which means the binary size of the output text can be quite a bit larger the binary size of the input. <br><br>One interesting note: Twitter has a character limit of 280, but considers some Unicode characters to be of length 1. All characters used for the Base1024 encoding are such characters. This means that by using this encoding, more than 280 bytes (i.e. 350 bytes) can be effectively encoded inside the text of a tweet!
+</div>
+
+<script src="bin2txt.js"></script>
+<script src="base65536.js"></script>
+<script>
+(function () {
+    function $(id) {
+        return document.getElementById(id);
+    }
+    
+    var binaryInput = null;
+    var binaryOutput = null;
+    var downloadLink = document.createElement("a");
+    
+    $("output-text").addEventListener("click", function () { this.select(); });
+    $("input-binary").addEventListener("change", uploadBinaryInput);
+    $("button-download").addEventListener("click", downloadBinaryOutput);
+    $("select-encoder").addEventListener("change", encodeTextEncoding);
+    $("select-decoder").addEventListener("change", decodeTextEncoding);
+    $("input-text").addEventListener("input", decodeTextEncoding);
+    
+    function encodeTextEncoding() {
+        var option = $("select-encoder").options[$("select-encoder").selectedIndex];
+        var base = parseInt(option.textContent.slice(4));
+        var text = "";
+        if (base === 65536) {
+            text = encodeBase65536(binaryInput);
+        } else {
+            text = encodeBase(base, binaryInput);
+        }
+        $("output-text").value = text;
+        var count = Array.from(text).length;
+        $("characters-info").innerHTML = "(" + count + " character" + (count === 1 ? "" : "s") + ")";
+    }
+    
+    function decodeTextEncoding() {
+        var text = $("input-text").value.trim();
+        if (text === "") return;
+        
+        var option = $("select-decoder").options[$("select-decoder").selectedIndex];
+        var base = parseInt(option.textContent.slice(4));
+        try {
+            if (base === 65536) {
+                binaryOutput = decodeBase65536(text);
+            } else {
+                binaryOutput = decodeBase(base, text);
+            }
+            $("error-info").innerHTML = "";
+            $("button-download").removeAttribute("disabled");
+            $("button-download").innerHTML = "Download Binary Output<br>(" + binaryOutput.length + " bytes)";
+        } catch (err) {
+            binaryOutput = null;
+            $("error-info").innerHTML = err.message;
+            $("button-download").setAttribute("disabled", true);
+            $("button-download").innerHTML = "Download Binary Output<br>(0 bytes)";
+        }
+    }
+    
+    function uploadBinaryInput(event) {
+        var files = event.target.files;
+        if (!files.length) return;
+        
+        var fr = new FileReader();
+        fr.onload = function (e) {
+            binaryInput = new Uint8Array(e.target.result);
+            encodeTextEncoding();
+        };
+        fr.readAsArrayBuffer(files[0]);
+        $("output-text").value = "";
+        $("characters-info").innerHTML = "(encoding... please wait)";
+    }
+    
+    function downloadBinaryOutput() {
+        if (!binaryOutput) return;
+        
+        var blob = new Blob([binaryOutput], { type: "octet/stream" });
+        downloadLink.setAttribute("download", "output");
+        downloadLink.setAttribute("href", URL.createObjectURL(blob));
+        downloadLink.click();
+    }
+})();
+</script>
+
+</body>
+</html>
