@@ -86,27 +86,17 @@
 <div class="container explanation">
     <h2>How does it work?</h2>
     The payload is encoded inside the container message by converting its UTF-8 bytes into <b>invisible characters</b>. 
-    Each pair of two bits gets encoded using one of the following unicode characters: <b>zero width space</b> (U+200B), <b>zero width non-joiner</b> (U+200C), <b>zero width joiner</b> (U+200D), <b>invisible times</b> (U+2062). 
+    Each pair of two bits gets encoded using one of the following unicode characters: <b>combining grapheme joiner</b> (U+034F), <b>zero width space</b> (U+200B), <b>zero width non-joiner</b> (U+200C), <b>zero width joiner</b> (U+200D).
     Because these characters are not visibly printed by most programs (including the browser), the payload appears not to be part of the resulting output text. 
-    This trick comes at a cost, though: using UTF-8, each byte of the payload is encoded by 12 bytes (i.e. 4 invisible characters each consisting of 3 bytes), which means the payload becomes 12 times as big inside the container message. In order to mitigate this, the payload is compressed first using the Lempel–Ziv–Markov chain algorithm (LZMA), if effective.
+    This trick comes at a cost, though: using UTF-8, each byte of the payload is encoded by 8, 9, 10, 11 or 12 bytes (i.e. 4 invisible characters each consisting of 2 or 3 bytes), which means the payload can become 12 times as big inside the container message. In order to mitigate this, the payload is compressed first using the Lempel–Ziv–Markov chain algorithm (LZMA), if effective.
 </div>
 
 <script src="lzma_worker.js"></script>
 <script>
 (function () {
-    var nothingChars = [ "\u200B", "\u200C", "\u200D", "\u2062" ];
-    var nothingBytes = [];
-    for (var i = 0; i < nothingChars.length; i++) {
-        var bytes = new TextEncoder("utf-8").encode(nothingChars[i]);
-        nothingBytes.push(bytes[0] + (bytes[1] << 8) + (bytes[2] << 16));
-    }
+    var nothingCharacters = [ "\u034F", "\u200B", "\u200C", "\u200D" ];
     var compressionFlags = [ "\u200C", "\u200D" ];
-    var compressionBytes = [];
-    for (var i = 0; i < compressionFlags.length; i++) {
-        var bytes = new TextEncoder("utf-8").encode(compressionFlags[i]);
-        compressionBytes.push(bytes[0] + (bytes[1] << 8) + (bytes[2] << 16));
-    }
-
+    
     function $(id) {
         return document.getElementById(id);
     }
@@ -149,7 +139,9 @@
             }
             
             for (var i = 0; i < bytes.length; i++) {
-                nothings += byteToNothings(bytes[i]);
+                for (var j = 0; j < 4; j++) {
+                    nothings += nothingCharacters[(bytes[i] >> (2 * j)) & 3];
+                }
             }
             
             if (container.length < 2) {
@@ -161,35 +153,33 @@
     }
 
     function decode(message, callback) {
-        var bytes = (new TextEncoder("utf-8")).encode(message);
-        var list = [];
+        var characters = Array.from(message);
         var i;
         
-        for (i = 0; i < bytes.length - 2; i++) {
-            if (isCompressionFlag(bytes[i], bytes[i + 1], bytes[i + 2])) break;
+        for (var i = 0; i < characters.length; i++) {
+            if (compressionFlags.indexOf(characters[i]) >= 0) break;
         }
-        if (i === bytes.length - 2) {
+        
+        if (i === characters.length) {
             callback("");
             return;
         }
         
-        var array = new Uint8Array([bytes[i], bytes[i + 1], bytes[i + 2]]);
-        var flag = (new TextDecoder("utf-8")).decode(array);
-        var compressed = flag === compressionFlags[1];
+        var isCompressed = (characters[i] === compressionFlags[1]);
+        var list = [];
         
-        for (i += 3; i < bytes.length - 2; i += 4 * 3) {
-            if (!isNothing(bytes[i], bytes[i + 1], bytes[i + 2])) break;
+        for (i += 1; i < characters.length; i += 4) {
+            if (nothingCharacters.indexOf(characters[i]) < 0) break;
             var value = 0;
-            for (var k = 0; k < 4; k++) {
-                var j = i + k * 3;
-                var twoBits = nothingToTwoBits(bytes[j], bytes[j + 1], bytes[j + 2]);
+            for (var j = 0; j < 4; j++) {
+                var twoBits = nothingCharacters.indexOf(characters[i + j]);
                 if (twoBits < 0) break;
-                value |= twoBits << (2 * k);
+                value |= twoBits << (2 * j);
             }
             list.push(value);
         }
         
-        if (compressed) {
+        if (isCompressed) {
             decompress(list, function (decompressed) {
                 if ((typeof decompressed) === "string") {
                     callback(decompressed);
@@ -201,27 +191,7 @@
             callback((new TextDecoder("utf-8")).decode(new Uint8Array(list)));
         }
     }
-
-    function byteToNothings(value) {
-        var nothings = "";
-        for (var i = 0; i < 4; i++) {
-            nothings += nothingChars[(value >> (2 * i)) & 3];
-        }
-        return nothings;
-    }
-
-    function nothingToTwoBits(byte1, byte2, byte3) {
-        return nothingBytes.indexOf(byte1 + (byte2 << 8) + (byte3 << 16));
-    }
-
-    function isNothing(byte1, byte2, byte3) {
-        return nothingToTwoBits(byte1, byte2, byte3) >= 0;
-    }
-
-    function isCompressionFlag(byte1, byte2, byte3) {
-        return compressionBytes.indexOf(byte1 + (byte2 << 8) + (byte3 << 16)) >= 0;
-    }
-
+    
     function compress(bytes, callback) {
         LZMA.compress(bytes, 9, function (result, error) {
             callback(error ? null : result);
