@@ -80,6 +80,7 @@
 <div class="container">
     <h1>Binary-to-Text <u>Encoder</u>: <select id="select-encoder">
         <option>Base64</option>
+        <option>Base85</option>
         <option>Base256</option>
         <option selected>Base1024</option>
         <option>Base65536</option>
@@ -103,6 +104,7 @@
 <div class="container">
     <h1>Binary-to-Text <u>Decoder</u>: <select id="select-decoder">
         <option>Base64</option>
+        <option>Base85</option>
         <option>Base256</option>
         <option selected>Base1024</option>
         <option>Base65536</option>
@@ -128,6 +130,7 @@
 </div>
 
 <script src="bin2txt.js"></script>
+<script src="base85.js"></script>
 <script src="base65536.js"></script>
 <script>
 (function () {
@@ -147,11 +150,15 @@
     $("input-text").addEventListener("input", decodeTextEncoding);
     
     function encodeTextEncoding() {
+        if (!binaryInput) return;
+        
         var option = $("select-encoder").options[$("select-encoder").selectedIndex];
         var base = parseInt(option.textContent.slice(4));
         var text = "";
         if (base === 65536) {
             text = encodeBase65536(binaryInput);
+        } else if (base === 85) {
+            text = encodeBase85(binaryInput);
         } else {
             text = encodeBase(base, binaryInput);
         }
@@ -169,6 +176,8 @@
         try {
             if (base === 65536) {
                 binaryOutput = decodeBase65536(text);
+            } else if (base === 85) {
+                binaryOutput = decodeBase85(text);
             } else {
                 binaryOutput = decodeBase(base, text);
             }
