@@ -54,7 +54,7 @@ var decodeBase65536;
     encodeBase65536 = function (bytes) {
         if (!(bytes instanceof Uint8Array)) {
             if (!Array.isArray(bytes)) {
-                throw new Error(`encodeBase65536: expected an array as second argument`);
+                throw new Error(`encodeBase65536: expected an array as argument`);
             }
             bytes = new Uint8Array(bytes);
         }
@@ -74,7 +74,7 @@ var decodeBase65536;
 
     decodeBase65536 = function (text) {
         if (typeof text !== "string") {
-            throw new Error(`decodeBase65536: expected a string as second argument`);
+            throw new Error(`decodeBase65536: expected a string as argument`);
         }
         
         var characters = Array.from(text);

@@ -11,7 +11,7 @@ var decodeBase85;
     encodeBase85 = function (bytes) {
         if (!(bytes instanceof Uint8Array)) {
             if (!Array.isArray(bytes)) {
-                throw new Error(`encodeBase85: expected an array as second argument`);
+                throw new Error(`encodeBase85: expected an array as argument`);
             }
             bytes = new Uint8Array(bytes);
         }
@@ -49,7 +49,7 @@ var decodeBase85;
 
     decodeBase85 = function (text) {
         if (typeof text !== "string") {
-            throw new Error(`decodeBase85: expected a string as second argument`);
+            throw new Error(`decodeBase85: expected a string as argument`);
         }
         
         var rest = text.length % 5;
