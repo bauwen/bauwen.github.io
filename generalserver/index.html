@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <title>Chat Test</title>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<input id="input" type="text" size="50"><button onclick="sendInput()">send</button>
+<br><br>
+<div id="messages" style="border: 2px solid black"></div>
+
+<script src="GeneralServer.js"></script>
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+var hub;
+
+function sendInput() {
+    var text = $("input").value;
+    if (text.trim() === "") {
+        return;
+    }
+    
+    hub.send(text);
+    addMessage(text);
+}
+
+function addMessage(message) {
+    $("messages").innerHTML += "<br>" + message;
+}
+
+window.addEventListener("load", function () {
+    hub = new GeneralServer();
+    hub.start();
+    
+    hub.onmessage = function (message) {
+        addMessage(message);
+    };
+});
+</script>
+
+</body>
+</html>
