@@ -30,7 +30,6 @@ class Multiplay {
                     $("info").textContent = "Waiting for " + (maxPlayers - 1) + " more players...";
                     host = true;
                     this.id = 0;
-                    this.turn = true;
                     players.push({ uuid, id: this.id });
                 }
             }, 2000);
@@ -56,6 +55,7 @@ class Multiplay {
                                 turnId: 0,
                                 state: startState,
                             });
+                            this.turn = true;
                             $("info").textContent = "It's your turn!";
                         }
                     }

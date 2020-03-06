@@ -30,6 +30,7 @@ const size = Math.floor(ctx.canvas.width / 3);
 
 let starter = 'x';
 let state = newGame(starter);
+let gameOver = false;
 
 const multiplay = new Multiplay(2, state);
 
@@ -81,10 +82,15 @@ const redrawBoard = () => {
         ctx.lineTo(ctx.canvas.width, i * size);
         ctx.stroke();
     }
+    
+    if (state.winner) {
+        $("info").textContent = "You " + (multiplay.turn ? "lost!" : "won!");
+        gameOver = true;
+    }
 };
 
 ctx.canvas.addEventListener("mousedown", function (event) {
-    if (!multiplay.turn) {
+    if (!multiplay.turn || gameOver) {
         return;
     }
     const rect = ctx.canvas.getBoundingClientRect();
