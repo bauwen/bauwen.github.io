@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+    <title>Tic Tac Toe</title>
+    <meta charset="utf-8">
+</head>
+<body style="margin: 0">
+
+<div align="center" style="margin: 24px">
+    <canvas id="display" width="240" height="240" style="border: 2px solid black"></canvas>
+    <br><br>
+    <div id="info" style="font-weight: bold; font-style: italic"></div>
+    <!--<button onclick="restartGame()">Restart Game</button>-->
+</div>
+
+<script src="base1024.js"></script>
+<script src="lzma.js"></script>
+
+<script src="TwitchServer.js"></script>
+<script src="BetterTwitchServer.js"></script>
+
+<script src="Multiplay.js"></script>
+<script src="logic.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+
+$("info").textContent = "Checking presence of other players...";
+
+const ctx = $("display").getContext("2d");
+const size = Math.floor(ctx.canvas.width / 3);
+
+let starter = 'x';
+let state = newGame(starter);
+
+const multiplay = new Multiplay(2, state);
+
+multiplay.onstatechange = (newState) => {
+    state = newState;
+    redrawBoard();
+};
+
+const restartGame = () => {
+    starter = (starter === 'x' ? 'o' : 'x');
+    state = newGame(starter);
+    redrawBoard();
+};
+
+const redrawBoard = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    for (let i = 0; i < state.grid.length; i++) {
+        const cell = state.grid[i];
+        const x = (i % 3) * size + size / 2;
+        const y = Math.floor(i / 3) * size + size / 2;
+        const r = 10;
+        if (state.winner && state.tiles.indexOf(i) >= 0) {
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(x - size / 2, y - size / 2, size, size);
+        }
+        if (cell) {
+            if (cell === 'x') {
+                ctx.fillStyle = "red";
+                ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+            } else {
+                ctx.fillStyle = "blue";
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+    }
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * size, 0);
+        ctx.lineTo(i * size, ctx.canvas.height);
+        ctx.stroke();
+    }
+    for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, i * size);
+        ctx.lineTo(ctx.canvas.width, i * size);
+        ctx.stroke();
+    }
+};
+
+ctx.canvas.addEventListener("mousedown", function (event) {
+    if (!multiplay.turn) {
+        return;
+    }
+    const rect = ctx.canvas.getBoundingClientRect();
+    const x = Math.floor((event.clientX - rect.left) / size);
+    const y = Math.floor((event.clientY - rect.top) / size);
+    const position = x + y * 3;
+    if (!state.grid[position]) {
+        state = playMove(state, position);
+        redrawBoard();
+        multiplay.next(state);
+    }
+});
+
+window.addEventListener("load", redrawBoard);
+</script>
+
+</body>
+</html>
