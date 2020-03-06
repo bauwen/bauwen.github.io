@@ -26,8 +26,8 @@ class Multiplay {
             });
             setTimeout(() => {
                 if (players.length === 0) {
-                    console.log("I'm host!");
-                    $("info").textContent = "Waiting for " + (maxPlayers - 1) + " more players...";
+                    var count = maxPlayers - 1;
+                    $("info").textContent = "Waiting for " + count + " more player" + (count === 1 ? "" : "s") + "...";
                     host = true;
                     this.id = 0;
                     players.push({ uuid, id: this.id });
