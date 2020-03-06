@@ -60,7 +60,7 @@
     #error-info {
         display: block;
         color: rgb(255, 100, 100);
-        font: italic 14px monospace;
+        font: italic 13px monospace;
     }
     
     button {
@@ -124,13 +124,14 @@
 <hr>
 
 <div class="container explanation">
-    <h2>What is this?</h2>
+    <h2>How does it work?</h2>
     
-    Binary-to-text encodings are a way to express arbitrary binary data as printable text. This is done by translating the value of bit groups into an ASCII or Unicode character. The most used text encoding is <b><a class="hide-a" href="https://en.wikipedia.org/wiki/Base64" target="_blank">Base64</a></b>, which uses 64 printable ASCII characters. As 64 is less than 256 (i.e. the number of values a byte can represent), Base64 outputs a string containing more characters than input bytes (more specifically, 4 characters per 3 bytes). The main advantage of Base64 is that every character is generally encoded by 1 byte, thus limiting the difference between the binary size of the output text and the input. <br><br><b>Base256</b>, <b>Base1024</b> and <b>Base65536</b> output strings that contain the same amount or fewer characters than the amount of input bytes. For example, Base65536 needs N/2 characters to express N bytes. However, this comes at a cost: using UTF-8, most of the characters used by these encodings are encoded by more than 1 byte (up to 4 bytes), which means the binary size of the output text can be quite a bit larger than the binary size of the input. <br><br>One interesting note: Twitter has a character limit of 280, but considers some Unicode characters to be of length 1. All characters used for the Base1024 encoding are such characters. This means that by using this encoding, more than 280 bytes (i.e. 350 bytes) can be effectively encoded inside the text of a tweet!
+    Binary-to-text encodings are a way to express arbitrary binary data as printable text. This is done by translating the value of bit groups into an ASCII or Unicode character. The most used text encoding is <b><a class="hide-a" href="https://en.wikipedia.org/wiki/Base64" target="_blank">Base64</a></b>, which uses 64 printable ASCII characters. As 64 is less than 256 (i.e. the number of values a byte can represent), Base64 outputs a string containing more characters than input bytes (more specifically, 4 characters per 3 bytes). The main advantage of Base64 is that every character is generally encoded by 1 byte, thus limiting the difference between the binary size of the output text and the input. A slightly better alternative is <b>Base85</b>, as this encodes 5 characters per 4 bytes. <br><br><b>Base256</b>, <b>Base1024</b> and <b>Base65536</b> output strings that contain the same amount or fewer characters than the amount of input bytes. For example, Base65536 needs N/2 characters to express N bytes. However, this comes at a cost: using UTF-8, most of the characters used by these encodings are encoded by more than 1 byte (up to 4 bytes), which means the binary size of the output text can be quite a bit larger than the binary size of the input. <br><br>One interesting note: Twitter has a character limit of 280, but considers some Unicode characters to be of length 1. All characters used for the Base1024 encoding are such characters. This means that by using this encoding, more than 280 bytes (i.e. 350 bytes) can be effectively encoded inside the text of a tweet!
 </div>
 
-<script src="bin2txt.js"></script>
+<script src="base2-256.js"></script>
 <script src="base85.js"></script>
+<script src="base1024.js"></script>
 <script src="base65536.js"></script>
 <script>
 (function () {
@@ -155,10 +156,12 @@
         var option = $("select-encoder").options[$("select-encoder").selectedIndex];
         var base = parseInt(option.textContent.slice(4));
         var text = "";
-        if (base === 65536) {
-            text = encodeBase65536(binaryInput);
-        } else if (base === 85) {
+        if (base === 85) {
             text = encodeBase85(binaryInput);
+        } else if (base === 1024) {
+            text = encodeBase1024(binaryInput);
+        } else if (base === 65536) {
+            text = encodeBase65536(binaryInput);
         } else {
             text = encodeBase(base, binaryInput);
         }
@@ -174,10 +177,12 @@
         var option = $("select-decoder").options[$("select-decoder").selectedIndex];
         var base = parseInt(option.textContent.slice(4));
         try {
-            if (base === 65536) {
-                binaryOutput = decodeBase65536(text);
-            } else if (base === 85) {
+            if (base === 85) {
                 binaryOutput = decodeBase85(text);
+            } else if (base === 1024) {
+                binaryOutput = decodeBase1024(text);
+            } else if (base === 65536) {
+                binaryOutput = decodeBase65536(text);
             } else {
                 binaryOutput = decodeBase(base, text);
             }

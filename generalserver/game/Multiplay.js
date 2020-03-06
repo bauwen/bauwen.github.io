@@ -66,7 +66,8 @@ class Multiplay {
                     if (message.uuid === uuid) {
                         this.id = players[players.length - 1].id;
                     }
-                    $("info").textContent = "Waiting for " + (maxPlayers - players.length) + " more players...";
+                    var count = maxPlayers - players.length;
+                    $("info").textContent = "Waiting for " + count + " more player" + (count === 1 ? "" : "s") + "...";
                     break;
                     
                 case "state":

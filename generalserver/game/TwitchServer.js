@@ -1,5 +1,6 @@
 class TwitchServer {
     constructor(channel, username, password) {
+        this.channel = channel;
         this.username = username;
         this.onready = () => {};
         this.onmessage = (message) => {};
@@ -34,7 +35,7 @@ class TwitchServer {
     
     broadcast(message) {
         if (typeof message === "string") {
-            this.websocket.send("PRIVMSG #" + this.username + " :" + message);
+            this.websocket.send("PRIVMSG #" + this.channel + " :" + message);
         }
     }
 }
