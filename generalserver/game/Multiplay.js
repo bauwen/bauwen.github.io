@@ -74,10 +74,12 @@ class Multiplay {
                     if (typeof this.onstatechange === "function") {
                         this.onstatechange(message.state);
                     }
-                    if (this.turn) {
-                        $("info").textContent = "It's your turn!";
-                    } else {
-                        $("info").textContent = "Please wait... It's player " + (message.turnId + 1) + "'s turn";
+                    if (!gameOver) {
+                        if (this.turn) {
+                            $("info").textContent = "It's your turn!";
+                        } else {
+                            $("info").textContent = "Please wait... It's player " + (message.turnId + 1) + "'s turn";
+                        }
                     }
                     break;
             }
