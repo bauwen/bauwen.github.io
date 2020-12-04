@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Test</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <meta name="apple-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <style>
+      body {
+        font-family: verdana, sans-serif;
+        margin: 64px;
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 24px;
+        padding: 12px;
+        min-width: 200px;
+        font-weight: bold;
+      }
+
+      input {
+        padding: 12px;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="page" align="center">
+        
+    </div>
+
+    <script>
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        function renderPage1() {
+             $("page").innerHTML = `
+                <h2>Corpsecho</h2>
+                <p>Voer de code in om door te gaan:</p><br>
+                <input id="code" type="text" size="20">
+            `;
+
+            $("code").focus();
+            $("code").addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    submitCode(this.value);
+                }
+            });
+        }
+
+        function renderPage2() {
+            $("page").innerHTML = `
+                <button id="button1">Poef</button>
+                <br><br><br>
+                <button id="button2">Addressenlijst</button>
+            `;
+
+            $("button1").addEventListener("click", function () {
+                window.location = "https://docs.google.com/spreadsheets/d/1pvfXoFXV9rnZyp1OZIUCzD0_o6araCrlobjy-_6rkww/edit#gid=901877043";
+            });
+
+            $("button2").addEventListener("click", function () {
+                window.location = "https://docs.google.com/spreadsheets/d/1zFEvpgigjYEnJP0edycxm0zlPvfe4Kh1jbj97g2BQU0/edit";
+            });
+        }
+
+        function submitCode(code) {
+            if (code.trim().toLowerCase() === decodeURIComponent("%6f%6c%69%66%61%6e%74")) {
+                renderPage2();
+            }
+        }
+
+        window.addEventListener("load", function () {
+            renderPage1();
+        });
+    </script>
+  </body>
+</html>
